@@ -1,0 +1,38 @@
+{
+    "version": "1.0.0-alpha1-*",
+    "description": "ASP.NET 5 authentication middleware for OpenID 2.0 providers.",
+    "authors": [ "Kévin Chalet", "Jerrie Pelser" ],
+    "owners": [ "Kévin Chalet", "Jerrie Pelser" ],
+
+    "projectUrl": "https://github.com/aspnet-contrib/AspNet.Security.OpenId.Providers",
+    "licenseUrl": "http://www.apache.org/licenses/LICENSE-2.0.html",
+
+    "dependencies": {
+        "System.Collections.Immutable": "1.1.36",
+
+        "Microsoft.AspNet.Authentication": "1.0.0-*",
+        "Microsoft.Framework.NotNullAttribute.Internal": { "type": "build", "version": "1.0.0-*" },
+        "Newtonsoft.Json": "6.0.6"
+    },
+
+    "frameworks": {
+        "dnx451": {
+            "dependencies": {
+                "CsQuery": "1.3.5-*"
+            },
+
+            "frameworkAssemblies": {
+                "System.Net.Http.WebRequest": "",
+                "System.Net.Http": "",
+                "System.Collections": "",
+                "System.Runtime": ""
+            }
+        },
+
+        "dnxcore50": {
+            "dependencies": {
+                "System.Net.Http.WinHttpHandler": "4.0.0-beta-*"
+            }
+        }
+    }
+}
