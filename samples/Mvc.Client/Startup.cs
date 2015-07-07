@@ -44,6 +44,8 @@ namespace Mvc.Client {
                 options.CallbackPath = new PathString("/signin-stackexchange");
             });
 
+            app.UseSteamAuthentication();
+
             app.UseMvc();
         }
     }

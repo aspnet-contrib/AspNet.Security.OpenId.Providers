@@ -54,7 +54,7 @@ namespace AspNet.Security.OpenId {
                 // See http://openid.net/specs/openid-authentication-2_0.html#anchor4
                 if (!string.Equals(Request.Method, "GET", StringComparison.OrdinalIgnoreCase) &&
                     !string.Equals(Request.Method, "POST", StringComparison.OrdinalIgnoreCase)) {
-                    Logger.LogWarning("The authentication response was rejected because it was made" +
+                    Logger.LogWarning("The authentication response was rejected because it was made " +
                                       "using an invalid method: make sure to use either GET or POST.");
 
                     return new AuthenticationTicket(properties, Options.AuthenticationScheme);
@@ -89,7 +89,7 @@ namespace AspNet.Security.OpenId {
                 if (!string.Equals(message[OpenIdAuthenticationConstants.Prefixes.OpenId +
                                            OpenIdAuthenticationConstants.Parameters.Namespace],
                                    OpenIdAuthenticationConstants.Namespaces.OpenId, StringComparison.Ordinal)) {
-                    Logger.LogWarning("The authentication response was rejected because it was missing the mandatory" +
+                    Logger.LogWarning("The authentication response was rejected because it was missing the mandatory " +
                                       "'openid.ns' parameter or because an unsupported version of OpenID was used.");
 
                     return new AuthenticationTicket(properties, Options.AuthenticationScheme);
@@ -374,7 +374,7 @@ namespace AspNet.Security.OpenId {
                         return endpoint;
                     }
 
-                    Logger.LogWarning("The Yadis discovery failed because the XRDS document returned by the" +
+                    Logger.LogWarning("The Yadis discovery failed because the XRDS document returned by the " +
                                       "identity provider was invalid or didn't contain the endpoint address.");
 
                     return null;
@@ -449,7 +449,7 @@ namespace AspNet.Security.OpenId {
 
             var response = await Options.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, Context.RequestAborted);
             if (!response.IsSuccessStatusCode) {
-                Logger.LogWarning("The authentication response was rejected because the identity provider" +
+                Logger.LogWarning("The authentication response was rejected because the identity provider " +
                                   "returned an invalid check_authentication response.");
 
                 return false;
@@ -474,7 +474,7 @@ namespace AspNet.Security.OpenId {
                 // Stop processing the assertion if the mandatory is_valid
                 // parameter was missing from the response body.
                 if (!parameters.ContainsKey(OpenIdAuthenticationConstants.Parameters.IsValid)) {
-                    Logger.LogWarning("The authentication response was rejected because the identity provider" +
+                    Logger.LogWarning("The authentication response was rejected because the identity provider " +
                                       "returned an invalid check_authentication response.");
 
                     return false;
@@ -482,7 +482,7 @@ namespace AspNet.Security.OpenId {
 
                 // Stop processing the assertion if the authentication server declared it as invalid.
                 if (!string.Equals(parameters[OpenIdAuthenticationConstants.Parameters.IsValid], "true", StringComparison.Ordinal)) {
-                    Logger.LogWarning("The authentication response was rejected because the identity provider" +
+                    Logger.LogWarning("The authentication response was rejected because the identity provider " +
                                       "declared the security assertion as invalid.");
 
                     return false;

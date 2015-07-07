@@ -6,8 +6,8 @@
   </PropertyGroup>
   <Import Project="$(VSToolsPath)\DNX\Microsoft.DNX.Props" Condition="'$(VSToolsPath)' != ''" />
   <PropertyGroup Label="Globals">
-    <ProjectGuid>9254c4f1-2305-457f-a7db-9bee8b2a76b7</ProjectGuid>
-    <RootNamespace>AspNet.Security.OpenId</RootNamespace>
+    <ProjectGuid>49400532-7b7b-4c8f-877f-fdb21d3717cc</ProjectGuid>
+    <RootNamespace>AspNet.Security.OpenId.Steam</RootNamespace>
     <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)'=='' ">..\..\artifacts\obj\$(MSBuildProjectName)</BaseIntermediateOutputPath>
     <OutputPath Condition="'$(OutputPath)'=='' ">..\..\artifacts\bin\$(MSBuildProjectName)\</OutputPath>
   </PropertyGroup>
