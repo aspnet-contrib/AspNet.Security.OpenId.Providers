@@ -22,6 +22,13 @@ __Adding external authentication to your application is a breeze__ and just requ
 
 See [https://github.com/aspnet-contrib/AspNet.Security.OpenId.Providers/tree/dev/samples/Mvc.Client](https://github.com/aspnet-contrib/AspNet.Security.OpenId.Providers/tree/dev/samples/Mvc.Client) for a complete sample __using MVC 6 and supporting multiple external providers__.
 
+## Support
+
+**Need help or wanna share your thoughts? Don't hesitate to join our dedicated chat rooms:**
+
+- **JabbR: [https://jabbr.net/#/rooms/aspnet-contrib](https://jabbr.net/#/rooms/aspnet-contrib)**
+- **Gitter: [https://gitter.im/aspnet-contrib/AspNet.Security.OpenId.Providers](https://gitter.im/aspnet-contrib/AspNet.Security.OpenId.Providers)**
+
 ## Contributors
 
 __AspNet.Security.OpenId.Providers__ is actively maintained by __[Kévin Chalet](https://github.com/PinpointTownes)__ ([@PinpointTownes](https://twitter.com/PinpointTownes)) and __[Jerrie Pelser](https://github.com/jerriep)__ ([@jerriepelser](https://twitter.com/jerriepelser)). Contributions are welcome and can be submitted using pull requests.
