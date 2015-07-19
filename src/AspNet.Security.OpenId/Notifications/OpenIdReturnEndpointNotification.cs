@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNet.Authentication;
-using Microsoft.AspNet.Authentication.Notifications;
 using Microsoft.AspNet.Http;
 using Microsoft.Framework.Internal;
 
