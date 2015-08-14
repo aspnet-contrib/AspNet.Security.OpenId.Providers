@@ -7,11 +7,10 @@
     "dependencies": {
         "AspNet.Security.OpenId.Steam": "",
 
-        "Kestrel": "1.0.0-*",
-
         "Microsoft.AspNet.Authentication.Cookies": "1.0.0-*",
         "Microsoft.AspNet.Mvc": "6.0.0-*",
         "Microsoft.AspNet.Server.IIS": "1.0.0-*",
+        "Microsoft.AspNet.Server.Kestrel": "1.0.0-*",
         "Microsoft.AspNet.Server.WebListener": "1.0.0-*",
         "Microsoft.AspNet.StaticFiles": "1.0.0-*",
 
@@ -20,7 +19,7 @@
     },
 
     "commands": {
-        "kestrel": "Microsoft.AspNet.Hosting --server Kestrel --server.urls http://localhost:54540",
+        "kestrel": "Microsoft.AspNet.Hosting --server=Microsoft.AspNet.Server.Kestrel --server.urls=http://localhost:54540",
         "web": "Microsoft.AspNet.Hosting server=Microsoft.AspNet.Server.WebListener server.urls=http://localhost:54540"
     },
 
