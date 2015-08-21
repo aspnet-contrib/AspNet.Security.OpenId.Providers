@@ -1,4 +1,10 @@
-﻿using System;
+﻿/*
+ * Licensed under the Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
+ * See https://github.com/aspnet-contrib/AspNet.Security.OpenId.Providers
+ * for more information concerning the license and the contributors participating to this project.
+ */
+
+using System;
 using AspNet.Security.OpenId.Steam;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Internal;
@@ -13,9 +19,9 @@ namespace Microsoft.AspNet.Builder {
         }
 
         public static IServiceCollection ConfigureSteamAuthentication(
-            [NotNull] this IServiceCollection services, [NotNull] string instance,
+            [NotNull] this IServiceCollection services, [NotNull] string scheme,
             [NotNull] Action<SteamAuthenticationOptions> configuration) {
-            return services.Configure(configuration, instance);
+            return services.Configure(configuration, scheme);
         }
 
         public static IApplicationBuilder UseSteamAuthentication([NotNull] this IApplicationBuilder app) {
@@ -30,16 +36,16 @@ namespace Microsoft.AspNet.Builder {
         }
 
         public static IApplicationBuilder UseSteamAuthentication(
-            [NotNull] this IApplicationBuilder app, [NotNull] string instance) {
+            [NotNull] this IApplicationBuilder app, [NotNull] string scheme) {
             return app.UseMiddleware<SteamAuthenticationMiddleware>(
-                new ConfigureOptions<SteamAuthenticationOptions>(options => { }) { Name = instance });
+                new ConfigureOptions<SteamAuthenticationOptions>(options => { }) { Name = scheme });
         }
 
         public static IApplicationBuilder UseSteamAuthentication(
-            [NotNull] this IApplicationBuilder app, [NotNull] string instance,
+            [NotNull] this IApplicationBuilder app, [NotNull] string scheme,
             [NotNull] Action<SteamAuthenticationOptions> configuration) {
             return app.UseMiddleware<SteamAuthenticationMiddleware>(
-                new ConfigureOptions<SteamAuthenticationOptions>(configuration) { Name = instance });
+                new ConfigureOptions<SteamAuthenticationOptions>(configuration) { Name = scheme });
         }
     }
 }

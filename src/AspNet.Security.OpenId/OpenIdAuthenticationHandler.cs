@@ -1,4 +1,10 @@
-﻿using System;
+﻿/*
+ * Licensed under the Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
+ * See https://github.com/aspnet-contrib/AspNet.Security.OpenId.Providers
+ * for more information concerning the license and the contributors participating to this project.
+ */
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -461,7 +467,7 @@ namespace AspNet.Security.OpenId {
 
                 // Note: the response is encoded using the 'Key-Value Form Encoding'.
                 // See http://openid.net/specs/openid-authentication-2_0.html#anchor4
-                for (var line = await reader.ReadLineAsync(); !string.IsNullOrEmpty(line); line = await reader.ReadLineAsync()) {
+                for (var line = await reader.ReadLineAsync(); line != null; line = await reader.ReadLineAsync()) {
                     var parameter = line.Split(':');
                     if (parameter.Length != 2) {
                         continue;
