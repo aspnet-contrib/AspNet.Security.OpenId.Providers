@@ -1,5 +1,5 @@
 ﻿{
-    "version": "1.0.0-alpha1-*",
+    "version": "1.0.0-*",
     "description": "ASP.NET 5 authentication middleware for Steam.",
     "authors": [ "Kévin Chalet" ],
     "owners": [ "Kévin Chalet" ],
@@ -10,7 +10,10 @@
     "dependencies": {
         "AspNet.Security.OpenId": "",
 
-        "Microsoft.Framework.NotNullAttribute.Internal": { "type": "build", "version": "1.0.0-*" }
+        "Microsoft.Framework.NotNullAttribute.Internal": {
+            "type": "build",
+            "version": "1.0.0-*"
+        }
     },
 
     "frameworks": {

@@ -1,5 +1,5 @@
 {
-    "version": "1.0.0-alpha1-*",
+    "version": "1.0.0-*",
     "description": "ASP.NET 5 authentication middleware for OpenID 2.0 providers.",
     "authors": [ "Kévin Chalet" ],
     "owners": [ "Kévin Chalet" ],
@@ -11,7 +11,10 @@
         "System.Collections.Immutable": "1.1.36",
 
         "Microsoft.AspNet.Authentication": "1.0.0-*",
-        "Microsoft.Framework.NotNullAttribute.Internal": { "type": "build", "version": "1.0.0-*" },
+        "Microsoft.Framework.NotNullAttribute.Internal": {
+            "type": "build",
+            "version": "1.0.0-*"
+        },
         "Newtonsoft.Json": "6.0.6"
     },
 
