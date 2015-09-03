@@ -168,13 +168,13 @@ namespace AspNet.Security.OpenId {
                         }
 
                         // Exclude attributes whose type is missing.
-                        var type = parameter.Value.FirstOrDefault();
+                        string type = parameter.Value;
                         if (string.IsNullOrEmpty(type)) {
                             continue;
                         }
 
                         // Exclude attributes whose value is missing.
-                        var value = message.Get($"openid.{alias}.value.{name}");
+                        string value = message[$"openid.{alias}.value.{name}"];
                         if (string.IsNullOrEmpty(value)) {
                             continue;
                         }
