@@ -18,12 +18,6 @@ namespace Microsoft.AspNet.Builder {
             return services.Configure(configuration);
         }
 
-        public static IServiceCollection ConfigureSteamAuthentication(
-            [NotNull] this IServiceCollection services, [NotNull] string scheme,
-            [NotNull] Action<SteamAuthenticationOptions> configuration) {
-            return services.Configure(configuration, scheme);
-        }
-
         public static IApplicationBuilder UseSteamAuthentication([NotNull] this IApplicationBuilder app) {
             return app.UseMiddleware<SteamAuthenticationMiddleware>();
         }
@@ -33,19 +27,6 @@ namespace Microsoft.AspNet.Builder {
             [NotNull] Action<SteamAuthenticationOptions> configuration) {
             return app.UseMiddleware<SteamAuthenticationMiddleware>(
                 new ConfigureOptions<SteamAuthenticationOptions>(configuration));
-        }
-
-        public static IApplicationBuilder UseSteamAuthentication(
-            [NotNull] this IApplicationBuilder app, [NotNull] string scheme) {
-            return app.UseMiddleware<SteamAuthenticationMiddleware>(
-                new ConfigureOptions<SteamAuthenticationOptions>(options => { }) { Name = scheme });
-        }
-
-        public static IApplicationBuilder UseSteamAuthentication(
-            [NotNull] this IApplicationBuilder app, [NotNull] string scheme,
-            [NotNull] Action<SteamAuthenticationOptions> configuration) {
-            return app.UseMiddleware<SteamAuthenticationMiddleware>(
-                new ConfigureOptions<SteamAuthenticationOptions>(configuration) { Name = scheme });
         }
     }
 }

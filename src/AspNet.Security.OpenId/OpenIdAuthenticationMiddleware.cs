@@ -27,7 +27,7 @@ namespace AspNet.Security.OpenId {
             ConfigureOptions<TOptions> configureOptions = null)
             : base(next, options, loggerFactory, encoder, configureOptions) {
             if (string.IsNullOrEmpty(Options.SignInScheme)) {
-                Options.SignInScheme = externalOptions.Options.SignInScheme;
+                Options.SignInScheme = externalOptions.Value.SignInScheme;
             }
 
             if (Options.StateDataFormat == null) {

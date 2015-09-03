@@ -36,14 +36,14 @@ namespace Mvc.Client {
                 options.LoginPath = new PathString("/signin");
             });
 
-            app.UseOpenIdAuthentication("Orange", options => {
+            app.UseOpenIdAuthentication(options => {
                 options.AuthenticationScheme = "Orange";
                 options.Caption = "Orange";
                 options.Authority = new Uri("http://orange.fr/");
                 options.CallbackPath = new PathString("/signin-orange");
             });
 
-            app.UseOpenIdAuthentication("StackExchange", options => {
+            app.UseOpenIdAuthentication(options => {
                 options.AuthenticationScheme = "StackExchange";
                 options.Caption = "StackExchange";
                 options.Authority = new Uri("https://openid.stackexchange.com/");
