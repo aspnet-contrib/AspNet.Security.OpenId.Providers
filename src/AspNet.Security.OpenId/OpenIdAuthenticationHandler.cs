@@ -22,7 +22,6 @@ using Microsoft.AspNet.WebUtilities;
 using Microsoft.Framework.Internal;
 using Microsoft.Framework.Logging;
 using System.Collections.Immutable;
-using AspNet.Security.OpenId.Notifications;
 
 #if DNX451
 using CsQuery;
@@ -229,20 +228,20 @@ namespace AspNet.Security.OpenId {
         protected virtual async Task<AuthenticationTicket> CreateTicketAsync(
             [NotNull] ClaimsIdentity identity, [NotNull] AuthenticationProperties properties,
             [NotNull] string identifier, [NotNull] IDictionary<string, string> attributes) {
-            var notification = new OpenIdAuthenticatedNotification(Context, Options) {
+            var context = new OpenIdAuthenticatedContext(Context, Options) {
                 Attributes = attributes.ToImmutableDictionary(),
                 Principal = new ClaimsPrincipal(identity),
                 Properties = properties,
                 Identifier = identifier
             };
 
-            await Options.Provider.Authenticated(notification);
+            await Options.Events.Authenticated(context);
 
-            if (notification.Principal?.Identity == null) {
+            if (context.Principal?.Identity == null) {
                 return new AuthenticationTicket(properties, Options.AuthenticationScheme);
             }
 
-            return new AuthenticationTicket(notification.Principal, notification.Properties, Options.AuthenticationScheme);
+            return new AuthenticationTicket(context.Principal, context.Properties, Options.AuthenticationScheme);
         }
 
         protected override async Task<bool> HandleUnauthorizedAsync(ChallengeContext context) {
@@ -507,14 +506,14 @@ namespace AspNet.Security.OpenId {
                     return true;
                 }
 
-                var context = new OpenIdReturnEndpointNotification(Context, ticket) {
+                var context = new OpenIdReturnEndpointContext(Context, ticket) {
                     SignInScheme = Options.SignInScheme,
                     RedirectUri = ticket.Properties.RedirectUri,
                 };
 
                 ticket.Properties.RedirectUri = null;
 
-                await Options.Provider.ReturnEndpoint(context);
+                await Options.Events.ReturnEndpoint(context);
 
                 if (context.SignInScheme != null && context.Principal != null) {
                     await Context.Authentication.SignInAsync(context.SignInScheme, context.Principal, context.Properties);

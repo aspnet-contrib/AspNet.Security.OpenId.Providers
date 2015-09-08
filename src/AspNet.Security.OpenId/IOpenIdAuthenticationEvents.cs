@@ -5,11 +5,10 @@
  */
 
 using System.Threading.Tasks;
-using AspNet.Security.OpenId.Notifications;
 
 namespace AspNet.Security.OpenId {
-    public interface IOpenIdAuthenticationProvider {
-        Task Authenticated(OpenIdAuthenticatedNotification notification);
-        Task ReturnEndpoint(OpenIdReturnEndpointNotification notification);
+    public interface IOpenIdAuthenticationEvents {
+        Task Authenticated(OpenIdAuthenticatedContext context);
+        Task ReturnEndpoint(OpenIdReturnEndpointContext context);
     }
 }

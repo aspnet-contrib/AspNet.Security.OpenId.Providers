@@ -38,7 +38,7 @@ namespace AspNet.Security.OpenId {
 
         public string Endpoint { get; set; }
 
-        public IOpenIdAuthenticationProvider Provider { get; [param: NotNull] set; } = new OpenIdAuthenticationProvider();
+        public IOpenIdAuthenticationEvents Events { get; [param: NotNull] set; } = new OpenIdAuthenticationEvents();
 
         public RandomNumberGenerator RandomNumberGenerator { get; [param: NotNull] set; } = RandomNumberGenerator.Create();
 

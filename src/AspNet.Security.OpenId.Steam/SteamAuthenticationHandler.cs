@@ -11,7 +11,6 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using AspNet.Security.OpenId.Notifications;
 using Microsoft.AspNet.Authentication;
 using Microsoft.AspNet.Http.Authentication;
 using Microsoft.AspNet.WebUtilities;
@@ -63,15 +62,15 @@ namespace AspNet.Security.OpenId.Steam {
                 identity.AddClaim(new Claim(ClaimTypes.Name, profile, ClaimValueTypes.String, Options.ClaimsIssuer));
             }
             
-            var notification = new OpenIdAuthenticatedNotification(Context, Options) {
+            var context = new OpenIdAuthenticatedContext(Context, Options) {
                 Attributes = attributes.ToImmutableDictionary(),
                 Principal = principal, Properties = properties,
                 Identifier = identifier, User = payload
             };
 
-            await Options.Provider.Authenticated(notification);
+            await Options.Events.Authenticated(context);
 
-            if (notification.Principal?.Identity == null) {
+            if (context.Principal?.Identity == null) {
                 return new AuthenticationTicket(properties, Options.AuthenticationScheme);
             }
 

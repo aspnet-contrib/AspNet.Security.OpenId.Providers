@@ -13,9 +13,9 @@ using Microsoft.AspNet.Http.Authentication;
 using Microsoft.Framework.Internal;
 using Newtonsoft.Json.Linq;
 
-namespace AspNet.Security.OpenId.Notifications {
-    public class OpenIdAuthenticatedNotification : BaseNotification<OpenIdAuthenticationOptions> {
-        public OpenIdAuthenticatedNotification(
+namespace AspNet.Security.OpenId {
+    public class OpenIdAuthenticatedContext : BaseControlContext<OpenIdAuthenticationOptions> {
+        public OpenIdAuthenticatedContext(
             [NotNull] HttpContext context,
             [NotNull] OpenIdAuthenticationOptions options)
             : base(context, options) {
