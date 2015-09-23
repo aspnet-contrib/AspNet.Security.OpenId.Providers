@@ -6,27 +6,27 @@
 
 using System;
 using AspNet.Security.OpenId;
-using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Internal;
-using Microsoft.Framework.OptionsModel;
 
 namespace Microsoft.AspNet.Builder {
     public static class OpenIdAuthenticationExtensions {
-        public static IServiceCollection ConfigureOpenIdAuthentication(
-            [NotNull] this IServiceCollection services,
-            [NotNull] Action<OpenIdAuthenticationOptions> configuration) {
-            return services.Configure(configuration);
+        public static IApplicationBuilder UseOpenIdAuthentication([NotNull] this IApplicationBuilder app) {
+            return app.UseMiddleware<OpenIdAuthenticationMiddleware<OpenIdAuthenticationOptions>>(new OpenIdAuthenticationOptions());
         }
 
-        public static IApplicationBuilder UseOpenIdAuthentication([NotNull] this IApplicationBuilder app) {
-            return app.UseMiddleware<OpenIdAuthenticationMiddleware<OpenIdAuthenticationOptions>>();
+        public static IApplicationBuilder UseOpenIdAuthentication(
+            [NotNull] this IApplicationBuilder app,
+            [NotNull] OpenIdAuthenticationOptions options) {
+            return app.UseMiddleware<OpenIdAuthenticationMiddleware<OpenIdAuthenticationOptions>>(options);
         }
 
         public static IApplicationBuilder UseOpenIdAuthentication(
             [NotNull] this IApplicationBuilder app,
             [NotNull] Action<OpenIdAuthenticationOptions> configuration) {
-            return app.UseMiddleware<OpenIdAuthenticationMiddleware<OpenIdAuthenticationOptions>>(
-                new ConfigureOptions<OpenIdAuthenticationOptions>(configuration));
+            var options = new OpenIdAuthenticationOptions();
+            configuration(options);
+
+            return app.UseOpenIdAuthentication(options);
         }
     }
 }

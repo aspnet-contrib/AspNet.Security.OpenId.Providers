@@ -16,14 +16,12 @@ namespace AspNet.Security.OpenId.Steam {
     public class SteamAuthenticationMiddleware : OpenIdAuthenticationMiddleware<SteamAuthenticationOptions> {
         public SteamAuthenticationMiddleware(
             [NotNull] RequestDelegate next,
+            [NotNull] SteamAuthenticationOptions options,
             [NotNull] IDataProtectionProvider dataProtectionProvider,
             [NotNull] ILoggerFactory loggerFactory,
             [NotNull] IUrlEncoder encoder,
-            [NotNull] IOptions<SharedAuthenticationOptions> externalOptions,
-            [NotNull] IOptions<SteamAuthenticationOptions> options,
-            ConfigureOptions<SteamAuthenticationOptions> configureOptions = null)
-            : base(next, dataProtectionProvider, loggerFactory,
-                   encoder, externalOptions, options, configureOptions) {
+            [NotNull] IOptions<SharedAuthenticationOptions> externalOptions)
+            : base(next, options, dataProtectionProvider, loggerFactory, encoder, externalOptions) {
         }
 
         protected override AuthenticationHandler<SteamAuthenticationOptions> CreateHandler() {

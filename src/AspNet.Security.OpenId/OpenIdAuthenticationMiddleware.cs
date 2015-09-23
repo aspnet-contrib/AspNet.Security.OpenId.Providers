@@ -19,13 +19,12 @@ namespace AspNet.Security.OpenId {
         where TOptions : OpenIdAuthenticationOptions, new() {
         public OpenIdAuthenticationMiddleware(
             [NotNull] RequestDelegate next,
+            [NotNull] TOptions options,
             [NotNull] IDataProtectionProvider dataProtectionProvider,
             [NotNull] ILoggerFactory loggerFactory,
             [NotNull] IUrlEncoder encoder,
-            [NotNull] IOptions<SharedAuthenticationOptions> externalOptions,
-            [NotNull] IOptions<TOptions> options,
-            ConfigureOptions<TOptions> configureOptions = null)
-            : base(next, options, loggerFactory, encoder, configureOptions) {
+            [NotNull] IOptions<SharedAuthenticationOptions> externalOptions)
+            : base(next, options, loggerFactory, encoder) {
             if (string.IsNullOrEmpty(Options.SignInScheme)) {
                 Options.SignInScheme = externalOptions.Value.SignInScheme;
             }
