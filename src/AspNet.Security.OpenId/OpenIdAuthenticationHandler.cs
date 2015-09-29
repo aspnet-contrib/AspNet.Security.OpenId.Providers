@@ -6,6 +6,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -21,7 +22,6 @@ using Microsoft.AspNet.Http.Features.Authentication;
 using Microsoft.AspNet.WebUtilities;
 using Microsoft.Framework.Internal;
 using Microsoft.Framework.Logging;
-using System.Collections.Immutable;
 
 #if DNX451
 using CsQuery;
@@ -506,7 +506,7 @@ namespace AspNet.Security.OpenId {
                     return true;
                 }
 
-                var context = new OpenIdReturnEndpointContext(Context, ticket) {
+                var context = new SigningInContext(Context, ticket) {
                     SignInScheme = Options.SignInScheme,
                     RedirectUri = ticket.Properties.RedirectUri,
                 };
@@ -535,11 +535,11 @@ namespace AspNet.Security.OpenId {
         }
 
         protected void GenerateCorrelationId([NotNull] AuthenticationProperties properties) {
-            var correlationKey = "security.Authenticate" + Options.AuthenticationScheme;
+            var correlationKey = ".AspNet.Correlation." + Options.AuthenticationScheme;
 
             var nonceBytes = new byte[32];
             Options.RandomNumberGenerator.GetBytes(nonceBytes);
-            var correlationId = TextEncodings.Base64Url.Encode(nonceBytes);
+            var correlationId = Base64UrlTextEncoder.Encode(nonceBytes);
 
             properties.Items[correlationKey] = correlationId;
 
@@ -550,7 +550,7 @@ namespace AspNet.Security.OpenId {
         }
 
         protected bool ValidateCorrelationId([NotNull] AuthenticationProperties properties) {
-            var correlationKey = "security.Authenticate" + Options.AuthenticationScheme;
+            var correlationKey = ".AspNet.Correlation." + Options.AuthenticationScheme;
 
             var correlationCookie = Request.Cookies[correlationKey];
             if (string.IsNullOrWhiteSpace(correlationCookie)) {

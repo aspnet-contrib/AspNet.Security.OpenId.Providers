@@ -5,10 +5,11 @@
  */
 
 using System.Threading.Tasks;
+using Microsoft.AspNet.Authentication;
 
 namespace AspNet.Security.OpenId {
     public interface IOpenIdAuthenticationEvents {
         Task Authenticated(OpenIdAuthenticatedContext context);
-        Task ReturnEndpoint(OpenIdReturnEndpointContext context);
+        Task ReturnEndpoint(SigningInContext context);
     }
 }

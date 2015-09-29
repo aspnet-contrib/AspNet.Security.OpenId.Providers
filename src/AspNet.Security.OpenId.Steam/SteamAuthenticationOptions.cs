@@ -11,7 +11,7 @@ namespace AspNet.Security.OpenId.Steam {
     public class SteamAuthenticationOptions : OpenIdAuthenticationOptions {
         public SteamAuthenticationOptions() {
             AuthenticationScheme = SteamAuthenticationDefaults.AuthenticationScheme;
-            Caption = SteamAuthenticationDefaults.Caption;
+            DisplayName = SteamAuthenticationDefaults.DisplayName;
             Authority = new Uri(SteamAuthenticationDefaults.Authority);
             CallbackPath = new PathString(SteamAuthenticationDefaults.CallbackPath);
         }

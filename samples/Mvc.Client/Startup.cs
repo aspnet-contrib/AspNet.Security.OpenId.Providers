@@ -38,16 +38,23 @@ namespace Mvc.Client {
 
             app.UseOpenIdAuthentication(options => {
                 options.AuthenticationScheme = "Orange";
-                options.Caption = "Orange";
+                options.DisplayName = "Orange";
                 options.Authority = new Uri("http://orange.fr/");
                 options.CallbackPath = new PathString("/signin-orange");
             });
 
             app.UseOpenIdAuthentication(options => {
                 options.AuthenticationScheme = "StackExchange";
-                options.Caption = "StackExchange";
+                options.DisplayName = "StackExchange";
                 options.Authority = new Uri("https://openid.stackexchange.com/");
                 options.CallbackPath = new PathString("/signin-stackexchange");
+            });
+
+            app.UseOpenIdAuthentication(options => {
+                options.AuthenticationScheme = "Intuit";
+                options.DisplayName = "Intuit";
+                options.CallbackPath = new PathString("/signin-intuit");
+                options.Endpoint = "https://openid.intuit.com/OpenId/Provider";
             });
 
             app.UseSteamAuthentication();

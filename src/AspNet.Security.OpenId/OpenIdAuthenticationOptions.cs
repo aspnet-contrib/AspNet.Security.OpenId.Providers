@@ -18,12 +18,12 @@ namespace AspNet.Security.OpenId {
 
         public OpenIdAuthenticationOptions() {
             AuthenticationScheme = OpenIdAuthenticationDefaults.AuthenticationScheme;
-            Caption = OpenIdAuthenticationDefaults.AuthenticationScheme;
+            DisplayName = OpenIdAuthenticationDefaults.DisplayName;
         }
 
-        public string Caption {
-            get { return Description.Caption; }
-            set { Description.Caption = value; }
+        public string DisplayName {
+            get { return Description.DisplayName; }
+            set { Description.DisplayName = value; }
         }
 
         public PathString CallbackPath { get; set; } = new PathString("/signin-openid");
