@@ -10,7 +10,7 @@ using System.Security.Claims;
 using Microsoft.AspNet.Authentication;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Http.Authentication;
-using Microsoft.Framework.Internal;
+using Microsoft.Extensions.Internal;
 using Newtonsoft.Json.Linq;
 
 namespace AspNet.Security.OpenId {

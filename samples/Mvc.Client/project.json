@@ -5,7 +5,7 @@
     "version": "1.0.0-*",
 
     "dependencies": {
-        "AspNet.Security.OpenId.Steam": "",
+        "AspNet.Security.OpenId.Steam": "1.0.0-*",
 
         "Microsoft.AspNet.Authentication.Cookies": "1.0.0-*",
         "Microsoft.AspNet.Mvc": "6.0.0-*",
@@ -14,9 +14,9 @@
         "Microsoft.AspNet.Server.WebListener": "1.0.0-*",
         "Microsoft.AspNet.StaticFiles": "1.0.0-*",
 
-        "Microsoft.Framework.Logging.Console": "1.0.0-*",
+        "Microsoft.Extensions.Logging.Console": "1.0.0-*",
 
-        "Microsoft.Framework.NotNullAttribute.Internal": {
+        "Microsoft.Extensions.NotNullAttribute.Sources": {
             "type": "build",
             "version": "1.0.0-*"
         }

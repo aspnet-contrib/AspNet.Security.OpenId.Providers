@@ -8,9 +8,9 @@
     "licenseUrl": "http://www.apache.org/licenses/LICENSE-2.0.html",
 
     "dependencies": {
-        "AspNet.Security.OpenId": "",
+        "AspNet.Security.OpenId": "1.0.0-*",
 
-        "Microsoft.Framework.NotNullAttribute.Internal": {
+        "Microsoft.Extensions.NotNullAttribute.Sources": {
             "type": "build",
             "version": "1.0.0-*"
         }

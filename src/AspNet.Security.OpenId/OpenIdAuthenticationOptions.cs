@@ -11,7 +11,7 @@ using System.Security.Cryptography;
 using Microsoft.AspNet.Authentication;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Http.Authentication;
-using Microsoft.Framework.Internal;
+using Microsoft.Extensions.Internal;
 
 namespace AspNet.Security.OpenId {
     public class OpenIdAuthenticationOptions : AuthenticationOptions {
