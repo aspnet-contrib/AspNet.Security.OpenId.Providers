@@ -71,7 +71,7 @@ namespace AspNet.Security.OpenId.Steam {
             await Options.Events.Authenticated(context);
 
             if (context.Principal?.Identity == null) {
-                return new AuthenticationTicket(properties, Options.AuthenticationScheme);
+                return null;
             }
 
             return new AuthenticationTicket(principal, properties, Options.AuthenticationScheme);

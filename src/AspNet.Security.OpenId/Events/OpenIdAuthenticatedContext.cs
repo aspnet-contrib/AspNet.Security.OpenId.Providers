@@ -14,12 +14,15 @@ using Microsoft.Extensions.Internal;
 using Newtonsoft.Json.Linq;
 
 namespace AspNet.Security.OpenId {
-    public class OpenIdAuthenticatedContext : BaseControlContext<OpenIdAuthenticationOptions> {
+    public class OpenIdAuthenticatedContext : BaseControlContext {
         public OpenIdAuthenticatedContext(
             [NotNull] HttpContext context,
             [NotNull] OpenIdAuthenticationOptions options)
-            : base(context, options) {
+            : base(context) {
+            Options = options;
         }
+
+        public OpenIdAuthenticationOptions Options { get; }
 
         public ClaimsPrincipal Principal { get; set; }
 

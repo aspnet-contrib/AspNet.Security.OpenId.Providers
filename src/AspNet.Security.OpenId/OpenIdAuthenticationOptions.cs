@@ -14,21 +14,13 @@ using Microsoft.AspNet.Http.Authentication;
 using Microsoft.Extensions.Internal;
 
 namespace AspNet.Security.OpenId {
-    public class OpenIdAuthenticationOptions : AuthenticationOptions {
-
+    public class OpenIdAuthenticationOptions : RemoteAuthenticationOptions {
         public OpenIdAuthenticationOptions() {
             AuthenticationScheme = OpenIdAuthenticationDefaults.AuthenticationScheme;
             DisplayName = OpenIdAuthenticationDefaults.DisplayName;
+            CallbackPath = new PathString(OpenIdAuthenticationDefaults.CallbackPath);
+            Events = new OpenIdAuthenticationEvents();
         }
-
-        public string DisplayName {
-            get { return Description.DisplayName; }
-            set { Description.DisplayName = value; }
-        }
-
-        public PathString CallbackPath { get; set; } = new PathString("/signin-openid");
-
-        public string SignInScheme { get; set; }
 
         public ISecureDataFormat<AuthenticationProperties> StateDataFormat { get; set; }
 
@@ -38,7 +30,10 @@ namespace AspNet.Security.OpenId {
 
         public string Endpoint { get; set; }
 
-        public IOpenIdAuthenticationEvents Events { get; [param: NotNull] set; } = new OpenIdAuthenticationEvents();
+        public new IOpenIdAuthenticationEvents Events {
+            get { return base.Events as IOpenIdAuthenticationEvents; }
+            set { base.Events = value; }
+        }
 
         public RandomNumberGenerator RandomNumberGenerator { get; [param: NotNull] set; } = RandomNumberGenerator.Create();
 

@@ -8,8 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Authentication;
 
 namespace AspNet.Security.OpenId {
-    public interface IOpenIdAuthenticationEvents {
+    public interface IOpenIdAuthenticationEvents : IRemoteAuthenticationEvents {
         Task Authenticated(OpenIdAuthenticatedContext context);
-        Task ReturnEndpoint(SigningInContext context);
     }
 }

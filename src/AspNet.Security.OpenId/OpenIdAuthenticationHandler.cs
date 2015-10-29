@@ -28,28 +28,32 @@ using CsQuery;
 #endif
 
 namespace AspNet.Security.OpenId {
-    public class OpenIdAuthenticationHandler<TOptions> : AuthenticationHandler<TOptions> where TOptions : OpenIdAuthenticationOptions {
-        protected override async Task<AuthenticationTicket> HandleAuthenticateAsync() {
-            AuthenticationProperties properties = null;
-
+    public class OpenIdAuthenticationHandler<TOptions> : RemoteAuthenticationHandler<TOptions> where TOptions : OpenIdAuthenticationOptions {
+        protected override async Task<AuthenticateResult> HandleRemoteAuthenticateAsync() {
             try {
                 // Always extract the "state" parameter from the query string.
                 var state = Request.Query[OpenIdAuthenticationConstants.Parameters.State];
                 if (string.IsNullOrEmpty(state)) {
-                    return null;
+                    Logger.LogWarning("The authentication response was rejected " +
+                                      "because the state parameter was missing.");
+
+                    return AuthenticateResult.Failed("The mandatory state parameter was missing.");
                 }
 
-                properties = Options.StateDataFormat.Unprotect(state);
+                var properties = Options.StateDataFormat.Unprotect(state);
                 if (properties == null) {
                     Logger.LogWarning("The authentication response was rejected " +
-                                      "because it contained an invalid state.");
+                                      "because the state parameter was invalid.");
 
-                    return null;
+                    return AuthenticateResult.Failed("The state parameter was invalid.");
                 }
 
                 // Validate the anti-forgery token.
                 if (!ValidateCorrelationId(properties)) {
-                    return new AuthenticationTicket(properties, Options.AuthenticationScheme);
+                    Logger.LogWarning("The authentication response was rejected " +
+                                      "because the anti-forgery identifier was invalid.");
+
+                    return AuthenticateResult.Failed("The anti-forgery identifier was invalid.");
                 }
 
                 IReadableStringCollection message;
@@ -61,7 +65,7 @@ namespace AspNet.Security.OpenId {
                     Logger.LogWarning("The authentication response was rejected because it was made " +
                                       "using an invalid method: make sure to use either GET or POST.");
 
-                    return new AuthenticationTicket(properties, Options.AuthenticationScheme);
+                    return AuthenticateResult.Failed("The authentication response used an invalid method.");
                 }
 
                 if (string.Equals(Request.Method, "GET", StringComparison.OrdinalIgnoreCase)) {
@@ -75,7 +79,7 @@ namespace AspNet.Security.OpenId {
                         Logger.LogWarning("The authentication response was rejected because " +
                                           "it was missing the mandatory 'Content-Type' header.");
 
-                        return new AuthenticationTicket(properties, Options.AuthenticationScheme);
+                        return AuthenticateResult.Failed("The authentication response used an invalid content type.");
                     }
 
                     // May have media/type; charset=utf-8, allow partial match.
@@ -83,7 +87,7 @@ namespace AspNet.Security.OpenId {
                         Logger.LogWarning("The authentication response was rejected because an invalid Content-Type header " +
                                           "was received: make sure to use 'application/x-www-form-urlencoded'.");
 
-                        return new AuthenticationTicket(properties, Options.AuthenticationScheme);
+                        return AuthenticateResult.Failed("The authentication response used an unsupported content type.");
                     }
 
                     message = await Request.ReadFormAsync();
@@ -96,7 +100,7 @@ namespace AspNet.Security.OpenId {
                     Logger.LogWarning("The authentication response was rejected because it was missing the mandatory " +
                                       "'openid.ns' parameter or because an unsupported version of OpenID was used.");
 
-                    return new AuthenticationTicket(properties, Options.AuthenticationScheme);
+                    return AuthenticateResult.Failed("The authentication response used an unsupported OpenID version.");
                 }
 
                 // Stop processing the message if the assertion was not positive.
@@ -106,13 +110,13 @@ namespace AspNet.Security.OpenId {
                     Logger.LogWarning("The authentication response was rejected because " +
                                       "the identity provider declared it as invalid.");
 
-                    return new AuthenticationTicket(properties, Options.AuthenticationScheme);
+                    return AuthenticateResult.Failed("The authentication response was rejected by the identity provider.");
                 }
 
                 // Stop processing the message if the assertion
                 // was not validated by the identity provider.
                 if (!await VerifyAssertionAsync(message)) {
-                    return new AuthenticationTicket(properties, Options.AuthenticationScheme);
+                    return AuthenticateResult.Failed("The authentication response was rejected by the identity provider.");
                 }
 
                 // Validate the return_to parameter by comparing it to the address stored in the properties.
@@ -123,7 +127,7 @@ namespace AspNet.Security.OpenId {
                                            OpenIdAuthenticationConstants.Parameters.ReturnTo], address, StringComparison.Ordinal)) {
                     Logger.LogWarning("The authentication response was rejected because the return_to parameter was invalid.");
 
-                    return new AuthenticationTicket(properties, Options.AuthenticationScheme);
+                    return AuthenticateResult.Failed("The authentication response was rejected due to an invalid return_to parameter.");
                 }
 
                 // Create a new dictionary containing the extensions found in the assertion.
@@ -139,7 +143,7 @@ namespace AspNet.Security.OpenId {
                     Logger.LogWarning("The authentication response was rejected because it " +
                                       "was missing the mandatory 'claimed_id' parameter.");
 
-                    return new AuthenticationTicket(properties, Options.AuthenticationScheme);
+                    return AuthenticateResult.Failed("The authentication response was rejected due to an invalid 'claimed_id'.");
                 }
 
                 var identity = new ClaimsIdentity(Options.AuthenticationScheme);
@@ -215,13 +219,21 @@ namespace AspNet.Security.OpenId {
                     }
                 }
 
-                return await CreateTicketAsync(identity, properties, identifier, attributes);
+                var ticket = await CreateTicketAsync(identity, properties, identifier, attributes);
+                if (ticket == null) {
+                    Logger.LogWarning("The authentication process cannot complete " +
+                                      "because CreateTicketAsync returned a null ticket.");
+
+                    return null;
+                }
+
+                return AuthenticateResult.Success(ticket);
             }
 
             catch (Exception exception) {
-                Logger.LogError("Authentication failed due to an unknown exception.", exception);
+                Logger.LogError("Authentication failed due to an unknown exception: {0}.", exception);
 
-                return new AuthenticationTicket(properties, Options.AuthenticationScheme);
+                return AuthenticateResult.Failed(exception);
             }
         }
 
@@ -238,7 +250,7 @@ namespace AspNet.Security.OpenId {
             await Options.Events.Authenticated(context);
 
             if (context.Principal?.Identity == null) {
-                return new AuthenticationTicket(properties, Options.AuthenticationScheme);
+                return null;
             }
 
             return new AuthenticationTicket(context.Principal, context.Properties, Options.AuthenticationScheme);
@@ -444,6 +456,12 @@ namespace AspNet.Security.OpenId {
                     continue;
                 }
 
+                // Note: the "state" parameter is ignored as it is not part of the
+                // OpenID message but directly flowed in the return_to parameter.
+                if (string.Equals(parameter.Key, OpenIdAuthenticationConstants.Parameters.State, StringComparison.Ordinal)) {
+                    continue;
+                }
+
                 payload.Add(parameter.Key, parameter.Value.FirstOrDefault());
             }
 
@@ -494,44 +512,6 @@ namespace AspNet.Security.OpenId {
             }
 
             return true;
-        }
-
-        public override async Task<bool> InvokeAsync() {
-            if (Options.CallbackPath.HasValue && Options.CallbackPath == Request.Path) {
-                var ticket = await HandleAuthenticateOnceAsync();
-                if (ticket == null) {
-                    Logger.LogWarning("Invalid return state, unable to redirect.");
-
-                    Response.StatusCode = 500;
-                    return true;
-                }
-
-                var context = new SigningInContext(Context, ticket) {
-                    SignInScheme = Options.SignInScheme,
-                    RedirectUri = ticket.Properties.RedirectUri,
-                };
-
-                ticket.Properties.RedirectUri = null;
-
-                await Options.Events.ReturnEndpoint(context);
-
-                if (context.SignInScheme != null && context.Principal != null) {
-                    await Context.Authentication.SignInAsync(context.SignInScheme, context.Principal, context.Properties);
-                }
-
-                if (!context.IsRequestCompleted && context.RedirectUri != null) {
-                    if (context.Principal == null) {
-                        context.RedirectUri = QueryHelpers.AddQueryString(context.RedirectUri, "error", "access_denied");
-                    }
-
-                    Response.Redirect(context.RedirectUri);
-                    context.RequestCompleted();
-                }
-
-                return context.IsRequestCompleted;
-            }
-
-            return false;
         }
 
         protected void GenerateCorrelationId([NotNull] AuthenticationProperties properties) {

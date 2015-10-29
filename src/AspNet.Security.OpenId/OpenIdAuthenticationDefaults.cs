@@ -8,5 +8,6 @@ namespace AspNet.Security.OpenId {
     public static class OpenIdAuthenticationDefaults {
         public const string AuthenticationScheme = "OpenId";
         public const string DisplayName = "OpenId";
+        public const string CallbackPath = "/signin-openid";
     }
 }

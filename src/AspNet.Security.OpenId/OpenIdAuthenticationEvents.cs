@@ -9,11 +9,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Authentication;
 
 namespace AspNet.Security.OpenId {
-    public class OpenIdAuthenticationEvents : IOpenIdAuthenticationEvents {
+    public class OpenIdAuthenticationEvents : RemoteAuthenticationEvents, IOpenIdAuthenticationEvents {
         public Func<OpenIdAuthenticatedContext, Task> OnAuthenticated { get; set; } = context => Task.FromResult<object>(null);
-        public Func<SigningInContext, Task> OnReturnEndpoint { get; set; } = context => Task.FromResult<object>(null);
 
         public virtual Task Authenticated(OpenIdAuthenticatedContext context) => OnAuthenticated(context);
-        public virtual Task ReturnEndpoint(SigningInContext context) => OnReturnEndpoint(context);
     }
 }
