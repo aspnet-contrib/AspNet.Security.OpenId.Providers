@@ -6,13 +6,13 @@
 
 using System;
 using System.Net.Http;
+using System.Text.Encodings.Web;
 using Microsoft.AspNet.Authentication;
-using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.DataProtection;
+using Microsoft.AspNet.Http;
 using Microsoft.Extensions.Internal;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.OptionsModel;
-using Microsoft.Extensions.WebEncoders;
 
 namespace AspNet.Security.OpenId {
     public class OpenIdAuthenticationMiddleware<TOptions> : AuthenticationMiddleware<TOptions>
@@ -22,7 +22,7 @@ namespace AspNet.Security.OpenId {
             [NotNull] TOptions options,
             [NotNull] IDataProtectionProvider dataProtectionProvider,
             [NotNull] ILoggerFactory loggerFactory,
-            [NotNull] IUrlEncoder encoder,
+            [NotNull] UrlEncoder encoder,
             [NotNull] IOptions<SharedAuthenticationOptions> externalOptions)
             : base(next, options, loggerFactory, encoder) {
             if (string.IsNullOrEmpty(Options.SignInScheme)) {

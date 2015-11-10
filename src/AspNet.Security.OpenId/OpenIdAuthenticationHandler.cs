@@ -22,6 +22,8 @@ using Microsoft.AspNet.Http.Features.Authentication;
 using Microsoft.AspNet.WebUtilities;
 using Microsoft.Extensions.Internal;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Primitives;
+using Microsoft.AspNet.Builder;
 
 #if DNX451
 using CsQuery;
@@ -56,7 +58,7 @@ namespace AspNet.Security.OpenId {
                     return AuthenticateResult.Failed("The anti-forgery identifier was invalid.");
                 }
 
-                IReadableStringCollection message;
+                IDictionary<string, StringValues> message;
 
                 // OpenID 2.0 responses MUST necessarily be made using either GET or POST.
                 // See http://openid.net/specs/openid-authentication-2_0.html#anchor4
@@ -69,7 +71,7 @@ namespace AspNet.Security.OpenId {
                 }
 
                 if (string.Equals(Request.Method, "GET", StringComparison.OrdinalIgnoreCase)) {
-                    message = Request.Query;
+                    message = Request.Query.ToDictionary();
                 }
 
                 else {
@@ -90,7 +92,9 @@ namespace AspNet.Security.OpenId {
                         return AuthenticateResult.Failed("The authentication response used an unsupported content type.");
                     }
 
-                    message = await Request.ReadFormAsync();
+                    var form = await Request.ReadFormAsync(Context.RequestAborted);
+
+                    message = form.ToDictionary();
                 }
 
                 // Ensure that the current request corresponds to an OpenID 2.0 assertion.
@@ -294,7 +298,7 @@ namespace AspNet.Security.OpenId {
             // Generate a new anti-forgery token.
             GenerateCorrelationId(properties);
 
-            var state = UrlEncoder.UrlEncode(Options.StateDataFormat.Protect(properties));
+            var state = UrlEncoder.Encode(Options.StateDataFormat.Protect(properties));
 
             // Create a new dictionary containing the OpenID 2.0 request parameters.
             // See http://openid.net/specs/openid-authentication-2_0.html#requesting_authentication
@@ -440,7 +444,7 @@ namespace AspNet.Security.OpenId {
             return null;
         }
 
-        protected virtual async Task<bool> VerifyAssertionAsync([NotNull] IReadableStringCollection message) {
+        protected virtual async Task<bool> VerifyAssertionAsync([NotNull] IDictionary<string, StringValues> message) {
             // Create a new dictionary to store the parameters sent to the identity provider.
             // Note: using a dictionary is safe as OpenID 2.0 parameters are supposed to be unique.
             // See http://openid.net/specs/openid-authentication-2_0.html#anchor4
