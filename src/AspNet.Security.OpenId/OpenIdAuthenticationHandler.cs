@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using Microsoft.AspNet.Authentication;
+using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Http.Authentication;
 using Microsoft.AspNet.Http.Features.Authentication;
@@ -23,7 +24,6 @@ using Microsoft.AspNet.WebUtilities;
 using Microsoft.Extensions.Internal;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
-using Microsoft.AspNet.Builder;
 
 #if DNX451
 using CsQuery;
@@ -36,26 +36,20 @@ namespace AspNet.Security.OpenId {
                 // Always extract the "state" parameter from the query string.
                 var state = Request.Query[OpenIdAuthenticationConstants.Parameters.State];
                 if (string.IsNullOrEmpty(state)) {
-                    Logger.LogWarning("The authentication response was rejected " +
-                                      "because the state parameter was missing.");
-
-                    return AuthenticateResult.Failed("The mandatory state parameter was missing.");
+                    return AuthenticateResult.Fail("The authentication response was rejected " +
+                                                   "because the state parameter was missing.");
                 }
 
                 var properties = Options.StateDataFormat.Unprotect(state);
                 if (properties == null) {
-                    Logger.LogWarning("The authentication response was rejected " +
-                                      "because the state parameter was invalid.");
-
-                    return AuthenticateResult.Failed("The state parameter was invalid.");
+                    return AuthenticateResult.Fail("The authentication response was rejected " +
+                                                   "because the state parameter was invalid.");
                 }
 
                 // Validate the anti-forgery token.
                 if (!ValidateCorrelationId(properties)) {
-                    Logger.LogWarning("The authentication response was rejected " +
-                                      "because the anti-forgery identifier was invalid.");
-
-                    return AuthenticateResult.Failed("The anti-forgery identifier was invalid.");
+                    return AuthenticateResult.Fail("The authentication response was rejected " +
+                                                   "because the anti-forgery identifier was invalid.");
                 }
 
                 IDictionary<string, StringValues> message;
@@ -64,10 +58,8 @@ namespace AspNet.Security.OpenId {
                 // See http://openid.net/specs/openid-authentication-2_0.html#anchor4
                 if (!string.Equals(Request.Method, "GET", StringComparison.OrdinalIgnoreCase) &&
                     !string.Equals(Request.Method, "POST", StringComparison.OrdinalIgnoreCase)) {
-                    Logger.LogWarning("The authentication response was rejected because it was made " +
-                                      "using an invalid method: make sure to use either GET or POST.");
-
-                    return AuthenticateResult.Failed("The authentication response used an invalid method.");
+                    return AuthenticateResult.Fail("The authentication response was rejected because it was made " +
+                                                   "using an invalid method: make sure to use either GET or POST.");
                 }
 
                 if (string.Equals(Request.Method, "GET", StringComparison.OrdinalIgnoreCase)) {
@@ -78,18 +70,14 @@ namespace AspNet.Security.OpenId {
                     // OpenID 2.0 responses MUST include a Content-Type header when using POST.
                     // See http://openid.net/specs/openid-authentication-2_0.html#anchor4
                     if (string.IsNullOrEmpty(Request.ContentType)) {
-                        Logger.LogWarning("The authentication response was rejected because " +
-                                          "it was missing the mandatory 'Content-Type' header.");
-
-                        return AuthenticateResult.Failed("The authentication response used an invalid content type.");
+                        return AuthenticateResult.Fail("The authentication response was rejected because " +
+                                                       "it was missing the mandatory 'Content-Type' header.");
                     }
 
                     // May have media/type; charset=utf-8, allow partial match.
                     if (!Request.ContentType.StartsWith("application/x-www-form-urlencoded", StringComparison.OrdinalIgnoreCase)) {
-                        Logger.LogWarning("The authentication response was rejected because an invalid Content-Type header " +
-                                          "was received: make sure to use 'application/x-www-form-urlencoded'.");
-
-                        return AuthenticateResult.Failed("The authentication response used an unsupported content type.");
+                        return AuthenticateResult.Fail("The authentication response was rejected because an invalid Content-Type header " +
+                                                       "was received: make sure to use 'application/x-www-form-urlencoded'.");
                     }
 
                     var form = await Request.ReadFormAsync(Context.RequestAborted);
@@ -101,26 +89,22 @@ namespace AspNet.Security.OpenId {
                 if (!string.Equals(message[OpenIdAuthenticationConstants.Prefixes.OpenId +
                                            OpenIdAuthenticationConstants.Parameters.Namespace],
                                    OpenIdAuthenticationConstants.Namespaces.OpenId, StringComparison.Ordinal)) {
-                    Logger.LogWarning("The authentication response was rejected because it was missing the mandatory " +
-                                      "'openid.ns' parameter or because an unsupported version of OpenID was used.");
-
-                    return AuthenticateResult.Failed("The authentication response used an unsupported OpenID version.");
+                    return AuthenticateResult.Fail("The authentication response was rejected because it was missing the mandatory " +
+                                                   "'openid.ns' parameter or because an unsupported version of OpenID was used.");
                 }
 
                 // Stop processing the message if the assertion was not positive.
                 if (!string.Equals(message[OpenIdAuthenticationConstants.Prefixes.OpenId +
                                            OpenIdAuthenticationConstants.Parameters.Mode],
                                    OpenIdAuthenticationConstants.Modes.IdRes, StringComparison.Ordinal)) {
-                    Logger.LogWarning("The authentication response was rejected because " +
-                                      "the identity provider declared it as invalid.");
-
-                    return AuthenticateResult.Failed("The authentication response was rejected by the identity provider.");
+                    return AuthenticateResult.Fail("The authentication response was rejected because " +
+                                                   "the identity provider declared it as invalid.");
                 }
 
                 // Stop processing the message if the assertion
                 // was not validated by the identity provider.
                 if (!await VerifyAssertionAsync(message)) {
-                    return AuthenticateResult.Failed("The authentication response was rejected by the identity provider.");
+                    return AuthenticateResult.Fail("The authentication response was rejected by the identity provider.");
                 }
 
                 // Validate the return_to parameter by comparing it to the address stored in the properties.
@@ -129,9 +113,7 @@ namespace AspNet.Security.OpenId {
                                                           name: OpenIdAuthenticationConstants.Parameters.State, value: state);
                 if (!string.Equals(message[OpenIdAuthenticationConstants.Prefixes.OpenId +
                                            OpenIdAuthenticationConstants.Parameters.ReturnTo], address, StringComparison.Ordinal)) {
-                    Logger.LogWarning("The authentication response was rejected because the return_to parameter was invalid.");
-
-                    return AuthenticateResult.Failed("The authentication response was rejected due to an invalid return_to parameter.");
+                    return AuthenticateResult.Fail("The authentication response was rejected because the return_to parameter was invalid.");
                 }
 
                 // Create a new dictionary containing the extensions found in the assertion.
@@ -144,10 +126,8 @@ namespace AspNet.Security.OpenId {
                 var identifier = message[OpenIdAuthenticationConstants.Prefixes.OpenId +
                                          OpenIdAuthenticationConstants.Parameters.ClaimedId];
                 if (string.IsNullOrEmpty(identifier)) {
-                    Logger.LogWarning("The authentication response was rejected because it " +
-                                      "was missing the mandatory 'claimed_id' parameter.");
-
-                    return AuthenticateResult.Failed("The authentication response was rejected due to an invalid 'claimed_id'.");
+                    return AuthenticateResult.Fail("The authentication response was rejected because it " +
+                                                   "was missing the mandatory 'claimed_id' parameter.");
                 }
 
                 var identity = new ClaimsIdentity(Options.AuthenticationScheme);
@@ -225,19 +205,17 @@ namespace AspNet.Security.OpenId {
 
                 var ticket = await CreateTicketAsync(identity, properties, identifier, attributes);
                 if (ticket == null) {
-                    Logger.LogWarning("The authentication process cannot complete " +
-                                      "because CreateTicketAsync returned a null ticket.");
+                    Logger.LogInformation("The authentication process was skipped because " +
+                                          "CreateTicketAsync returned a null ticket.");
 
-                    return null;
+                    return AuthenticateResult.Skip();
                 }
 
                 return AuthenticateResult.Success(ticket);
             }
 
             catch (Exception exception) {
-                Logger.LogError("Authentication failed due to an unknown exception: {0}.", exception);
-
-                return AuthenticateResult.Failed(exception);
+                return AuthenticateResult.Fail(exception);
             }
         }
 
