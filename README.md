@@ -12,7 +12,16 @@ AspNet.Security.OpenId.Providers
 
 **Adding external authentication to your application is a breeze** and just requires a few lines in your `Startup` class:
 
+    // Add Steam authentication support.
     app.UseSteamAuthentication();
+
+    // Add StackExchange authentication support.
+    app.UseOpenIdAuthentication(options => {
+        options.AuthenticationScheme = "StackExchange";
+        options.DisplayName = "StackExchange";
+        options.Authority = new Uri("https://openid.stackexchange.com/");
+        options.CallbackPath = new PathString("/signin-stackexchange");
+    });
 
 See [https://github.com/aspnet-contrib/AspNet.Security.OpenId.Providers/tree/dev/samples/Mvc.Client](https://github.com/aspnet-contrib/AspNet.Security.OpenId.Providers/tree/dev/samples/Mvc.Client) for a complete sample **using MVC 6 and supporting multiple external providers**.
 
