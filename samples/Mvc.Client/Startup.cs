@@ -64,7 +64,7 @@ namespace Mvc.Client {
                 options.AuthenticationScheme = "Intuit";
                 options.DisplayName = "Intuit";
                 options.CallbackPath = new PathString("/signin-intuit");
-                options.Endpoint = "https://openid.intuit.com/OpenId/Provider";
+                options.Endpoint = new Uri("https://openid.intuit.com/OpenId/Provider");
             });
 
             app.UseSteamAuthentication();

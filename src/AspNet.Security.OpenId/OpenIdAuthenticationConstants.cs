@@ -5,7 +5,7 @@
  */
 
 namespace AspNet.Security.OpenId {
-    internal static class OpenIdAuthenticationConstants {
+    public static class OpenIdAuthenticationConstants {
         public static class Aliases {
             public const string Ax = "ax";
         }
@@ -22,6 +22,7 @@ namespace AspNet.Security.OpenId {
         }
 
         public static class Media {
+            public const string Json = "application/json";
             public const string Html = "text/html";
             public const string Xhtml = "application/xhtml+xml";
             public const string Xml = "text/xml";

@@ -5,7 +5,7 @@
  */
 
 namespace AspNet.Security.OpenId.Steam {
-    internal static class SteamAuthenticationConstants {
+    public static class SteamAuthenticationConstants {
         public static class Namespaces {
             public const string Identifier = "http://steamcommunity.com/openid/id/";
         }

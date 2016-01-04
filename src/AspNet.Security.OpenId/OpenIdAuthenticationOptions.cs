@@ -12,7 +12,6 @@ using AngleSharp.Parser.Html;
 using Microsoft.AspNet.Authentication;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Http.Authentication;
-using Microsoft.Extensions.Internal;
 
 namespace AspNet.Security.OpenId {
     public class OpenIdAuthenticationOptions : RemoteAuthenticationOptions {
@@ -23,25 +22,32 @@ namespace AspNet.Security.OpenId {
             Events = new OpenIdAuthenticationEvents();
         }
 
+        /// <summary>
+        /// Gets or sets the data format used to serialize the
+        /// authentication properties used for the "state" parameter.
+        /// </summary>
         public ISecureDataFormat<AuthenticationProperties> StateDataFormat { get; set; }
 
+        /// <summary>
+        /// Gets or sets the address used to discover the OpenID provider.
+        /// </summary>
         public Uri Authority { get; set; }
 
+        /// <summary>
+        /// Gets or sets the address of the OpenID provider.
+        /// </summary>
+        public Uri Endpoint { get; set; }
+
+        /// <summary>
+        /// Gets or sets the realm associated with this instance.
+        /// A default value is automatically inferred from the
+        /// current URL when this value is left to <c>null</c>.
+        /// </summary>
         public string Realm { get; set; }
 
-        public string Endpoint { get; set; }
-
-        public new IOpenIdAuthenticationEvents Events {
-            get { return base.Events as IOpenIdAuthenticationEvents; }
-            set { base.Events = value; }
-        }
-
-        public RandomNumberGenerator RandomNumberGenerator { get; [param: NotNull] set; } = RandomNumberGenerator.Create();
-
-        public HttpClient HttpClient { get; set; }
-
-        public HtmlParser HtmlParser { get; set; }
-
+        /// <summary>
+        /// Gets or sets the default AX attributes added to the OpenID request.
+        /// </summary>
         public IDictionary<string, string> Attributes { get; } = new Dictionary<string, string> {
             ["email"] = "http://axschema.org/contact/email",
             ["name"] = "http://axschema.org/namePerson",
@@ -53,5 +59,29 @@ namespace AspNet.Security.OpenId {
             ["first2"] = "http://schema.openid.net/namePerson/first",
             ["last2"] = "http://schema.openid.net/namePerson/last"
         };
+
+        /// <summary>
+        /// Gets or sets the events provider associated with this instance.
+        /// </summary>
+        public new IOpenIdAuthenticationEvents Events {
+            get { return base.Events as IOpenIdAuthenticationEvents; }
+            set { base.Events = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the HTTP client used to communicate with the OpenID provider.
+        /// </summary>
+        public HttpClient HttpClient { get; set; }
+
+        /// <summary>
+        /// Gets or sets the HTML parser used to parse discovery documents.
+        /// </summary>
+        public HtmlParser HtmlParser { get; set; }
+
+        /// <summary>
+        /// Gets or sets the random number generator used to generate correlation identifiers.
+        /// Replacing the default instance is generally not necessary.
+        /// </summary>
+        public RandomNumberGenerator RandomNumberGenerator { get; set; } = RandomNumberGenerator.Create();
     }
 }

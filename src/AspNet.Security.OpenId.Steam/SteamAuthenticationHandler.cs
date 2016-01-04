@@ -6,7 +6,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -24,27 +23,28 @@ namespace AspNet.Security.OpenId.Steam {
             [NotNull] ClaimsIdentity identity, [NotNull] AuthenticationProperties properties,
             [NotNull] string identifier, [NotNull] IDictionary<string, string> attributes) {
             var principal = new ClaimsPrincipal(identity);
+            var ticket = new AuthenticationTicket(principal, properties, Options.AuthenticationScheme);
 
-            // Return the authentication ticket as-is
-            // if the application key cannot be found.
-            if (string.IsNullOrEmpty(Options.AppKey)) {
-                return new AuthenticationTicket(principal, properties, Options.AuthenticationScheme);
+            // Return the authentication ticket as-is if the application key cannot
+            // be found or if the user information endpoint has not been set.
+            if (string.IsNullOrEmpty(Options.UserInformationEndpoint) || string.IsNullOrEmpty(Options.ApplicationKey)) {
+                return ticket;
             }
 
             // Return the authentication ticket as-is if the claimed identifier is malformed.
             if (!identifier.StartsWith(SteamAuthenticationConstants.Namespaces.Identifier, StringComparison.Ordinal)) {
                 Logger.LogWarning("The userinfo request was skipped because an invalid identifier was received: {Identifier}.", identifier);
 
-                return new AuthenticationTicket(principal, properties, Options.AuthenticationScheme);
+                return ticket;
             }
 
-            var address = QueryHelpers.AddQueryString("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/", new Dictionary<string, string> {
-                [SteamAuthenticationConstants.Parameters.Key] = Options.AppKey,
+            var address = QueryHelpers.AddQueryString(Options.UserInformationEndpoint, new Dictionary<string, string> {
+                [SteamAuthenticationConstants.Parameters.Key] = Options.ApplicationKey,
                 [SteamAuthenticationConstants.Parameters.SteamId] = identifier.Substring(SteamAuthenticationConstants.Namespaces.Identifier.Length)
             });
 
             var request = new HttpRequestMessage(HttpMethod.Get, address);
-            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(OpenIdAuthenticationConstants.Media.Json));
 
             // Return the authentication ticket as-is if the userinfo request failed.
             var response = await Options.HttpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, Context.RequestAborted);
@@ -69,19 +69,20 @@ namespace AspNet.Security.OpenId.Steam {
                 identity.AddClaim(new Claim(ClaimTypes.Name, profile, ClaimValueTypes.String, Options.ClaimsIssuer));
             }
             
-            var context = new OpenIdAuthenticatedContext(Context, Options) {
-                Attributes = attributes.ToImmutableDictionary(),
-                Principal = principal, Properties = properties,
-                Identifier = identifier, User = payload
+            var context = new OpenIdAuthenticatedContext(Context, Options, ticket) {
+                User = payload
             };
+
+            // Copy the attributes to the context object.
+            foreach (var attribute in attributes) {
+                context.Attributes.Add(attribute);
+            }
 
             await Options.Events.Authenticated(context);
 
-            if (context.Principal?.Identity == null) {
-                return null;
-            }
-
-            return new AuthenticationTicket(principal, properties, Options.AuthenticationScheme);
+            // Note: return the authentication ticket associated
+            // with the notification to allow replacing the ticket.
+            return context.AuthenticationTicket;
         }
     }
 }

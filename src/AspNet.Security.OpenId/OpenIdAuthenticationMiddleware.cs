@@ -26,6 +26,14 @@ namespace AspNet.Security.OpenId {
             [NotNull] UrlEncoder encoder,
             [NotNull] IOptions<SharedAuthenticationOptions> externalOptions)
             : base(next, options, loggerFactory, encoder) {
+            if (Options.Authority == null && Options.Endpoint == null) {
+                throw new ArgumentException("An authority or an endpoint must be specified.", nameof(options));
+            }
+
+            if (Options.RandomNumberGenerator == null) {
+                throw new ArgumentException("A random number generator must be specified.", nameof(options));
+            }
+
             if (string.IsNullOrEmpty(Options.SignInScheme)) {
                 Options.SignInScheme = externalOptions.Value.SignInScheme;
             }

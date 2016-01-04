@@ -8,8 +8,6 @@
     "licenseUrl": "http://www.apache.org/licenses/LICENSE-2.0.html",
 
     "dependencies": {
-        "System.Collections.Immutable": "1.1.36",
-
         "Microsoft.AspNet.Authentication": "1.0.0-*",
 
         "Microsoft.Extensions.NotNullAttribute.Sources": {
@@ -23,22 +21,7 @@
     },
 
     "frameworks": {
-        "dnx451": {
-            "dependencies": {
-            },
-
-            "frameworkAssemblies": {
-                "System.Net.Http.WebRequest": "",
-                "System.Net.Http": "",
-                "System.Collections": "",
-                "System.Runtime": ""
-            }
-        },
-
-        "dnxcore50": {
-            "dependencies": {
-                "System.Net.Http.WinHttpHandler": "4.0.0-beta-*"
-            }
-        }
+        "dnx451": { },
+        "dnxcore50": { }
     }
 }

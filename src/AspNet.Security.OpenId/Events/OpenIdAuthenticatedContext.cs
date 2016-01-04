@@ -5,33 +5,45 @@
  */
 
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Security.Claims;
 using Microsoft.AspNet.Authentication;
 using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Http.Authentication;
 using Microsoft.Extensions.Internal;
 using Newtonsoft.Json.Linq;
 
 namespace AspNet.Security.OpenId {
+    /// <summary>
+    /// Exposes various information about the current OpenID authentication flow.
+    /// </summary>
     public class OpenIdAuthenticatedContext : BaseControlContext {
         public OpenIdAuthenticatedContext(
             [NotNull] HttpContext context,
-            [NotNull] OpenIdAuthenticationOptions options)
+            [NotNull] OpenIdAuthenticationOptions options,
+            [NotNull] AuthenticationTicket ticket)
             : base(context) {
             Options = options;
+            AuthenticationTicket = ticket;
         }
 
+        /// <summary>
+        /// Gets the options used by the OpenID authentication middleware.
+        /// </summary>
         public OpenIdAuthenticationOptions Options { get; }
 
-        public ClaimsPrincipal Principal { get; set; }
+        /// <summary>
+        /// Gets the identifier returned by the identity provider.
+        /// </summary>
+        public string Identifier => AuthenticationTicket?.Principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-        public AuthenticationProperties Properties { get; set; }
+        /// <summary>
+        /// Gets or sets the attributes associated with the current user.
+        /// </summary>
+        public IDictionary<string, string> Attributes { get; } = new Dictionary<string, string>();
 
-        public string Identifier { get; [param: NotNull] set; }
-
-        public IReadOnlyDictionary<string, string> Attributes { get; [param: NotNull] set; } = ImmutableDictionary.Create<string, string>();
-
-        public JObject User { get; [param: NotNull] set; } = new JObject();
+        /// <summary>
+        /// Gets or sets the optional JSON payload extracted from the current request.
+        /// This property is not set by the generic middleware but can be used by specialized middleware.
+        /// </summary>
+        public JObject User { get; set; } = new JObject();
     }
 }

@@ -16,6 +16,14 @@ namespace AspNet.Security.OpenId.Steam {
             CallbackPath = new PathString(SteamAuthenticationDefaults.CallbackPath);
         }
 
-        public string AppKey { get; set; }
+        /// <summary>
+        /// Gets or sets the application key used to retrive user details from Steam's API.
+        /// </summary>
+        public string ApplicationKey { get; set; }
+
+        /// <summary>
+        /// Gets or sets the endpoint used to retrieve user details.
+        /// </summary>
+        public string UserInformationEndpoint { get; set; } = SteamAuthenticationDefaults.UserInformationEndpoint;
     }
 }

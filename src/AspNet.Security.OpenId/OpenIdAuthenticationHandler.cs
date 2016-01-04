@@ -6,7 +6,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -18,7 +17,6 @@ using System.Xml;
 using System.Xml.Linq;
 using AngleSharp.Dom.Html;
 using Microsoft.AspNet.Authentication;
-using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Http.Authentication;
 using Microsoft.AspNet.Http.Features.Authentication;
@@ -215,32 +213,33 @@ namespace AspNet.Security.OpenId {
         protected virtual async Task<AuthenticationTicket> CreateTicketAsync(
             [NotNull] ClaimsIdentity identity, [NotNull] AuthenticationProperties properties,
             [NotNull] string identifier, [NotNull] IDictionary<string, string> attributes) {
-            var context = new OpenIdAuthenticatedContext(Context, Options) {
-                Attributes = attributes.ToImmutableDictionary(),
-                Principal = new ClaimsPrincipal(identity),
-                Properties = properties,
-                Identifier = identifier
-            };
+            var principal = new ClaimsPrincipal(identity);
+            var ticket = new AuthenticationTicket(principal, properties, Options.AuthenticationScheme);
+
+            var context = new OpenIdAuthenticatedContext(Context, Options, ticket);
+
+            // Copy the attributes to the context object.
+            foreach (var attribute in attributes) {
+                context.Attributes.Add(attribute);
+            }
 
             await Options.Events.Authenticated(context);
 
-            if (context.Principal?.Identity == null) {
-                return null;
-            }
-
-            return new AuthenticationTicket(context.Principal, context.Properties, Options.AuthenticationScheme);
+            // Note: return the authentication ticket associated
+            // with the notification to allow replacing the ticket.
+            return context.AuthenticationTicket;
         }
 
         protected override async Task<bool> HandleUnauthorizedAsync(ChallengeContext context) {
             var properties = new AuthenticationProperties(context.Properties);
 
-            if (string.IsNullOrEmpty(Options.Endpoint)) {
+            if (Options.Endpoint == null) {
                 // Note: altering options during a request is not thread safe but
                 // would only result in multiple discovery requests in the worst case.
                 Options.Endpoint = await DiscoverEndpointAsync(Options.Authority);
             }
 
-            if (string.IsNullOrEmpty(Options.Endpoint)) {
+            if (Options.Endpoint == null) {
                 Logger.LogError("The user agent cannot be redirected to the identity provider because no " +
                                 "endpoint was registered in the options or discovered through Yadis.");
 
@@ -328,10 +327,10 @@ namespace AspNet.Security.OpenId {
         }
 
         protected virtual Task<string> GenerateChallengeUrlAsync([NotNull] IDictionary<string, string> parameters) {
-            return Task.FromResult(QueryHelpers.AddQueryString(Options.Endpoint, parameters));
+            return Task.FromResult(QueryHelpers.AddQueryString(Options.Endpoint.AbsoluteUri, parameters));
         }
 
-        protected virtual async Task<string> DiscoverEndpointAsync([NotNull] Uri address) {
+        protected virtual async Task<Uri> DiscoverEndpointAsync([NotNull] Uri address) {
             // application/xrds+xml MUST be the preferred content type to avoid a second round-trip.
             // See http://openid.net/specs/yadis-v1.0.pdf (chapter 6.2.4)
             var request = new HttpRequestMessage(HttpMethod.Get, address);
@@ -367,8 +366,8 @@ namespace AspNet.Security.OpenId {
                                     orderby service.Attribute("priority")?.Value
                                     select service.Element(XName.Get("URI", "xri://$xrd*($v*2.0)"))?.Value).FirstOrDefault();
 
-                    if (!string.IsNullOrEmpty(endpoint)) {
-                        return endpoint;
+                    if (!string.IsNullOrEmpty(endpoint) && Uri.TryCreate(endpoint, UriKind.Absolute, out address)) {
+                        return address;
                     }
 
                     Logger.LogWarning("The Yadis discovery failed because the XRDS document returned by the " +
@@ -421,8 +420,8 @@ namespace AspNet.Security.OpenId {
                                 where string.Equals(attribute?.Value, OpenIdAuthenticationConstants.Metadata.XrdsLocation, StringComparison.OrdinalIgnoreCase)
                                 select element.Attributes[OpenIdAuthenticationConstants.Metadata.Content]?.Value).FirstOrDefault();
 
-                if (!string.IsNullOrEmpty(endpoint)) {
-                    return endpoint;
+                if (!string.IsNullOrEmpty(endpoint) && Uri.TryCreate(endpoint, UriKind.Absolute, out address)) {
+                    return address;
                 }
             }
 

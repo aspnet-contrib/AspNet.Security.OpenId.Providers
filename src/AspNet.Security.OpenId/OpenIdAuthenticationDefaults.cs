@@ -4,10 +4,27 @@
  * for more information concerning the license and the contributors participating to this project.
  */
 
+using Microsoft.AspNet.Authentication;
+
 namespace AspNet.Security.OpenId {
+    /// <summary>
+    /// Contains various constants used as default values
+    /// for the OpenID authentication middleware.
+    /// </summary>
     public static class OpenIdAuthenticationDefaults {
+        /// <summary>
+        /// Gets the default value associated with <see cref="AuthenticationOptions.AuthenticationScheme"/>.
+        /// </summary>
         public const string AuthenticationScheme = "OpenId";
+
+        /// <summary>
+        /// Gets the default value associated with <see cref="RemoteAuthenticationOptions.DisplayName"/>.
+        /// </summary>
         public const string DisplayName = "OpenId";
+
+        /// <summary>
+        /// Gets the default value associated with <see cref="RemoteAuthenticationOptions.CallbackPath"/>.
+        /// </summary>
         public const string CallbackPath = "/signin-openid";
     }
 }
