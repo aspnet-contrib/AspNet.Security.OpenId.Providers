@@ -10,15 +10,42 @@ namespace AspNet.Security.OpenId {
             public const string Ax = "ax";
         }
 
-        public static class Prefixes {
-            public const string OpenId = "openid.";
-            public const string Namespace = "ns.";
-            public const string Ax = "ax.";
-            public const string Type = "type.";
+        public static class Attributes {
+            public const string Email = "http://axschema.org/contact/email";
+            public const string Name = "http://axschema.org/namePerson";
+            public const string Firstname = "http://axschema.org/namePerson/first";
+            public const string Lastname = "http://axschema.org/namePerson/last";
         }
 
-        public static class Suffixes {
-            public const string Type = ".type";
+        public static class Headers {
+            public const string XrdsLocation = "X-XRDS-Location";
+        }
+
+        public static class Media {
+            public const string Html = "text/html";
+            public const string Xhtml = "application/xhtml+xml";
+            public const string Xml = "text/xml";
+            public const string Xrds = "application/xrds+xml";
+
+        }
+
+        public static class Metadata {
+            public const string Content = "content";
+            public const string HttpEquiv = "http-equiv";
+            public const string Meta = "meta";
+            public const string XrdsLocation = "X-XRDS-Location";
+        }
+
+        public static class Modes {
+            public const string IdRes = "id_res";
+            public const string CheckIdSetup = "checkid_setup";
+            public const string CheckAuthentication = "check_authentication";
+            public const string FetchRequest = "fetch_request";
+        }
+
+        public static class Namespaces {
+            public const string OpenId = "http://specs.openid.net/auth/2.0";
+            public const string Ax = "http://openid.net/srv/ax/1.0";
         }
 
         public static class Parameters {
@@ -33,23 +60,16 @@ namespace AspNet.Security.OpenId {
             public const string State = "state";
         }
 
-        public static class Namespaces {
-            public const string OpenId = "http://specs.openid.net/auth/2.0";
-            public const string Ax = "http://openid.net/srv/ax/1.0";
+        public static class Prefixes {
+            public const string OpenId = "openid.";
+            public const string Namespace = "ns.";
+            public const string Ax = "ax.";
+            public const string Type = "type.";
         }
 
-        public static class Modes {
-            public const string IdRes = "id_res";
-            public const string CheckIdSetup = "checkid_setup";
-            public const string CheckAuthentication = "check_authentication";
-            public const string FetchRequest = "fetch_request";
-        }
-
-        public static class Attributes {
-            public const string Email = "http://axschema.org/contact/email";
-            public const string Name = "http://axschema.org/namePerson";
-            public const string Firstname = "http://axschema.org/namePerson/first";
-            public const string Lastname = "http://axschema.org/namePerson/last";
+        public static class Suffixes {
+            public const string Type = ".type";
+            public const string Value = ".value";
         }
     }
 }

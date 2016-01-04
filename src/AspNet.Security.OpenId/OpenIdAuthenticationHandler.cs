@@ -24,10 +24,9 @@ using Microsoft.AspNet.WebUtilities;
 using Microsoft.Extensions.Internal;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
-
-#if DNX451
-using CsQuery;
-#endif
+using AngleSharp.Parser.Html;
+using AngleSharp.Dom.Html;
+using System.Diagnostics;
 
 namespace AspNet.Security.OpenId {
     public class OpenIdAuthenticationHandler<TOptions> : RemoteAuthenticationHandler<TOptions> where TOptions : OpenIdAuthenticationOptions {
@@ -149,7 +148,8 @@ namespace AspNet.Security.OpenId {
                         }
 
                         // Exclude attributes whose alias is malformed.
-                        var name = parameter.Key.Substring($"openid.{alias}.type.".Length);
+                        var name = parameter.Key.Substring((OpenIdAuthenticationConstants.Prefixes.OpenId + alias +
+                                                            OpenIdAuthenticationConstants.Suffixes.Type + ".").Length);
                         if (string.IsNullOrEmpty(name)) {
                             continue;
                         }
@@ -161,7 +161,8 @@ namespace AspNet.Security.OpenId {
                         }
 
                         // Exclude attributes whose value is missing.
-                        string value = message[$"openid.{alias}.value.{name}"];
+                        string value = message[OpenIdAuthenticationConstants.Prefixes.OpenId + alias +
+                                               OpenIdAuthenticationConstants.Suffixes.Value + $".{name}"];
                         if (string.IsNullOrEmpty(value)) {
                             continue;
                         }
@@ -342,11 +343,11 @@ namespace AspNet.Security.OpenId {
             // application/xrds+xml MUST be the preferred content type to avoid a second round-trip.
             // See http://openid.net/specs/yadis-v1.0.pdf (chapter 6.2.4)
             var request = new HttpRequestMessage(HttpMethod.Get, address);
-            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xrds+xml"));
-            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/html"));
-            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xhtml+xml"));
+            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(OpenIdAuthenticationConstants.Media.Xrds));
+            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(OpenIdAuthenticationConstants.Media.Html));
+            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(OpenIdAuthenticationConstants.Media.Xhtml));
 
-            var response = await Options.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, Context.RequestAborted);
+            var response = await Options.HttpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, Context.RequestAborted);
             if (!response.IsSuccessStatusCode) {
                 Logger.LogWarning("The Yadis discovery failed because an invalid response was returned by the identity provider.");
 
@@ -355,8 +356,10 @@ namespace AspNet.Security.OpenId {
 
             // Note: application/xrds+xml is the standard content type but text/xml is frequent.
             // See http://openid.net/specs/yadis-v1.0.pdf (chapter 6.2.6)
-            if (string.Equals(response.Content.Headers.ContentType?.MediaType, "application/xrds+xml") ||
-                string.Equals(response.Content.Headers.ContentType?.MediaType, "text/xml")) {
+            if (string.Equals(response.Content.Headers.ContentType?.MediaType,
+                              OpenIdAuthenticationConstants.Media.Xrds, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(response.Content.Headers.ContentType?.MediaType,
+                              OpenIdAuthenticationConstants.Media.Xml, StringComparison.OrdinalIgnoreCase)) {
                 using (var stream = await response.Content.ReadAsStreamAsync())
                 using (var reader = XmlReader.Create(stream, new XmlReaderSettings { Async = true })) {
                     var document = XDocument.Load(reader);
@@ -382,7 +385,7 @@ namespace AspNet.Security.OpenId {
             // Try to extract the XRDS location from the response headers before parsing the body.
             // See http://openid.net/specs/yadis-v1.0.pdf (chapter 6.2.6)
             var location = (from header in response.Headers
-                            where string.Equals(header.Key, "X-XRDS-Location", StringComparison.OrdinalIgnoreCase)
+                            where string.Equals(header.Key, OpenIdAuthenticationConstants.Headers.XrdsLocation, StringComparison.OrdinalIgnoreCase)
                             from value in header.Value
                             select value).FirstOrDefault();
 
@@ -398,24 +401,34 @@ namespace AspNet.Security.OpenId {
                 return await DiscoverEndpointAsync(address);
             }
 
-#if DNX451
             // Only text/html or application/xhtml+xml can be safely parsed.
             // See http://openid.net/specs/yadis-v1.0.pdf
-            if (string.Equals(response.Content.Headers.ContentType?.MediaType, "text/html") ||
-                string.Equals(response.Content.Headers.ContentType?.MediaType, "application/xhtml+xml")) {
-                var document = CQ.CreateDocument(await response.Content.ReadAsStringAsync());
+            if (string.Equals(response.Content.Headers.ContentType?.MediaType,
+                              OpenIdAuthenticationConstants.Media.Html, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(response.Content.Headers.ContentType?.MediaType,
+                              OpenIdAuthenticationConstants.Media.Xhtml, StringComparison.OrdinalIgnoreCase)) {
+                IHtmlDocument document = null;
 
-                // Use LINQ instead of a CSS selector
-                // to execute a case-insensitive search.
-                var endpoint = (from meta in document.Find("meta")
-                                where string.Equals(meta.Attributes["http-equiv"], "X-XRDS-Location", StringComparison.OrdinalIgnoreCase)
-                                select meta.Attributes["content"]).FirstOrDefault();
+                try {
+                    document = Options.HtmlParser.Parse(await response.Content.ReadAsStreamAsync());
+                    Debug.Assert(document != null);
+                }
+
+                catch (Exception exception) {
+                    Logger.LogWarning("An exception occurred when parsing the HTML document.", exception);
+
+                    return null;
+                }
+
+                var endpoint = (from element in document.Head.GetElementsByTagName(OpenIdAuthenticationConstants.Metadata.Meta)
+                                let attribute = element.Attributes[OpenIdAuthenticationConstants.Metadata.HttpEquiv]
+                                where string.Equals(attribute?.Value, OpenIdAuthenticationConstants.Metadata.XrdsLocation, StringComparison.OrdinalIgnoreCase)
+                                select element.Attributes[OpenIdAuthenticationConstants.Metadata.Content]?.Value).FirstOrDefault();
 
                 if (!string.IsNullOrEmpty(endpoint)) {
                     return endpoint;
                 }
             }
-#endif
 
             Logger.LogWarning("The Yadis discovery failed because the XRDS document location was not found.");
 
@@ -451,7 +464,7 @@ namespace AspNet.Security.OpenId {
             var request = new HttpRequestMessage(HttpMethod.Post, Options.Endpoint);
             request.Content = new FormUrlEncodedContent(payload);
 
-            var response = await Options.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, Context.RequestAborted);
+            var response = await Options.HttpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, Context.RequestAborted);
             if (!response.IsSuccessStatusCode) {
                 Logger.LogWarning("The authentication response was rejected because the identity provider " +
                                   "returned an invalid check_authentication response.");

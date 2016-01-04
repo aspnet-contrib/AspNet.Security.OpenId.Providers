@@ -43,7 +43,7 @@ namespace AspNet.Security.OpenId.Steam {
             var request = new HttpRequestMessage(HttpMethod.Get, address);
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            var response = await Options.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, Context.RequestAborted);
+            var response = await Options.HttpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, Context.RequestAborted);
 
             // Return the authentication ticket as-is
             // if the GetPlayerSummaries request failed.

@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Security.Cryptography;
+using AngleSharp.Parser.Html;
 using Microsoft.AspNet.Authentication;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Http.Authentication;
@@ -37,7 +38,9 @@ namespace AspNet.Security.OpenId {
 
         public RandomNumberGenerator RandomNumberGenerator { get; [param: NotNull] set; } = RandomNumberGenerator.Create();
 
-        public HttpClient Client { get; set; }
+        public HttpClient HttpClient { get; set; }
+
+        public HtmlParser HtmlParser { get; set; }
 
         public IDictionary<string, string> Attributes { get; } = new Dictionary<string, string> {
             ["email"] = "http://axschema.org/contact/email",

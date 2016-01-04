@@ -7,6 +7,7 @@
 using System;
 using System.Net.Http;
 using System.Text.Encodings.Web;
+using AngleSharp.Parser.Html;
 using Microsoft.AspNet.Authentication;
 using Microsoft.AspNet.DataProtection;
 using Microsoft.AspNet.Http;
@@ -35,13 +36,17 @@ namespace AspNet.Security.OpenId {
                         GetType().FullName, Options.AuthenticationScheme, "v1"));
             }
 
-            if (Options.Client == null) {
-                Options.Client = new HttpClient {
+            if (Options.HtmlParser == null) {
+                Options.HtmlParser = new HtmlParser();
+            }
+
+            if (Options.HttpClient == null) {
+                Options.HttpClient = new HttpClient {
                     Timeout = TimeSpan.FromSeconds(60),
                     MaxResponseContentBufferSize = 1024 * 1024 * 10
                 };
 
-                Options.Client.DefaultRequestHeaders.UserAgent.ParseAdd("ASP.NET OpenID 2.0 middleware");
+                Options.HttpClient.DefaultRequestHeaders.UserAgent.ParseAdd("ASP.NET OpenID 2.0 middleware");
             }
         }
 
