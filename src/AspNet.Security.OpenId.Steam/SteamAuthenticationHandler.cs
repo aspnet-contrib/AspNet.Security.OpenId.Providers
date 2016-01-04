@@ -15,6 +15,7 @@ using Microsoft.AspNet.Authentication;
 using Microsoft.AspNet.Http.Authentication;
 using Microsoft.AspNet.WebUtilities;
 using Microsoft.Extensions.Internal;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 
 namespace AspNet.Security.OpenId.Steam {
@@ -32,6 +33,8 @@ namespace AspNet.Security.OpenId.Steam {
 
             // Return the authentication ticket as-is if the claimed identifier is malformed.
             if (!identifier.StartsWith(SteamAuthenticationConstants.Namespaces.Identifier, StringComparison.Ordinal)) {
+                Logger.LogWarning("The userinfo request was skipped because an invalid identifier was received: {Identifier}.", identifier);
+
                 return new AuthenticationTicket(principal, properties, Options.AuthenticationScheme);
             }
 
@@ -43,11 +46,15 @@ namespace AspNet.Security.OpenId.Steam {
             var request = new HttpRequestMessage(HttpMethod.Get, address);
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
+            // Return the authentication ticket as-is if the userinfo request failed.
             var response = await Options.HttpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, Context.RequestAborted);
-
-            // Return the authentication ticket as-is
-            // if the GetPlayerSummaries request failed.
             if (!response.IsSuccessStatusCode) {
+                Logger.LogWarning("The userinfo request failed because an invalid response was received: the identity provider " +
+                                  "returned returned a {Status} response with the following payload: {Headers} {Body}.",
+                                  /* Status: */ response.StatusCode,
+                                  /* Headers: */ response.Headers.ToString(),
+                                  /* Body: */ await response.Content.ReadAsStringAsync());
+
                 return new AuthenticationTicket(principal, properties, Options.AuthenticationScheme);
             }
 

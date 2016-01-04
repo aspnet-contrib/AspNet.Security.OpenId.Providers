@@ -5,11 +5,8 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using AspNet.Security.OpenId;
 using Microsoft.Extensions.Internal;
-using Microsoft.Extensions.Primitives;
 
 namespace Microsoft.AspNet.Builder {
     public static class OpenIdAuthenticationExtensions {
@@ -30,10 +27,6 @@ namespace Microsoft.AspNet.Builder {
             configuration(options);
 
             return app.UseOpenIdAuthentication(options);
-        }
-
-        internal static IDictionary<string, StringValues> ToDictionary(this IEnumerable<KeyValuePair<string, StringValues>> collection) {
-            return collection.ToDictionary(item => item.Key, item => item.Value);
         }
     }
 }
