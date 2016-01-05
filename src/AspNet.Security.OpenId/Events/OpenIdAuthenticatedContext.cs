@@ -15,14 +15,14 @@ namespace AspNet.Security.OpenId {
     /// <summary>
     /// Exposes various information about the current OpenID authentication flow.
     /// </summary>
-    public class OpenIdAuthenticatedContext : BaseControlContext {
+    public class OpenIdAuthenticatedContext : BaseContext {
         public OpenIdAuthenticatedContext(
             [NotNull] HttpContext context,
             [NotNull] OpenIdAuthenticationOptions options,
             [NotNull] AuthenticationTicket ticket)
             : base(context) {
             Options = options;
-            AuthenticationTicket = ticket;
+            Ticket = ticket;
         }
 
         /// <summary>
@@ -31,9 +31,19 @@ namespace AspNet.Security.OpenId {
         public OpenIdAuthenticationOptions Options { get; }
 
         /// <summary>
+        /// Gets or sets the authentication ticket.
+        /// </summary>
+        public AuthenticationTicket Ticket { get; set; }
+
+        /// <summary>
+        /// Gets the identity containing the claims associated with the current user.
+        /// </summary>
+        public ClaimsIdentity Identity => Ticket?.Principal?.Identity as ClaimsIdentity;
+
+        /// <summary>
         /// Gets the identifier returned by the identity provider.
         /// </summary>
-        public string Identifier => AuthenticationTicket?.Principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        public string Identifier => Ticket?.Principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
         /// <summary>
         /// Gets or sets the attributes associated with the current user.

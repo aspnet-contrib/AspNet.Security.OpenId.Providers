@@ -55,7 +55,7 @@ namespace AspNet.Security.OpenId.Steam {
                                   /* Headers: */ response.Headers.ToString(),
                                   /* Body: */ await response.Content.ReadAsStringAsync());
 
-                return new AuthenticationTicket(principal, properties, Options.AuthenticationScheme);
+                return ticket;
             }
 
             var payload = JObject.Parse(await response.Content.ReadAsStringAsync());
@@ -82,7 +82,7 @@ namespace AspNet.Security.OpenId.Steam {
 
             // Note: return the authentication ticket associated
             // with the notification to allow replacing the ticket.
-            return context.AuthenticationTicket;
+            return context.Ticket;
         }
     }
 }

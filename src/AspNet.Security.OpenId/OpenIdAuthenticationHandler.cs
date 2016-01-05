@@ -227,7 +227,7 @@ namespace AspNet.Security.OpenId {
 
             // Note: return the authentication ticket associated
             // with the notification to allow replacing the ticket.
-            return context.AuthenticationTicket;
+            return context.Ticket;
         }
 
         protected override async Task<bool> HandleUnauthorizedAsync(ChallengeContext context) {
