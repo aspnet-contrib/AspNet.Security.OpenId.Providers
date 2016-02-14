@@ -7,11 +7,11 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Security.Cryptography;
 using AngleSharp.Parser.Html;
-using Microsoft.AspNet.Authentication;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Http.Authentication;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Authentication;
 
 namespace AspNet.Security.OpenId {
     public class OpenIdAuthenticationOptions : RemoteAuthenticationOptions {
@@ -77,11 +77,5 @@ namespace AspNet.Security.OpenId {
         /// Gets or sets the HTML parser used to parse discovery documents.
         /// </summary>
         public HtmlParser HtmlParser { get; set; }
-
-        /// <summary>
-        /// Gets or sets the random number generator used to generate correlation identifiers.
-        /// Replacing the default instance is generally not necessary.
-        /// </summary>
-        public RandomNumberGenerator RandomNumberGenerator { get; set; } = RandomNumberGenerator.Create();
     }
 }

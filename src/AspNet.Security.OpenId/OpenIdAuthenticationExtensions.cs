@@ -6,9 +6,10 @@
 
 using System;
 using AspNet.Security.OpenId;
-using Microsoft.Extensions.Internal;
+using JetBrains.Annotations;
+using Microsoft.Extensions.Options;
 
-namespace Microsoft.AspNet.Builder {
+namespace Microsoft.AspNetCore.Builder {
     /// <summary>
     /// Exposes convenient extensions that can be used to add an instance
     /// of the OpenID authentication middleware in an ASP.NET 5 pipeline.
@@ -32,7 +33,7 @@ namespace Microsoft.AspNet.Builder {
                 throw new ArgumentNullException(nameof(options));
             }
 
-            return app.UseMiddleware<OpenIdAuthenticationMiddleware<OpenIdAuthenticationOptions>>(options);
+            return app.UseMiddleware<OpenIdAuthenticationMiddleware<OpenIdAuthenticationOptions>>(Options.Create(options));
         }
 
         /// <summary>

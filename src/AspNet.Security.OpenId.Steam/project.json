@@ -8,16 +8,14 @@
     "licenseUrl": "http://www.apache.org/licenses/LICENSE-2.0.html",
 
     "dependencies": {
-        "AspNet.Security.OpenId": "1.0.0-*",
-
-        "Microsoft.Extensions.NotNullAttribute.Sources": {
-            "type": "build",
-            "version": "1.0.0-*"
-        }
+        "AspNet.Security.OpenId": "1.0.0-*"
     },
 
     "frameworks": {
-        "dnx451": { },
-        "dnxcore50": { }
+        "net451": { },
+
+        "dotnet5.4": {
+            "imports": "portable-net451+win8"
+        }
     }
 }

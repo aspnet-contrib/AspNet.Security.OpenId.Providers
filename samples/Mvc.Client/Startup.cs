@@ -5,19 +5,22 @@
  */
 
 using System;
-using Microsoft.AspNet.Authentication;
-using Microsoft.AspNet.Authentication.Cookies;
-using Microsoft.AspNet.Builder;
-using Microsoft.AspNet.Hosting;
-using Microsoft.AspNet.Http;
+using AspNet.Security.OpenId;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Mvc.Client {
     public class Startup {
         public static void Main(string[] args) {
-            var application = new WebApplicationBuilder()
-                .UseConfiguration(WebApplicationConfiguration.GetDefault(args))
+            var application = new WebHostBuilder()
+                .UseDefaultConfiguration(args)
+                .UseIISPlatformHandlerUrl()
+                .UseServer("Microsoft.AspNetCore.Server.Kestrel")
                 .UseStartup<Startup>()
                 .Build();
 
@@ -25,46 +28,51 @@ namespace Mvc.Client {
         }
 
         public void ConfigureServices(IServiceCollection services) {
-            services.AddAuthentication();
-            services.AddMvc();
-
-            services.Configure<SharedAuthenticationOptions>(options => {
+            services.AddAuthentication(options => {
                 options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             });
+
+            services.AddMvc();
         }
 
         public void Configure(IApplicationBuilder app) {
             var factory = app.ApplicationServices.GetRequiredService<ILoggerFactory>();
             factory.AddConsole();
 
+            app.UseIISPlatformHandler();
+
+            app.UseForwardedHeaders(new ForwardedHeadersOptions {
+                ForwardedHeaders = ForwardedHeaders.All
+            });
+
             app.UseStaticFiles();
 
-            app.UseCookieAuthentication(options => {
-                options.AutomaticAuthenticate = true;
-                options.AutomaticChallenge = true;
-                options.AuthenticationScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.LoginPath = new PathString("/signin");
+            app.UseCookieAuthentication(new CookieAuthenticationOptions {
+                AutomaticAuthenticate = true,
+                AutomaticChallenge = true,
+                AuthenticationScheme = CookieAuthenticationDefaults.AuthenticationScheme,
+                LoginPath = new PathString("/signin")
             });
 
-            app.UseOpenIdAuthentication(options => {
-                options.AuthenticationScheme = "Orange";
-                options.DisplayName = "Orange";
-                options.Authority = new Uri("http://orange.fr/");
-                options.CallbackPath = new PathString("/signin-orange");
+            app.UseOpenIdAuthentication(new OpenIdAuthenticationOptions {
+                AuthenticationScheme = "Orange",
+                DisplayName = "Orange",
+                Authority = new Uri("http://orange.fr/"),
+                CallbackPath = new PathString("/signin-orange")
             });
 
-            app.UseOpenIdAuthentication(options => {
-                options.AuthenticationScheme = "StackExchange";
-                options.DisplayName = "StackExchange";
-                options.Authority = new Uri("https://openid.stackexchange.com/");
-                options.CallbackPath = new PathString("/signin-stackexchange");
+            app.UseOpenIdAuthentication(new OpenIdAuthenticationOptions {
+                AuthenticationScheme = "StackExchange",
+                DisplayName = "StackExchange",
+                Authority = new Uri("https://openid.stackexchange.com/"),
+                CallbackPath = new PathString("/signin-stackexchange")
             });
 
-            app.UseOpenIdAuthentication(options => {
-                options.AuthenticationScheme = "Intuit";
-                options.DisplayName = "Intuit";
-                options.CallbackPath = new PathString("/signin-intuit");
-                options.Endpoint = new Uri("https://openid.intuit.com/OpenId/Provider");
+            app.UseOpenIdAuthentication(new OpenIdAuthenticationOptions {
+                AuthenticationScheme = "Intuit",
+                DisplayName = "Intuit",
+                CallbackPath = new PathString("/signin-intuit"),
+                Endpoint = new Uri("https://openid.intuit.com/OpenId/Provider")
             });
 
             app.UseSteamAuthentication();

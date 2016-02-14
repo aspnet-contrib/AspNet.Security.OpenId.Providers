@@ -5,7 +5,7 @@
  */
 
 using System;
-using Microsoft.AspNet.Http;
+using Microsoft.AspNetCore.Http;
 
 namespace AspNet.Security.OpenId.Steam {
     public class SteamAuthenticationOptions : OpenIdAuthenticationOptions {

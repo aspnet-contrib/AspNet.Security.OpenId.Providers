@@ -8,10 +8,10 @@ using System;
 using System.Net.Http;
 using System.Text.Encodings.Web;
 using AngleSharp.Parser.Html;
-using Microsoft.AspNet.Authentication;
-using Microsoft.AspNet.DataProtection;
-using Microsoft.AspNet.Http;
-using Microsoft.Extensions.Internal;
+using JetBrains.Annotations;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -20,7 +20,7 @@ namespace AspNet.Security.OpenId {
         where TOptions : OpenIdAuthenticationOptions, new() {
         public OpenIdAuthenticationMiddleware(
             [NotNull] RequestDelegate next,
-            [NotNull] TOptions options,
+            [NotNull] IOptions<TOptions> options,
             [NotNull] IDataProtectionProvider dataProtectionProvider,
             [NotNull] ILoggerFactory loggerFactory,
             [NotNull] UrlEncoder encoder,
@@ -28,10 +28,6 @@ namespace AspNet.Security.OpenId {
             : base(next, options, loggerFactory, encoder) {
             if (Options.Authority == null && Options.Endpoint == null) {
                 throw new ArgumentException("An authority or an endpoint must be specified.", nameof(options));
-            }
-
-            if (Options.RandomNumberGenerator == null) {
-                throw new ArgumentException("A random number generator must be specified.", nameof(options));
             }
 
             if (string.IsNullOrEmpty(Options.SignInScheme)) {

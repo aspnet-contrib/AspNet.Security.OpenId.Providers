@@ -16,12 +16,11 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using AngleSharp.Dom.Html;
-using Microsoft.AspNet.Authentication;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Http.Authentication;
-using Microsoft.AspNet.Http.Features.Authentication;
-using Microsoft.AspNet.WebUtilities;
-using Microsoft.Extensions.Internal;
+using JetBrains.Annotations;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http.Authentication;
+using Microsoft.AspNetCore.Http.Features.Authentication;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 
@@ -502,54 +501,6 @@ namespace AspNet.Security.OpenId {
 
                     return false;
                 }
-            }
-
-            return true;
-        }
-
-        protected void GenerateCorrelationId([NotNull] AuthenticationProperties properties) {
-            var correlationKey = ".AspNet.Correlation." + Options.AuthenticationScheme;
-
-            var nonceBytes = new byte[32];
-            Options.RandomNumberGenerator.GetBytes(nonceBytes);
-            var correlationId = Base64UrlTextEncoder.Encode(nonceBytes);
-
-            properties.Items[correlationKey] = correlationId;
-
-            Response.Cookies.Append(correlationKey, correlationId, new CookieOptions {
-                HttpOnly = true,
-                Secure = Request.IsHttps
-            });
-        }
-
-        protected bool ValidateCorrelationId([NotNull] AuthenticationProperties properties) {
-            var correlationKey = ".AspNet.Correlation." + Options.AuthenticationScheme;
-
-            var correlationCookie = Request.Cookies[correlationKey];
-            if (string.IsNullOrWhiteSpace(correlationCookie)) {
-                Logger.LogWarning("{0} cookie not found.", correlationKey);
-
-                return false;
-            }
-
-            Response.Cookies.Delete(correlationKey, new CookieOptions {
-                HttpOnly = true,
-                Secure = Request.IsHttps
-            });
-
-            string correlationExtra;
-            if (!properties.Items.TryGetValue(correlationKey, out correlationExtra)) {
-                Logger.LogWarning("{0} state property not found.", correlationKey);
-
-                return false;
-            }
-
-            properties.Items.Remove(correlationKey);
-
-            if (!string.Equals(correlationCookie, correlationExtra, StringComparison.Ordinal)) {
-                Logger.LogWarning("{0} correlation cookie and state property mismatch.", correlationKey);
-
-                return false;
             }
 
             return true;

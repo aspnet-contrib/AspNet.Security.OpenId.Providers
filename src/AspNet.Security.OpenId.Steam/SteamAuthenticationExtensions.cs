@@ -6,9 +6,10 @@
 
 using System;
 using AspNet.Security.OpenId.Steam;
-using Microsoft.Extensions.Internal;
+using JetBrains.Annotations;
+using Microsoft.Extensions.Options;
 
-namespace Microsoft.AspNet.Builder {
+namespace Microsoft.AspNetCore.Builder {
     /// <summary>
     /// Exposes convenient extensions that can be used to add an instance
     /// of the Steam authentication middleware in an ASP.NET 5 pipeline.
@@ -21,7 +22,7 @@ namespace Microsoft.AspNet.Builder {
         /// <param name="app">The <see cref="IApplicationBuilder"/>.</param>
         /// <returns>The <see cref="IApplicationBuilder"/>.</returns>
         public static IApplicationBuilder UseSteamAuthentication([NotNull] this IApplicationBuilder app) {
-            return app.UseMiddleware<SteamAuthenticationMiddleware>(new SteamAuthenticationOptions());
+            return app.UseSteamAuthentication(new SteamAuthenticationOptions());
         }
 
         /// <summary>
@@ -34,9 +35,8 @@ namespace Microsoft.AspNet.Builder {
         public static IApplicationBuilder UseSteamAuthentication(
             [NotNull] this IApplicationBuilder app,
             [NotNull] SteamAuthenticationOptions options) {
-            return app.UseMiddleware<SteamAuthenticationMiddleware>(options);
+            return app.UseMiddleware<SteamAuthenticationMiddleware>(Options.Create(options));
         }
-
 
         /// <summary>
         /// Adds <see cref="SteamAuthenticationMiddleware"/> to the specified

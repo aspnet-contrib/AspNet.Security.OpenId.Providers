@@ -6,9 +6,9 @@
 
 using System.Collections.Generic;
 using System.Security.Claims;
-using Microsoft.AspNet.Authentication;
-using Microsoft.AspNet.Http;
-using Microsoft.Extensions.Internal;
+using JetBrains.Annotations;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
 
 namespace AspNet.Security.OpenId {
