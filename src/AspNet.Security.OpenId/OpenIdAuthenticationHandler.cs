@@ -22,7 +22,6 @@ using Microsoft.AspNetCore.Http.Authentication;
 using Microsoft.AspNetCore.Http.Features.Authentication;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Primitives;
 
 namespace AspNet.Security.OpenId {
     public class OpenIdAuthenticationHandler<TOptions> : RemoteAuthenticationHandler<TOptions> where TOptions : OpenIdAuthenticationOptions {
@@ -43,10 +42,10 @@ namespace AspNet.Security.OpenId {
             // Validate the anti-forgery token.
             if (!ValidateCorrelationId(properties)) {
                 return AuthenticateResult.Fail("The authentication response was rejected " +
-                                               "because the anti-forgery identifier was invalid.");
+                                               "because the anti-forgery token was invalid.");
             }
 
-            IDictionary<string, StringValues> message;
+            OpenIdAuthenticationMessage message;
 
             // OpenID 2.0 responses MUST necessarily be made using either GET or POST.
             // See http://openid.net/specs/openid-authentication-2_0.html#anchor4
@@ -57,7 +56,7 @@ namespace AspNet.Security.OpenId {
             }
 
             if (string.Equals(Request.Method, "GET", StringComparison.OrdinalIgnoreCase)) {
-                message = Request.Query.ToDictionary();
+                message = new OpenIdAuthenticationMessage(Request.Query);
             }
 
             else {
@@ -74,23 +73,34 @@ namespace AspNet.Security.OpenId {
                                                    "was received: make sure to use 'application/x-www-form-urlencoded'.");
                 }
 
-                var form = await Request.ReadFormAsync(Context.RequestAborted);
-
-                message = form.ToDictionary();
+                message = new OpenIdAuthenticationMessage(await Request.ReadFormAsync(Context.RequestAborted));
             }
 
             // Ensure that the current request corresponds to an OpenID 2.0 assertion.
-            if (!string.Equals(message[OpenIdAuthenticationConstants.Prefixes.OpenId +
-                                       OpenIdAuthenticationConstants.Parameters.Namespace],
-                               OpenIdAuthenticationConstants.Namespaces.OpenId, StringComparison.Ordinal)) {
+            if (!string.Equals(message.Namespace, OpenIdAuthenticationConstants.Namespaces.OpenId, StringComparison.Ordinal)) {
                 return AuthenticateResult.Fail("The authentication response was rejected because it was missing the mandatory " +
                                                "'openid.ns' parameter or because an unsupported version of OpenID was used.");
             }
 
-            // Stop processing the message if the assertion was not positive.
-            if (!string.Equals(message[OpenIdAuthenticationConstants.Prefixes.OpenId +
-                                       OpenIdAuthenticationConstants.Parameters.Mode],
-                               OpenIdAuthenticationConstants.Modes.IdRes, StringComparison.Ordinal)) {
+            // Stop processing the message if the authentication process was cancelled by the user.
+            if (string.Equals(message.Mode, OpenIdAuthenticationConstants.Modes.Cancel, StringComparison.Ordinal)) {
+                return AuthenticateResult.Fail("The authentication response was rejected because " +
+                                               "the operation was cancelled by the user.");
+            }
+
+            // Stop processing the message if an error was returned by the provider.
+            else if (string.Equals(message.Mode, OpenIdAuthenticationConstants.Modes.Error, StringComparison.Ordinal)) {
+                if (string.IsNullOrEmpty(message.Error)) {
+                    return AuthenticateResult.Fail("The authentication response was rejected because an " +
+                                                   "unspecified error was returned by the identity provider.");
+                }
+
+                return AuthenticateResult.Fail("The authentication response was rejected because " +
+                                              $"an error was returned by the identity provider: {message.Error}.");
+            }
+
+            // At this point, stop processing the message if the assertion was not positive.
+            else if (!string.Equals(message.Mode, OpenIdAuthenticationConstants.Modes.IdRes, StringComparison.Ordinal)) {
                 return AuthenticateResult.Fail("The authentication response was rejected because " +
                                                "the identity provider declared it as invalid.");
             }
@@ -101,25 +111,17 @@ namespace AspNet.Security.OpenId {
                 return AuthenticateResult.Fail("The authentication response was rejected by the identity provider.");
             }
 
+            var address = QueryHelpers.AddQueryString(uri: properties.Items[OpenIdAuthenticationConstants.Properties.ReturnTo],
+                                                      name: OpenIdAuthenticationConstants.Parameters.State, value: state);
+
             // Validate the return_to parameter by comparing it to the address stored in the properties.
             // See http://openid.net/specs/openid-authentication-2_0.html#verify_return_to
-            var address = QueryHelpers.AddQueryString(uri: properties.Items[OpenIdAuthenticationConstants.Parameters.ReturnTo],
-                                                      name: OpenIdAuthenticationConstants.Parameters.State, value: state);
-            if (!string.Equals(message[OpenIdAuthenticationConstants.Prefixes.OpenId +
-                                       OpenIdAuthenticationConstants.Parameters.ReturnTo], address, StringComparison.Ordinal)) {
+            if (!string.Equals(message.ReturnTo, address, StringComparison.Ordinal)) {
                 return AuthenticateResult.Fail("The authentication response was rejected because the return_to parameter was invalid.");
             }
 
-            // Create a new dictionary containing the extensions found in the assertion.
-            var prefix = OpenIdAuthenticationConstants.Prefixes.OpenId + OpenIdAuthenticationConstants.Prefixes.Namespace;
-            var extensions = message.Where(parameter => parameter.Key.StartsWith(prefix, StringComparison.Ordinal))
-                                    .ToDictionary(parameter => parameter.Value.FirstOrDefault(),
-                                                  parameter => parameter.Key.Substring(prefix.Length));
-
             // Make sure the OpenID 2.0 assertion contains an identifier.
-            var identifier = message[OpenIdAuthenticationConstants.Prefixes.OpenId +
-                                     OpenIdAuthenticationConstants.Parameters.ClaimedId];
-            if (string.IsNullOrEmpty(identifier)) {
+            if (string.IsNullOrEmpty(message.ClaimedIdentifier)) {
                 return AuthenticateResult.Fail("The authentication response was rejected because it " +
                                                "was missing the mandatory 'claimed_id' parameter.");
             }
@@ -127,79 +129,43 @@ namespace AspNet.Security.OpenId {
             var identity = new ClaimsIdentity(Options.AuthenticationScheme);
 
             // Add the claimed identifier to the identity. 
-            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, identifier, ClaimValueTypes.String, Options.ClaimsIssuer));
+            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, message.ClaimedIdentifier, ClaimValueTypes.String, Options.ClaimsIssuer));
 
-            // Create a new dictionary containing the optional attributes extracted from the assertion.
-            var attributes = new Dictionary<string, string>(StringComparer.Ordinal);
-
-            // Determine whether attribute exchange has been enabled.
-            string alias;
-            if (extensions.TryGetValue(OpenIdAuthenticationConstants.Namespaces.Ax, out alias)) {
-                foreach (var parameter in message) {
-                    // Exclude parameters that don't correspond to the attribute exchange alias.
-                    if (!parameter.Key.StartsWith(OpenIdAuthenticationConstants.Prefixes.OpenId + alias +
-                                                  OpenIdAuthenticationConstants.Suffixes.Type, StringComparison.Ordinal)) {
-                        continue;
-                    }
-
-                    // Exclude attributes whose alias is malformed.
-                    var name = parameter.Key.Substring((OpenIdAuthenticationConstants.Prefixes.OpenId + alias +
-                                                        OpenIdAuthenticationConstants.Suffixes.Type + ".").Length);
-                    if (string.IsNullOrEmpty(name)) {
-                        continue;
-                    }
-
-                    // Exclude attributes whose type is missing.
-                    string type = parameter.Value;
-                    if (string.IsNullOrEmpty(type)) {
-                        continue;
-                    }
-
-                    // Exclude attributes whose value is missing.
-                    string value = message[OpenIdAuthenticationConstants.Prefixes.OpenId + alias +
-                                           OpenIdAuthenticationConstants.Suffixes.Value + $".{name}"];
-                    if (string.IsNullOrEmpty(value)) {
-                        continue;
-                    }
-
-                    attributes.Add(type, value);
+            // Add the most common attributes to the identity.
+            var attributes = message.GetAttributes();
+            foreach (var attribute in attributes) {
+                // http://axschema.org/contact/email
+                if (string.Equals(attribute.Key, OpenIdAuthenticationConstants.Attributes.Email, StringComparison.Ordinal)) {
+                    identity.AddClaim(new Claim(ClaimTypes.Email, attribute.Value, ClaimValueTypes.Email, Options.ClaimsIssuer));
                 }
 
-                // Add the most common attributes to the identity.
-                foreach (var attribute in attributes) {
-                    // http://axschema.org/contact/email
-                    if (string.Equals(attribute.Key, OpenIdAuthenticationConstants.Attributes.Email, StringComparison.Ordinal)) {
-                        identity.AddClaim(new Claim(ClaimTypes.Email, attribute.Value, ClaimValueTypes.Email, Options.ClaimsIssuer));
-                    }
-
-                    // http://axschema.org/namePerson
-                    else if (string.Equals(attribute.Key, OpenIdAuthenticationConstants.Attributes.Name, StringComparison.Ordinal)) {
-                        identity.AddClaim(new Claim(ClaimTypes.Name, attribute.Value, ClaimValueTypes.String, Options.ClaimsIssuer));
-                    }
-
-                    // http://axschema.org/namePerson/first
-                    else if (string.Equals(attribute.Key, OpenIdAuthenticationConstants.Attributes.Firstname, StringComparison.Ordinal)) {
-                        identity.AddClaim(new Claim(ClaimTypes.GivenName, attribute.Value, ClaimValueTypes.String, Options.ClaimsIssuer));
-                    }
-
-                    // http://axschema.org/namePerson/last
-                    else if (string.Equals(attribute.Key, OpenIdAuthenticationConstants.Attributes.Lastname, StringComparison.Ordinal)) {
-                        identity.AddClaim(new Claim(ClaimTypes.Surname, attribute.Value, ClaimValueTypes.String, Options.ClaimsIssuer));
-                    }
+                // http://axschema.org/namePerson
+                else if (string.Equals(attribute.Key, OpenIdAuthenticationConstants.Attributes.Name, StringComparison.Ordinal)) {
+                    identity.AddClaim(new Claim(ClaimTypes.Name, attribute.Value, ClaimValueTypes.String, Options.ClaimsIssuer));
                 }
 
-                // Create a ClaimTypes.Name claim using ClaimTypes.GivenName and ClaimTypes.Surname
-                // if the http://axschema.org/namePerson attribute cannot be found in the assertion.
-                if (!identity.HasClaim(claim => string.Equals(claim.Type, ClaimTypes.Name, StringComparison.OrdinalIgnoreCase)) &&
-                     identity.HasClaim(claim => string.Equals(claim.Type, ClaimTypes.GivenName, StringComparison.OrdinalIgnoreCase)) &&
-                     identity.HasClaim(claim => string.Equals(claim.Type, ClaimTypes.Surname, StringComparison.OrdinalIgnoreCase))) {
-                    identity.AddClaim(new Claim(ClaimTypes.Name, $"{identity.FindFirst(ClaimTypes.GivenName).Value} " +
-                                                                 $"{identity.FindFirst(ClaimTypes.Surname).Value}",
-                                                ClaimValueTypes.String, Options.ClaimsIssuer));
+                // http://axschema.org/namePerson/first
+                else if (string.Equals(attribute.Key, OpenIdAuthenticationConstants.Attributes.Firstname, StringComparison.Ordinal)) {
+                    identity.AddClaim(new Claim(ClaimTypes.GivenName, attribute.Value, ClaimValueTypes.String, Options.ClaimsIssuer));
+                }
+
+                // http://axschema.org/namePerson/last
+                else if (string.Equals(attribute.Key, OpenIdAuthenticationConstants.Attributes.Lastname, StringComparison.Ordinal)) {
+                    identity.AddClaim(new Claim(ClaimTypes.Surname, attribute.Value, ClaimValueTypes.String, Options.ClaimsIssuer));
                 }
             }
 
-            var ticket = await CreateTicketAsync(identity, properties, identifier, attributes);
+            // Create a ClaimTypes.Name claim using ClaimTypes.GivenName and ClaimTypes.Surname
+            // if the http://axschema.org/namePerson attribute cannot be found in the assertion.
+            if (!identity.HasClaim(claim => string.Equals(claim.Type, ClaimTypes.Name, StringComparison.OrdinalIgnoreCase)) &&
+                 identity.HasClaim(claim => string.Equals(claim.Type, ClaimTypes.GivenName, StringComparison.OrdinalIgnoreCase)) &&
+                 identity.HasClaim(claim => string.Equals(claim.Type, ClaimTypes.Surname, StringComparison.OrdinalIgnoreCase))) {
+                identity.AddClaim(new Claim(ClaimTypes.Name, $"{identity.FindFirst(ClaimTypes.GivenName).Value} " +
+                                                             $"{identity.FindFirst(ClaimTypes.Surname).Value}",
+                                            ClaimValueTypes.String, Options.ClaimsIssuer));
+            }
+
+            var ticket = await CreateTicketAsync(identity, properties, message.ClaimedIdentifier, attributes);
             if (ticket == null) {
                 Logger.LogInformation("The authentication process was skipped because returned a null ticket was returned.");
 
@@ -260,7 +226,7 @@ namespace AspNet.Security.OpenId {
             }
 
             // Store the return_to parameter for later comparison.
-            properties.Items[OpenIdAuthenticationConstants.Parameters.ReturnTo] =
+            properties.Items[OpenIdAuthenticationConstants.Properties.ReturnTo] =
                 Request.Scheme + "://" + Request.Host +
                 OriginalPathBase + Options.CallbackPath;
 
@@ -269,64 +235,53 @@ namespace AspNet.Security.OpenId {
 
             var state = UrlEncoder.Encode(Options.StateDataFormat.Protect(properties));
 
-            // Create a new dictionary containing the OpenID 2.0 request parameters.
+            // Create a new message containing the OpenID 2.0 request parameters.
             // See http://openid.net/specs/openid-authentication-2_0.html#requesting_authentication
-            var parameters = new Dictionary<string, string> {
-                // openid.ns (http://specs.openid.net/auth/2.0)
-                [OpenIdAuthenticationConstants.Prefixes.OpenId +
-                 OpenIdAuthenticationConstants.Parameters.Namespace] = OpenIdAuthenticationConstants.Namespaces.OpenId,
-
-                // openid.mode (checkid_setup)
-                [OpenIdAuthenticationConstants.Prefixes.OpenId +
-                 OpenIdAuthenticationConstants.Parameters.Mode] = OpenIdAuthenticationConstants.Modes.CheckIdSetup,
-
-                // openid.claimed_id (http://specs.openid.net/auth/2.0/identifier_select)
-                [OpenIdAuthenticationConstants.Prefixes.OpenId +
-                 OpenIdAuthenticationConstants.Parameters.ClaimedId] = "http://specs.openid.net/auth/2.0/identifier_select",
-
-                // openid.identity (http://specs.openid.net/auth/2.0/identifier_select)
-                [OpenIdAuthenticationConstants.Prefixes.OpenId +
-                 OpenIdAuthenticationConstants.Parameters.Identity] = "http://specs.openid.net/auth/2.0/identifier_select",
-
-                // openid.return_to
-                [OpenIdAuthenticationConstants.Prefixes.OpenId +
-                 OpenIdAuthenticationConstants.Parameters.ReturnTo] = QueryHelpers.AddQueryString(
-                     properties.Items[OpenIdAuthenticationConstants.Parameters.ReturnTo], "state", state),
-
-                // openid_realm
-                [OpenIdAuthenticationConstants.Prefixes.OpenId + OpenIdAuthenticationConstants.Parameters.Realm] = realm
+            var message = new OpenIdAuthenticationMessage {
+                ClaimedIdentifier = "http://specs.openid.net/auth/2.0/identifier_select",
+                Identity = "http://specs.openid.net/auth/2.0/identifier_select",
+                Mode = OpenIdAuthenticationConstants.Modes.CheckIdSetup,
+                Namespace = OpenIdAuthenticationConstants.Namespaces.OpenId,
+                Realm = realm,
+                ReturnTo = QueryHelpers.AddQueryString(
+                    uri: properties.Items[OpenIdAuthenticationConstants.Properties.ReturnTo],
+                    name: OpenIdAuthenticationConstants.Parameters.State, value: state)
             };
 
-            if (Options.Attributes.Any()) {
+            if (Options.Attributes.Count != 0) {
                 // openid.ns.ax (http://openid.net/srv/ax/1.0)
-                parameters[OpenIdAuthenticationConstants.Prefixes.OpenId +
-                           OpenIdAuthenticationConstants.Prefixes.Namespace +
-                           OpenIdAuthenticationConstants.Aliases.Ax] = OpenIdAuthenticationConstants.Namespaces.Ax;
+                message.SetParameter(
+                    prefix: OpenIdAuthenticationConstants.Prefixes.Namespace,
+                    name: OpenIdAuthenticationConstants.Aliases.Ax,
+                    value: OpenIdAuthenticationConstants.Namespaces.Ax);
 
                 // openid.ax.mode (fetch_request)
-                parameters[OpenIdAuthenticationConstants.Prefixes.OpenId +
-                           OpenIdAuthenticationConstants.Prefixes.Ax +
-                           OpenIdAuthenticationConstants.Parameters.Mode] = OpenIdAuthenticationConstants.Modes.FetchRequest;
+                message.SetParameter(
+                    prefix: OpenIdAuthenticationConstants.Prefixes.Ax,
+                    name: OpenIdAuthenticationConstants.Parameters.Mode,
+                    value: OpenIdAuthenticationConstants.Modes.FetchRequest);
 
                 foreach (var attribute in Options.Attributes) {
-                    parameters[OpenIdAuthenticationConstants.Prefixes.OpenId +
-                               OpenIdAuthenticationConstants.Prefixes.Ax +
-                               OpenIdAuthenticationConstants.Prefixes.Type + attribute.Key] = attribute.Value;
+                    message.SetParameter(
+                        prefix: OpenIdAuthenticationConstants.Prefixes.Ax,
+                        name: $"{OpenIdAuthenticationConstants.Prefixes.Type}.{attribute.Key}",
+                        value: attribute.Value);
                 }
 
                 // openid.ax.required
-                parameters[OpenIdAuthenticationConstants.Prefixes.OpenId +
-                           OpenIdAuthenticationConstants.Prefixes.Ax +
-                           OpenIdAuthenticationConstants.Parameters.Required] = string.Join(",", Options.Attributes.Select(attribute => attribute.Key));
+                message.SetParameter(
+                    prefix: OpenIdAuthenticationConstants.Prefixes.Ax,
+                    name: OpenIdAuthenticationConstants.Parameters.Required,
+                    value: string.Join(",", Options.Attributes.Select(attribute => attribute.Key)));
             }
 
-            Response.Redirect(await GenerateChallengeUrlAsync(parameters));
+            Response.Redirect(await GenerateChallengeUrlAsync(message));
 
             return true;
         }
 
-        protected virtual Task<string> GenerateChallengeUrlAsync([NotNull] IDictionary<string, string> parameters) {
-            return Task.FromResult(QueryHelpers.AddQueryString(Options.Endpoint.AbsoluteUri, parameters));
+        protected virtual Task<string> GenerateChallengeUrlAsync([NotNull] OpenIdAuthenticationMessage message) {
+            return Task.FromResult(QueryHelpers.AddQueryString(Options.Endpoint.AbsoluteUri, message.Parameters));
         }
 
         protected virtual async Task<Uri> DiscoverEndpointAsync([NotNull] Uri address) {
@@ -429,19 +384,19 @@ namespace AspNet.Security.OpenId {
             return null;
         }
 
-        protected virtual async Task<bool> VerifyAssertionAsync([NotNull] IDictionary<string, StringValues> message) {
-            // Create a new dictionary to store the parameters sent to the identity provider.
+        protected virtual async Task<bool> VerifyAssertionAsync([NotNull] OpenIdAuthenticationMessage message) {
+            // Create a new message to store the parameters sent to the identity provider.
             // Note: using a dictionary is safe as OpenID 2.0 parameters are supposed to be unique.
             // See http://openid.net/specs/openid-authentication-2_0.html#anchor4
             var payload = new Dictionary<string, string> {
-                [OpenIdAuthenticationConstants.Prefixes.OpenId +
-                 OpenIdAuthenticationConstants.Parameters.Mode] = OpenIdAuthenticationConstants.Modes.CheckAuthentication
+                [$"{OpenIdAuthenticationConstants.Prefixes.OpenId}." +
+                    OpenIdAuthenticationConstants.Parameters.Mode] = OpenIdAuthenticationConstants.Modes.CheckAuthentication
             };
 
             // Copy the parameters extracted from the assertion.
-            foreach (var parameter in message) {
-                if (string.Equals(parameter.Key, OpenIdAuthenticationConstants.Prefixes.OpenId +
-                                                 OpenIdAuthenticationConstants.Parameters.Mode, StringComparison.Ordinal)) {
+            foreach (var parameter in message.Parameters) {
+                if (string.Equals(parameter.Key, $"{OpenIdAuthenticationConstants.Prefixes.OpenId}." +
+                                                    OpenIdAuthenticationConstants.Parameters.Mode, StringComparison.Ordinal)) {
                     continue;
                 }
 
@@ -451,7 +406,7 @@ namespace AspNet.Security.OpenId {
                     continue;
                 }
 
-                payload.Add(parameter.Key, parameter.Value.FirstOrDefault());
+                payload.Add(parameter.Key, parameter.Value);
             }
 
             // Create a new check_authentication request to verify the assertion.

@@ -38,6 +38,7 @@ namespace Mvc.Client {
         public void Configure(IApplicationBuilder app) {
             var factory = app.ApplicationServices.GetRequiredService<ILoggerFactory>();
             factory.AddConsole();
+            factory.AddDebug();
 
             app.UseIISPlatformHandler();
 
