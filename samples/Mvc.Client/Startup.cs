@@ -33,6 +33,7 @@ namespace Mvc.Client {
             });
 
             services.AddMvc();
+            services.AddMvcDnx();
         }
 
         public void Configure(IApplicationBuilder app) {
