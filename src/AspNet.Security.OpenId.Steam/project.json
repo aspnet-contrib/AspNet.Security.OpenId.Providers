@@ -1,24 +1,44 @@
 ﻿{
-    "version": "1.0.0-*",
-    "description": "ASP.NET 5 authentication middleware for Steam.",
-    "authors": [ "Kévin Chalet" ],
-    "owners": [ "Kévin Chalet" ],
+  "version": "1.0.0-alpha4-*",
 
-    "projectUrl": "https://github.com/aspnet-contrib/AspNet.Security.OpenId.Providers",
-    "licenseUrl": "http://www.apache.org/licenses/LICENSE-2.0.html",
+  "description": "ASP.NET Core authentication middleware for Steam.",
+  "authors": [ "Kévin Chalet" ],
+  "owners": [ "Kévin Chalet" ],
 
-    "dependencies": {
-        "AspNet.Security.OpenId": "1.0.0-*"
-    },
+  "projectUrl": "https://github.com/aspnet-contrib/AspNet.Security.OpenId.Providers",
+  "licenseUrl": "http://www.apache.org/licenses/LICENSE-2.0.html",
 
-    "frameworks": {
-        "net451": { },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/aspnet-contrib/AspNet.Security.OpenId.Providers"
+  },
 
-        "netstandard1.3": {
-            "imports": [
-                "dotnet5.4",
-                "portable-net451+win8"
-            ]
-        }
+  "tags": [
+    "aspnetcore",
+    "authentication",
+    "openid",
+    "security",
+    "steam"
+  ],
+
+  "compilationOptions": {
+    "nowarn": [ "CS1591" ],
+    "xmlDoc": true
+  },
+
+  "dependencies": {
+    "AspNet.Security.OpenId": "1.0.0-*",
+    "JetBrains.Annotations": { "type": "build", "version": "10.1.2-eap" }
+  },
+
+  "frameworks": {
+    "net451": { },
+
+    "netstandard1.3": {
+      "imports": [
+        "dotnet5.4",
+        "portable-net451+win8"
+      ]
     }
+  }
 }
