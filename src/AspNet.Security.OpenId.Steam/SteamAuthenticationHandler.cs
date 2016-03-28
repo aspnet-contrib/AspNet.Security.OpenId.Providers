@@ -25,9 +25,19 @@ namespace AspNet.Security.OpenId.Steam {
             var principal = new ClaimsPrincipal(identity);
             var ticket = new AuthenticationTicket(principal, properties, Options.AuthenticationScheme);
 
-            // Return the authentication ticket as-is if the application key cannot
-            // be found or if the user information endpoint has not been set.
-            if (string.IsNullOrEmpty(Options.UserInformationEndpoint) || string.IsNullOrEmpty(Options.ApplicationKey)) {
+            // Return the authentication ticket as-is if the
+            // user information endpoint has not been set.
+            if (string.IsNullOrEmpty(Options.UserInformationEndpoint)) {
+                Logger.LogInformation("The userinfo request was skipped because no userinfo endpoint was configured.");
+
+                return ticket;
+            }
+
+            // Return the authentication ticket as-is
+            // if the application key has not been set.
+            if (string.IsNullOrEmpty(Options.ApplicationKey)) {
+                Logger.LogInformation("The userinfo request was skipped because no application key was configured.");
+
                 return ticket;
             }
 
@@ -68,7 +78,7 @@ namespace AspNet.Security.OpenId.Steam {
             if (!string.IsNullOrEmpty(profile)) {
                 identity.AddClaim(new Claim(ClaimTypes.Name, profile, ClaimValueTypes.String, Options.ClaimsIssuer));
             }
-            
+
             var context = new OpenIdAuthenticatedContext(Context, Options, ticket) {
                 User = payload
             };
