@@ -28,7 +28,7 @@
   },
 
   "dependencies": {
-    "AspNet.Security.OpenId": "1.0.0-*",
+    "AspNet.Security.OpenId": "1.0.0-alpha4-*",
     "JetBrains.Annotations": { "type": "build", "version": "10.1.2-eap" }
   },
 
