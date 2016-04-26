@@ -9,7 +9,6 @@ using AspNet.Security.OpenId;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Mvc.Client {
@@ -23,10 +22,6 @@ namespace Mvc.Client {
         }
 
         public void Configure(IApplicationBuilder app) {
-            app.UseForwardedHeaders(new ForwardedHeadersOptions {
-                ForwardedHeaders = ForwardedHeaders.All
-            });
-
             app.UseStaticFiles();
 
             app.UseCookieAuthentication(new CookieAuthenticationOptions {
