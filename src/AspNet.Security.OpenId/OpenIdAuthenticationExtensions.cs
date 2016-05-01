@@ -57,7 +57,7 @@ namespace Microsoft.AspNetCore.Builder {
             var options = new OpenIdAuthenticationOptions();
             configuration(options);
 
-            return app.UseOpenIdAuthentication(options);
+            return app.UseMiddleware<OpenIdAuthenticationMiddleware<OpenIdAuthenticationOptions>>(Options.Create(options));
         }
     }
 }

@@ -67,7 +67,7 @@ namespace Microsoft.AspNetCore.Builder {
             var options = new SteamAuthenticationOptions();
             configuration(options);
 
-            return app.UseSteamAuthentication(options);
+            return app.UseMiddleware<SteamAuthenticationMiddleware>(Options.Create(options));
         }
     }
 }
