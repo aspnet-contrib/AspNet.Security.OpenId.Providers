@@ -1,7 +1,8 @@
 {
-  "compilationOptions": {
+  "buildOptions": {
     "debugType": "portable",
     "emitEntryPoint": true,
+    "warningsAsErrors": true,
     "preserveCompilationContext": true
   },
 
@@ -34,12 +35,6 @@
     }
   },
 
-  "content": [
-    "wwwroot",
-    "Views",
-    "web.config"
-  ],
-
   "tools": {
     "Microsoft.AspNetCore.Server.IISIntegration.Tools": {
       "version": "1.0.0-rc2-*",
@@ -51,17 +46,11 @@
     "postpublish": "dotnet publish-iis --publish-folder %publish:OutputPath% --framework %publish:FullTargetFramework%"
   },
 
-  "exclude": [
-    "wwwroot",
-    "node_modules",
-    "bower_components"
-  ],
-
-  "publishExclude": [
-    "node_modules",
-    "bower_components",
-    "**.xproj",
-    "**.user",
-    "**.vspscc"
-  ]
+  "publishOptions": {
+    "include": [
+      "wwwroot",
+      "Views",
+      "web.config"
+    ]
+  }
 }
