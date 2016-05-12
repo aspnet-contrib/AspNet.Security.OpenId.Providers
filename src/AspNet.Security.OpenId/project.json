@@ -1,27 +1,30 @@
 {
   "version": "1.0.0-beta1-*",
 
-  "description": "ASP.NET Core authentication middleware for OpenID 2.0 providers.",
-  "authors": [ "Kévin Chalet" ],
-  "owners": [ "Kévin Chalet" ],
+  "packOptions": {
+    "description": "ASP.NET Core authentication middleware for OpenID 2.0 providers.",
+    "authors": [ "Kévin Chalet" ],
+    "owners": [ "Kévin Chalet" ],
 
-  "projectUrl": "https://github.com/aspnet-contrib/AspNet.Security.OpenId.Providers",
-  "iconUrl": "https://avatars3.githubusercontent.com/u/7998081?s=64",
-  "licenseUrl": "http://www.apache.org/licenses/LICENSE-2.0.html",
+    "projectUrl": "https://github.com/aspnet-contrib/AspNet.Security.OpenId.Providers",
+    "iconUrl": "https://avatars3.githubusercontent.com/u/7998081?s=64",
+    "licenseUrl": "http://www.apache.org/licenses/LICENSE-2.0.html",
 
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/aspnet-contrib/AspNet.Security.OpenId.Providers"
+    "repository": {
+      "type": "git",
+      "url": "git://github.com/aspnet-contrib/AspNet.Security.OpenId.Providers"
+    },
+
+    "tags": [
+      "aspnetcore",
+      "authentication",
+      "openid",
+      "security"
+    ]
   },
 
-  "tags": [
-    "aspnetcore",
-    "authentication",
-    "openid",
-    "security"
-  ],
-
-  "compilationOptions": {
+  "buildOptions": {
+    "warningsAsErrors": true,
     "nowarn": [ "CS1591" ],
     "xmlDoc": true
   },

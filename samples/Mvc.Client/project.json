@@ -1,7 +1,8 @@
 {
-  "compilationOptions": {
+  "buildOptions": {
     "debugType": "portable",
     "emitEntryPoint": true,
+    "warningsAsErrors": true,
     "preserveCompilationContext": true
   },
 
@@ -20,7 +21,11 @@
   },
 
   "frameworks": {
-    "net451": { },
+    "net451": {
+      "dependencies": {
+        "Microsoft.NETCore.Platforms": "1.0.1-*"
+      }
+    },
 
     "netcoreapp1.0": {
       "dependencies": {
@@ -34,12 +39,6 @@
     }
   },
 
-  "content": [
-    "wwwroot",
-    "Views",
-    "web.config"
-  ],
-
   "tools": {
     "Microsoft.AspNetCore.Server.IISIntegration.Tools": {
       "version": "1.0.0-*",
@@ -51,17 +50,11 @@
     "postpublish": "dotnet publish-iis --publish-folder %publish:OutputPath% --framework %publish:FullTargetFramework%"
   },
 
-  "exclude": [
-    "wwwroot",
-    "node_modules",
-    "bower_components"
-  ],
-
-  "publishExclude": [
-    "node_modules",
-    "bower_components",
-    "**.xproj",
-    "**.user",
-    "**.vspscc"
-  ]
+  "publishOptions": {
+    "include": [
+      "wwwroot",
+      "Views",
+      "web.config"
+    ]
+  }
 }
