@@ -30,19 +30,14 @@
   },
 
   "dependencies": {
-    "AngleSharp": "0.9.4",
-    "JetBrains.Annotations": { "type": "build", "version": "10.1.2-eap" },
+    "AngleSharp": "0.9.6",
+    "JetBrains.Annotations": { "type": "build", "version": "10.1.4" },
     "Microsoft.AspNetCore.Authentication": "1.0.0-*",
     "Newtonsoft.Json": "8.0.3"
   },
 
   "frameworks": {
-    "net451": {
-      "frameworkAssemblies": {
-        "System.IO": { "type": "build" },
-        "System.Runtime": { "type": "build" }
-      }
-    },
+    "net451": { },
 
     "netstandard1.3": {
       "imports": [
