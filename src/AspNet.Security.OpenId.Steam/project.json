@@ -31,7 +31,7 @@
   },
 
   "dependencies": {
-    "AspNet.Security.OpenId": "1.0.0-alpha4-*",
+    "AspNet.Security.OpenId": { "target": "project" },
     "JetBrains.Annotations": { "type": "build", "version": "10.1.4" }
   },
 

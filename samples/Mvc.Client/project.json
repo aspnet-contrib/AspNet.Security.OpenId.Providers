@@ -15,7 +15,7 @@
   },
 
   "dependencies": {
-    "AspNet.Security.OpenId.Steam": "1.0.0-alpha4-*",
+    "AspNet.Security.OpenId.Steam": { "target": "project" },
     "Microsoft.AspNetCore.Authentication.Cookies": "1.0.0-rc2-*",
     "Microsoft.AspNetCore.Hosting": "1.0.0-rc2-*",
     "Microsoft.AspNetCore.Mvc": "1.0.0-rc2-*",
