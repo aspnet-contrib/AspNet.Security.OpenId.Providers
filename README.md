@@ -5,8 +5,8 @@ AspNet.Security.OpenId.Providers
 
 **The latest official release can be found on [NuGet](https://www.nuget.org/profiles/aspnet-contrib) and the nightly builds on [MyGet](https://www.myget.org/gallery/aspnet-contrib)**.
 
-[![Build status](https://ci.appveyor.com/api/projects/status/tc9n807mwi4sr5jd/branch/release?svg=true)](https://ci.appveyor.com/project/aspnet-contrib/aspnet-security-openid-providers/branch/release)
-[![Build status](https://travis-ci.org/aspnet-contrib/AspNet.Security.OpenId.Providers.svg?branch=release)](https://travis-ci.org/aspnet-contrib/AspNet.Security.OpenId.Providers)
+[![Build status](https://ci.appveyor.com/api/projects/status/tc9n807mwi4sr5jd/branch/master?svg=true)](https://ci.appveyor.com/project/aspnet-contrib/aspnet-security-openid-providers/branch/master)
+[![Build status](https://travis-ci.org/aspnet-contrib/AspNet.Security.OpenId.Providers.svg?branch=master)](https://travis-ci.org/aspnet-contrib/AspNet.Security.OpenId.Providers)
 
 ## Getting started
 

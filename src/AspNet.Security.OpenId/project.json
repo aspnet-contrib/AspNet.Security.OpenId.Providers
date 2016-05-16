@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-alpha4-*",
+  "version": "1.0.0-alpha4-final",
 
   "packOptions": {
     "description": "ASP.NET Core authentication middleware for OpenID 2.0 providers.",
@@ -32,7 +32,7 @@
   "dependencies": {
     "AngleSharp": "0.9.6",
     "JetBrains.Annotations": { "type": "build", "version": "10.1.4" },
-    "Microsoft.AspNetCore.Authentication": "1.0.0-rc2-*",
+    "Microsoft.AspNetCore.Authentication": "1.0.0-rc2-final",
     "Newtonsoft.Json": "8.0.3"
   },
 
