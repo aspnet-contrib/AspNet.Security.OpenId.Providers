@@ -1,9 +1,10 @@
 ﻿{
   "version": "1.0.0-beta1-*",
 
+  "description": "ASP.NET Core authentication middleware for Steam.",
+  "authors": [ "Kévin Chalet" ],
+
   "packOptions": {
-    "description": "ASP.NET Core authentication middleware for Steam.",
-    "authors": [ "Kévin Chalet" ],
     "owners": [ "Kévin Chalet" ],
 
     "projectUrl": "https://github.com/aspnet-contrib/AspNet.Security.OpenId.Providers",
