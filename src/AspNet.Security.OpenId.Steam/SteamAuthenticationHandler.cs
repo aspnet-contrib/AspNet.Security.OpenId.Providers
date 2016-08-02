@@ -71,13 +71,13 @@ namespace AspNet.Security.OpenId.Steam {
             var payload = JObject.Parse(await response.Content.ReadAsStringAsync());
 
             // Try to extract the profile name of the authenticated user.
-            var profile = payload.Value<JObject>(SteamAuthenticationConstants.Parameters.Response)
-                                ?.Value<JArray>(SteamAuthenticationConstants.Parameters.Players)
-                            ?[0]?.Value<string>(SteamAuthenticationConstants.Parameters.Name);
-
-            if (!string.IsNullOrEmpty(profile)) {
-                identity.AddClaim(new Claim(ClaimTypes.Name, profile, ClaimValueTypes.String, Options.ClaimsIssuer));
-            }
+            StoreProfileItemInClaim(identity, payload, ClaimTypes.Name, SteamAuthenticationConstants.Parameters.Name);
+            StoreProfileItemInClaim(identity, payload, "avatar", SteamAuthenticationConstants.Parameters.Avatar);
+            StoreProfileItemInClaim(identity, payload, "avatarmedium", SteamAuthenticationConstants.Parameters.AvatarMedium);
+            StoreProfileItemInClaim(identity, payload, "avatarfull", SteamAuthenticationConstants.Parameters.AvatarFull);
+            StoreProfileItemInClaim(identity, payload, "profileurl", SteamAuthenticationConstants.Parameters.ProfileURL);
+            StoreProfileItemInClaim(identity, payload, "loccountry", SteamAuthenticationConstants.Parameters.LocationCountry);
+            StoreProfileItemInClaim(identity, payload, "locstate", SteamAuthenticationConstants.Parameters.LocationState);
 
             var context = new OpenIdAuthenticatedContext(Context, Options, ticket) {
                 User = payload
@@ -93,6 +93,16 @@ namespace AspNet.Security.OpenId.Steam {
             // Note: return the authentication ticket associated
             // with the notification to allow replacing the ticket.
             return context.Ticket;
+        }
+
+        private void StoreProfileItemInClaim(ClaimsIdentity identity, JObject payload, string ClaimType, string param) {
+            var profile = payload.Value<JObject>(SteamAuthenticationConstants.Parameters.Response)
+                                ?.Value<JArray>(SteamAuthenticationConstants.Parameters.Players)
+                            ?[0]?.Value<string>(param);
+
+            if (!string.IsNullOrEmpty(profile)) {
+                identity.AddClaim(new Claim(ClaimType, profile, ClaimValueTypes.String, Options.ClaimsIssuer));
+            }
         }
     }
 }
