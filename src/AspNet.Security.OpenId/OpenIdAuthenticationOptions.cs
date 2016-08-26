@@ -63,8 +63,8 @@ namespace AspNet.Security.OpenId {
         /// <summary>
         /// Gets or sets the events provider associated with this instance.
         /// </summary>
-        public new IOpenIdAuthenticationEvents Events {
-            get { return base.Events as IOpenIdAuthenticationEvents; }
+        public new OpenIdAuthenticationEvents Events {
+            get { return base.Events as OpenIdAuthenticationEvents; }
             set { base.Events = value; }
         }
 

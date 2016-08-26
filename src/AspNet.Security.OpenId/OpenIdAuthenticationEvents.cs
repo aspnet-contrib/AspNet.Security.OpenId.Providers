@@ -13,7 +13,7 @@ namespace AspNet.Security.OpenId {
     /// Specifies callback methods that the <see cref="OpenIdAuthenticationMiddleware{TOptions}"/>
     /// invokes to enable developer control over the OpenID2 authentication process.
     /// </summary>
-    public class OpenIdAuthenticationEvents : RemoteAuthenticationEvents, IOpenIdAuthenticationEvents {
+    public class OpenIdAuthenticationEvents : RemoteAuthenticationEvents {
         /// <summary>
         /// Defines a notification invoked when the user is authenticated by the identity provider.
         /// </summary>
