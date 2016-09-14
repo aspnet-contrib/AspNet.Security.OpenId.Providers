@@ -284,7 +284,15 @@ namespace AspNet.Security.OpenId {
             return Task.FromResult(QueryHelpers.AddQueryString(Options.Endpoint.AbsoluteUri, message.Parameters));
         }
 
-        protected virtual async Task<Uri> DiscoverEndpointAsync([NotNull] Uri address) {
+        protected virtual async Task<Uri> DiscoverEndpointAsync([NotNull] Uri address, int redirections = 0) {
+            // Limit the total redirections to 5 roundtrips.
+            if (redirections >= 5) {
+                Logger.LogWarning("The Yadis discovery process failed because it " +
+                                  "exceeded the maximum number of redirections.");
+
+                return null;
+            }
+
             // application/xrds+xml MUST be the preferred content type to avoid a second round-trip.
             // See http://openid.net/specs/yadis-v1.0.pdf (chapter 6.2.4)
             var request = new HttpRequestMessage(HttpMethod.Get, address);
@@ -347,7 +355,7 @@ namespace AspNet.Security.OpenId {
                     return null;
                 }
 
-                return await DiscoverEndpointAsync(address);
+                return await DiscoverEndpointAsync(address, ++redirections);
             }
 
             // Only text/html or application/xhtml+xml can be safely parsed.
