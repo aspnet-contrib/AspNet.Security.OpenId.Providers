@@ -27,10 +27,10 @@ See [https://github.com/aspnet-contrib/AspNet.Security.OpenId.Providers/tree/dev
 
 ## Support
 
-**Need help or wanna share your thoughts? Don't hesitate to join our dedicated chat rooms:**
+**Need help or wanna share your thoughts?** Don't hesitate to join us on Gitter or ask your question on StackOverflow:
 
-- **JabbR: [https://jabbr.net/#/rooms/aspnet-contrib](https://jabbr.net/#/rooms/aspnet-contrib)**
 - **Gitter: [https://gitter.im/aspnet-contrib/AspNet.Security.OpenId.Providers](https://gitter.im/aspnet-contrib/AspNet.Security.OpenId.Providers)**
+- **StackOverflow: [https://stackoverflow.com/questions/tagged/aspnet-contrib](https://stackoverflow.com/questions/tagged/aspnet-contrib)**
 
 ## Contributors
 
