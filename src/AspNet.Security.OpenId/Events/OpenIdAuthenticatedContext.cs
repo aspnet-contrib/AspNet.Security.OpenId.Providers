@@ -9,6 +9,7 @@ using System.Security.Claims;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Authentication;
 using Newtonsoft.Json.Linq;
 
 namespace AspNet.Security.OpenId {
@@ -44,6 +45,11 @@ namespace AspNet.Security.OpenId {
         /// Gets the identifier returned by the identity provider.
         /// </summary>
         public string Identifier => Ticket?.Principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        /// <summary>
+        /// Gets the authentication properties associated with the ticket.
+        /// </summary>
+        public AuthenticationProperties Properties => Ticket?.Properties;
 
         /// <summary>
         /// Gets or sets the attributes associated with the current user.
