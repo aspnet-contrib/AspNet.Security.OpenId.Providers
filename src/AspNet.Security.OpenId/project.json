@@ -31,20 +31,15 @@
   },
 
   "dependencies": {
-    "AngleSharp": "0.9.6",
-    "JetBrains.Annotations": { "type": "build", "version": "10.1.4" },
-    "Microsoft.AspNetCore.Authentication": "1.0.0",
+    "AngleSharp": "0.9.9",
+    "JetBrains.Annotations": { "type": "build", "version": "10.2.1" },
+    "Microsoft.AspNetCore.Authentication": "1.1.0",
+    "NETStandard.Library": "1.6.1",
     "Newtonsoft.Json": "9.0.1"
   },
 
   "frameworks": {
     "net451": { },
-
-    "netstandard1.3": {
-      "imports": [
-        "dotnet5.4",
-        "portable-net451+win8"
-      ]
-    }
+    "netstandard1.3": { }
   }
 }
