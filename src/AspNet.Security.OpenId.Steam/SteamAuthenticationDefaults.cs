@@ -6,12 +6,14 @@
 
 using Microsoft.AspNetCore.Builder;
 
-namespace AspNet.Security.OpenId.Steam {
+namespace AspNet.Security.OpenId.Steam
+{
     /// <summary>
     /// Contains various constants used as default values
     /// for the Steam authentication middleware.
     /// </summary>
-    public static class SteamAuthenticationDefaults {
+    public static class SteamAuthenticationDefaults
+    {
         /// <summary>
         /// Gets the default value associated with <see cref="AuthenticationOptions.AuthenticationScheme"/>.
         /// </summary>

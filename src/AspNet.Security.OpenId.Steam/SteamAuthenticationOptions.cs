@@ -7,9 +7,12 @@
 using System;
 using Microsoft.AspNetCore.Http;
 
-namespace AspNet.Security.OpenId.Steam {
-    public class SteamAuthenticationOptions : OpenIdAuthenticationOptions {
-        public SteamAuthenticationOptions() {
+namespace AspNet.Security.OpenId.Steam
+{
+    public class SteamAuthenticationOptions : OpenIdAuthenticationOptions
+    {
+        public SteamAuthenticationOptions()
+        {
             AuthenticationScheme = SteamAuthenticationDefaults.AuthenticationScheme;
             DisplayName = SteamAuthenticationDefaults.DisplayName;
             Authority = new Uri(SteamAuthenticationDefaults.Authority);

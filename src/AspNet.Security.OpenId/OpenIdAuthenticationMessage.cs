@@ -4,24 +4,29 @@ using System.Linq;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Primitives;
 
-namespace AspNet.Security.OpenId {
+namespace AspNet.Security.OpenId
+{
     /// <summary>
     /// Represents an OpenID message.
     /// </summary>
-    public class OpenIdAuthenticationMessage {
+    public class OpenIdAuthenticationMessage
+    {
         /// <summary>
         /// Initializes a new OpenID message.
         /// </summary>
         public OpenIdAuthenticationMessage()
-            : this(new Dictionary<string, string>()) {
+            : this(new Dictionary<string, string>())
+        {
         }
 
         /// <summary>
         /// Initializes a new OpenID message.
         /// </summary>
         /// <param name="parameters">The parameters associated with the message.</param>
-        public OpenIdAuthenticationMessage([NotNull] IDictionary<string, string> parameters) {
-            if (parameters == null) {
+        public OpenIdAuthenticationMessage([NotNull] IDictionary<string, string> parameters)
+        {
+            if (parameters == null)
+            {
                 throw new ArgumentNullException(nameof(parameters));
             }
 
@@ -32,8 +37,10 @@ namespace AspNet.Security.OpenId {
         /// Initializes a new OpenID message.
         /// </summary>
         /// <param name="parameters">The parameters associated with the message.</param>
-        public OpenIdAuthenticationMessage([NotNull] IEnumerable<KeyValuePair<string, StringValues>> parameters) {
-            if (parameters == null) {
+        public OpenIdAuthenticationMessage([NotNull] IEnumerable<KeyValuePair<string, StringValues>> parameters)
+        {
+            if (parameters == null)
+            {
                 throw new ArgumentNullException(nameof(parameters));
             }
 
@@ -45,7 +52,8 @@ namespace AspNet.Security.OpenId {
         /// <summary>
         /// Gets or sets the openid.claimed_id property.
         /// </summary>
-        public string ClaimedIdentifier {
+        public string ClaimedIdentifier
+        {
             get { return GetParameter(OpenIdAuthenticationConstants.Parameters.ClaimedId); }
             set { SetParameter(OpenIdAuthenticationConstants.Parameters.ClaimedId, value); }
         }
@@ -53,7 +61,8 @@ namespace AspNet.Security.OpenId {
         /// <summary>
         /// Gets or sets the openid.identity property.
         /// </summary>
-        public string Identity {
+        public string Identity
+        {
             get { return GetParameter(OpenIdAuthenticationConstants.Parameters.Identity); }
             set { SetParameter(OpenIdAuthenticationConstants.Parameters.Identity, value); }
         }
@@ -61,7 +70,8 @@ namespace AspNet.Security.OpenId {
         /// <summary>
         /// Gets or sets the openid.error property.
         /// </summary>
-        public string Error {
+        public string Error
+        {
             get { return GetParameter(OpenIdAuthenticationConstants.Parameters.Error); }
             set { SetParameter(OpenIdAuthenticationConstants.Parameters.Error, value); }
         }
@@ -69,7 +79,8 @@ namespace AspNet.Security.OpenId {
         /// <summary>
         /// Gets or sets the openid.mode property.
         /// </summary>
-        public string Mode {
+        public string Mode
+        {
             get { return GetParameter(OpenIdAuthenticationConstants.Parameters.Mode); }
             set { SetParameter(OpenIdAuthenticationConstants.Parameters.Mode, value); }
         }
@@ -77,7 +88,8 @@ namespace AspNet.Security.OpenId {
         /// <summary>
         /// Gets or sets the openid.ns property.
         /// </summary>
-        public string Namespace {
+        public string Namespace
+        {
             get { return GetParameter(OpenIdAuthenticationConstants.Parameters.Namespace); }
             set { SetParameter(OpenIdAuthenticationConstants.Parameters.Namespace, value); }
         }
@@ -85,7 +97,8 @@ namespace AspNet.Security.OpenId {
         /// <summary>
         /// Gets or sets the openid.realm property.
         /// </summary>
-        public string Realm {
+        public string Realm
+        {
             get { return GetParameter(OpenIdAuthenticationConstants.Parameters.Realm); }
             set { SetParameter(OpenIdAuthenticationConstants.Parameters.Realm, value); }
         }
@@ -93,7 +106,8 @@ namespace AspNet.Security.OpenId {
         /// <summary>
         /// Gets or sets the openid.return_to property.
         /// </summary>
-        public string ReturnTo {
+        public string ReturnTo
+        {
             get { return GetParameter(OpenIdAuthenticationConstants.Parameters.ReturnTo); }
             set { SetParameter(OpenIdAuthenticationConstants.Parameters.ReturnTo, value); }
         }
@@ -108,45 +122,53 @@ namespace AspNet.Security.OpenId {
         /// dictionary if the message doesn't expose an attribute exchange alias.
         /// </summary>
         /// <returns>The attributes contained in this message.</returns>
-        public IDictionary<string, string> GetAttributes() {
+        public IDictionary<string, string> GetAttributes()
+        {
             var attributes = new Dictionary<string, string>(StringComparer.Ordinal);
 
             string alias;
             var extensions = GetExtensions();
             // If the ax alias cannot be found, return an empty dictionary.
-            if (!extensions.TryGetValue(OpenIdAuthenticationConstants.Namespaces.Ax, out alias)) {
+            if (!extensions.TryGetValue(OpenIdAuthenticationConstants.Namespaces.Ax, out alias))
+            {
                 return attributes;
             }
 
-            foreach (var parameter in Parameters) {
+            foreach (var parameter in Parameters)
+            {
                 var prefix = $"{OpenIdAuthenticationConstants.Prefixes.OpenId}.{alias}.{OpenIdAuthenticationConstants.Suffixes.Type}.";
 
                 // Exclude parameters that don't correspond to the attribute exchange alias.
-                if (!parameter.Key.StartsWith(prefix, StringComparison.Ordinal)) {
+                if (!parameter.Key.StartsWith(prefix, StringComparison.Ordinal))
+                {
                     continue;
                 }
 
                 // Exclude attributes whose alias is malformed.
                 var name = parameter.Key.Substring(prefix.Length);
-                if (string.IsNullOrEmpty(name)) {
+                if (string.IsNullOrEmpty(name))
+                {
                     continue;
                 }
 
                 // Exclude attributes whose type is missing.
                 var type = parameter.Value;
-                if (string.IsNullOrEmpty(type)) {
+                if (string.IsNullOrEmpty(type))
+                {
                     continue;
                 }
 
                 // Exclude attributes whose value is missing.
                 string value;
                 if (!Parameters.TryGetValue($"{OpenIdAuthenticationConstants.Prefixes.OpenId}.{alias}." +
-                                            $"{OpenIdAuthenticationConstants.Suffixes.Value}.{name}", out value)) {
+                                            $"{OpenIdAuthenticationConstants.Suffixes.Value}.{name}", out value))
+                {
                     continue;
                 }
 
                 // Exclude attributes whose value is null or empty.
-                if (string.IsNullOrEmpty(value)) {
+                if (string.IsNullOrEmpty(value))
+                {
                     continue;
                 }
 
@@ -160,13 +182,16 @@ namespace AspNet.Security.OpenId {
         /// Gets the extensions and their corresponding alias.
         /// </summary>
         /// <returns>The extensions contained in this message.</returns>
-        public IDictionary<string, string> GetExtensions() {
+        public IDictionary<string, string> GetExtensions()
+        {
             var extensions = new Dictionary<string, string>(StringComparer.Ordinal);
 
-            foreach (var parameter in Parameters) {
+            foreach (var parameter in Parameters)
+            {
                 var prefix = $"{OpenIdAuthenticationConstants.Prefixes.Namespace}.";
 
-                if (parameter.Key.StartsWith(prefix, StringComparison.Ordinal)) {
+                if (parameter.Key.StartsWith(prefix, StringComparison.Ordinal))
+                {
                     extensions.Add(parameter.Value, parameter.Key.Substring(prefix.Length));
                 }
             }
@@ -180,7 +205,8 @@ namespace AspNet.Security.OpenId {
         /// </summary>
         /// <param name="name">The parameter to retrieve.</param>
         /// <returns>The value extracted from the parameter.</returns>
-        public string GetParameter([NotNull] string name) {
+        public string GetParameter([NotNull] string name)
+        {
             return GetParameter(OpenIdAuthenticationConstants.Prefixes.OpenId, name);
         }
 
@@ -191,17 +217,21 @@ namespace AspNet.Security.OpenId {
         /// <param name="prefix">The prefix used to discriminate the parameter.</param>
         /// <param name="name">The parameter to retrieve.</param>
         /// <returns>The value extracted from the parameter.</returns>
-        public string GetParameter([NotNull] string prefix, [NotNull] string name) {
-            if (string.IsNullOrEmpty(prefix)) {
+        public string GetParameter([NotNull] string prefix, [NotNull] string name)
+        {
+            if (string.IsNullOrEmpty(prefix))
+            {
                 throw new ArgumentNullException(nameof(prefix));
             }
 
-            if (string.IsNullOrEmpty(name)) {
+            if (string.IsNullOrEmpty(name))
+            {
                 throw new ArgumentNullException(nameof(name));
             }
 
             string value;
-            if (Parameters.TryGetValue($"{prefix}.{name}", out value)) {
+            if (Parameters.TryGetValue($"{prefix}.{name}", out value))
+            {
                 return value;
             }
 
@@ -214,7 +244,8 @@ namespace AspNet.Security.OpenId {
         /// </summary>
         /// <param name="name">The parameter to store.</param>
         /// <param name="value">The value associated with the parameter.</param>
-        public void SetParameter([NotNull] string name, [CanBeNull] string value) {
+        public void SetParameter([NotNull] string name, [CanBeNull] string value)
+        {
             SetParameter(OpenIdAuthenticationConstants.Prefixes.OpenId, name, value);
         }
 
@@ -225,18 +256,22 @@ namespace AspNet.Security.OpenId {
         /// <param name="prefix">The prefix used to discriminate the parameter.</param>
         /// <param name="name">The parameter to store.</param>
         /// <param name="value">The value associated with the parameter.</param>
-        public void SetParameter([NotNull] string prefix, [NotNull] string name, [CanBeNull] string value) {
-            if (string.IsNullOrEmpty(prefix)) {
+        public void SetParameter([NotNull] string prefix, [NotNull] string name, [CanBeNull] string value)
+        {
+            if (string.IsNullOrEmpty(prefix))
+            {
                 throw new ArgumentNullException(nameof(prefix));
             }
 
-            if (string.IsNullOrEmpty(name)) {
+            if (string.IsNullOrEmpty(name))
+            {
                 throw new ArgumentNullException(nameof(name));
             }
 
             // If the parameter value is null, remove
             // it from the parameters dictionary.
-            if (string.IsNullOrEmpty(value)) {
+            if (string.IsNullOrEmpty(value))
+            {
                 Parameters.Remove($"{prefix}.{name}");
 
                 return;

@@ -17,17 +17,21 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 
-namespace AspNet.Security.OpenId.Steam {
-    public class SteamAuthenticationHandler : OpenIdAuthenticationHandler<SteamAuthenticationOptions> {
+namespace AspNet.Security.OpenId.Steam
+{
+    public class SteamAuthenticationHandler : OpenIdAuthenticationHandler<SteamAuthenticationOptions>
+    {
         protected override async Task<AuthenticationTicket> CreateTicketAsync(
             [NotNull] ClaimsIdentity identity, [NotNull] AuthenticationProperties properties,
-            [NotNull] string identifier, [NotNull] IDictionary<string, string> attributes) {
+            [NotNull] string identifier, [NotNull] IDictionary<string, string> attributes)
+        {
             var principal = new ClaimsPrincipal(identity);
             var ticket = new AuthenticationTicket(principal, properties, Options.AuthenticationScheme);
 
             // Return the authentication ticket as-is if the
             // user information endpoint has not been set.
-            if (string.IsNullOrEmpty(Options.UserInformationEndpoint)) {
+            if (string.IsNullOrEmpty(Options.UserInformationEndpoint))
+            {
                 Logger.LogInformation("The userinfo request was skipped because no userinfo endpoint was configured.");
 
                 return ticket;
@@ -35,20 +39,23 @@ namespace AspNet.Security.OpenId.Steam {
 
             // Return the authentication ticket as-is
             // if the application key has not been set.
-            if (string.IsNullOrEmpty(Options.ApplicationKey)) {
+            if (string.IsNullOrEmpty(Options.ApplicationKey))
+            {
                 Logger.LogInformation("The userinfo request was skipped because no application key was configured.");
 
                 return ticket;
             }
 
             // Return the authentication ticket as-is if the claimed identifier is malformed.
-            if (!identifier.StartsWith(SteamAuthenticationConstants.Namespaces.Identifier, StringComparison.Ordinal)) {
+            if (!identifier.StartsWith(SteamAuthenticationConstants.Namespaces.Identifier, StringComparison.Ordinal))
+            {
                 Logger.LogWarning("The userinfo request was skipped because an invalid identifier was received: {Identifier}.", identifier);
 
                 return ticket;
             }
 
-            var address = QueryHelpers.AddQueryString(Options.UserInformationEndpoint, new Dictionary<string, string> {
+            var address = QueryHelpers.AddQueryString(Options.UserInformationEndpoint, new Dictionary<string, string>
+            {
                 [SteamAuthenticationConstants.Parameters.Key] = Options.ApplicationKey,
                 [SteamAuthenticationConstants.Parameters.SteamId] = identifier.Substring(SteamAuthenticationConstants.Namespaces.Identifier.Length)
             });
@@ -58,7 +65,8 @@ namespace AspNet.Security.OpenId.Steam {
 
             // Return the authentication ticket as-is if the userinfo request failed.
             var response = await Options.HttpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, Context.RequestAborted);
-            if (!response.IsSuccessStatusCode) {
+            if (!response.IsSuccessStatusCode)
+            {
                 Logger.LogWarning("The userinfo request failed because an invalid response was received: the identity provider " +
                                   "returned returned a {Status} response with the following payload: {Headers} {Body}.",
                                   /* Status: */ response.StatusCode,
@@ -75,16 +83,19 @@ namespace AspNet.Security.OpenId.Steam {
                                 ?.Value<JArray>(SteamAuthenticationConstants.Parameters.Players)
                             ?[0]?.Value<string>(SteamAuthenticationConstants.Parameters.Name);
 
-            if (!string.IsNullOrEmpty(profile)) {
+            if (!string.IsNullOrEmpty(profile))
+            {
                 identity.AddClaim(new Claim(ClaimTypes.Name, profile, ClaimValueTypes.String, Options.ClaimsIssuer));
             }
 
-            var context = new OpenIdAuthenticatedContext(Context, Options, ticket) {
+            var context = new OpenIdAuthenticatedContext(Context, Options, ticket)
+            {
                 User = payload
             };
 
             // Copy the attributes to the context object.
-            foreach (var attribute in attributes) {
+            foreach (var attribute in attributes)
+            {
                 context.Attributes.Add(attribute);
             }
 

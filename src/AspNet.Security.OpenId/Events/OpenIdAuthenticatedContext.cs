@@ -12,16 +12,19 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Authentication;
 using Newtonsoft.Json.Linq;
 
-namespace AspNet.Security.OpenId {
+namespace AspNet.Security.OpenId
+{
     /// <summary>
     /// Exposes various information about the current OpenID authentication flow.
     /// </summary>
-    public class OpenIdAuthenticatedContext : BaseContext {
+    public class OpenIdAuthenticatedContext : BaseContext
+    {
         public OpenIdAuthenticatedContext(
             [NotNull] HttpContext context,
             [NotNull] OpenIdAuthenticationOptions options,
             [NotNull] AuthenticationTicket ticket)
-            : base(context) {
+            : base(context)
+        {
             Options = options;
             Ticket = ticket;
         }

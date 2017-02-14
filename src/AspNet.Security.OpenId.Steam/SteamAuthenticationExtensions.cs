@@ -9,19 +9,22 @@ using AspNet.Security.OpenId.Steam;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Options;
 
-namespace Microsoft.AspNetCore.Builder {
+namespace Microsoft.AspNetCore.Builder
+{
     /// <summary>
     /// Exposes convenient extensions that can be used to add an instance
     /// of the Steam authentication middleware in an ASP.NET 5 pipeline.
     /// </summary>
-    public static class SteamAuthenticationExtensions {
+    public static class SteamAuthenticationExtensions
+    {
         /// <summary>
         /// Adds <see cref="SteamAuthenticationMiddleware"/> to the specified
         /// <see cref="IApplicationBuilder"/>, which enables Steam authentication capabilities.
         /// </summary>
         /// <param name="app">The <see cref="IApplicationBuilder"/>.</param>
         /// <returns>The <see cref="IApplicationBuilder"/>.</returns>
-        public static IApplicationBuilder UseSteamAuthentication([NotNull] this IApplicationBuilder app) {
+        public static IApplicationBuilder UseSteamAuthentication([NotNull] this IApplicationBuilder app)
+        {
             return app.UseSteamAuthentication(new SteamAuthenticationOptions());
         }
 
@@ -34,12 +37,15 @@ namespace Microsoft.AspNetCore.Builder {
         /// <returns>The <see cref="IApplicationBuilder"/>.</returns>
         public static IApplicationBuilder UseSteamAuthentication(
             [NotNull] this IApplicationBuilder app,
-            [NotNull] SteamAuthenticationOptions options) {
-            if (app == null) {
+            [NotNull] SteamAuthenticationOptions options)
+        {
+            if (app == null)
+            {
                 throw new ArgumentNullException(nameof(app));
             }
 
-            if (options == null) {
+            if (options == null)
+            {
                 throw new ArgumentNullException(nameof(options));
             }
 
@@ -55,12 +61,15 @@ namespace Microsoft.AspNetCore.Builder {
         /// <returns>The <see cref="IApplicationBuilder"/>.</returns>
         public static IApplicationBuilder UseSteamAuthentication(
             [NotNull] this IApplicationBuilder app,
-            [NotNull] Action<SteamAuthenticationOptions> configuration) {
-            if (app == null) {
+            [NotNull] Action<SteamAuthenticationOptions> configuration)
+        {
+            if (app == null)
+            {
                 throw new ArgumentNullException(nameof(app));
             }
 
-            if (configuration == null) {
+            if (configuration == null)
+            {
                 throw new ArgumentNullException(nameof(configuration));
             }
 

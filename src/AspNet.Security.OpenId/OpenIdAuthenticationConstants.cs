@@ -4,24 +4,30 @@
  * for more information concerning the license and the contributors participating to this project.
  */
 
-namespace AspNet.Security.OpenId {
-    public static class OpenIdAuthenticationConstants {
-        public static class Aliases {
+namespace AspNet.Security.OpenId
+{
+    public static class OpenIdAuthenticationConstants
+    {
+        public static class Aliases
+        {
             public const string Ax = "ax";
         }
 
-        public static class Attributes {
+        public static class Attributes
+        {
             public const string Email = "http://axschema.org/contact/email";
             public const string Firstname = "http://axschema.org/namePerson/first";
             public const string Lastname = "http://axschema.org/namePerson/last";
             public const string Name = "http://axschema.org/namePerson";
         }
 
-        public static class Headers {
+        public static class Headers
+        {
             public const string XrdsLocation = "X-XRDS-Location";
         }
 
-        public static class Media {
+        public static class Media
+        {
             public const string Html = "text/html";
             public const string Json = "application/json";
             public const string Xhtml = "application/xhtml+xml";
@@ -30,14 +36,16 @@ namespace AspNet.Security.OpenId {
 
         }
 
-        public static class Metadata {
+        public static class Metadata
+        {
             public const string Content = "content";
             public const string HttpEquiv = "http-equiv";
             public const string Meta = "meta";
             public const string XrdsLocation = "X-XRDS-Location";
         }
 
-        public static class Modes {
+        public static class Modes
+        {
             public const string Cancel = "cancel";
             public const string CheckAuthentication = "check_authentication";
             public const string CheckIdSetup = "checkid_setup";
@@ -46,12 +54,14 @@ namespace AspNet.Security.OpenId {
             public const string IdRes = "id_res";
         }
 
-        public static class Namespaces {
+        public static class Namespaces
+        {
             public const string Ax = "http://openid.net/srv/ax/1.0";
             public const string OpenId = "http://specs.openid.net/auth/2.0";
         }
 
-        public static class Parameters {
+        public static class Parameters
+        {
             public const string ClaimedId = "claimed_id";
             public const string Error = "error";
             public const string Identity = "identity";
@@ -64,18 +74,21 @@ namespace AspNet.Security.OpenId {
             public const string State = "state";
         }
 
-        public static class Prefixes {
+        public static class Prefixes
+        {
             public const string Ax = "openid.ax";
             public const string Namespace = "openid.ns";
             public const string OpenId = "openid";
             public const string Type = "type";
         }
 
-        public static class Properties {
+        public static class Properties
+        {
             public const string ReturnTo = ".return_to";
         }
 
-        public static class Suffixes {
+        public static class Suffixes
+        {
             public const string Type = "type";
             public const string Value = "value";
         }

@@ -4,13 +4,17 @@
  * for more information concerning the license and the contributors participating to this project.
  */
 
-namespace AspNet.Security.OpenId.Steam {
-    public static class SteamAuthenticationConstants {
-        public static class Namespaces {
+namespace AspNet.Security.OpenId.Steam
+{
+    public static class SteamAuthenticationConstants
+    {
+        public static class Namespaces
+        {
             public const string Identifier = "http://steamcommunity.com/openid/id/";
         }
 
-        public static class Parameters {
+        public static class Parameters
+        {
             public const string Key = "key";
             public const string SteamId = "steamids";
             public const string Response = "response";

@@ -11,41 +11,50 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Mvc.Client {
-    public class Startup {
-        public void ConfigureServices(IServiceCollection services) {
-            services.AddAuthentication(options => {
+namespace Mvc.Client
+{
+    public class Startup
+    {
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddAuthentication(options =>
+            {
                 options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             });
 
             services.AddMvc();
         }
 
-        public void Configure(IApplicationBuilder app) {
+        public void Configure(IApplicationBuilder app)
+        {
             app.UseStaticFiles();
 
-            app.UseCookieAuthentication(new CookieAuthenticationOptions {
+            app.UseCookieAuthentication(new CookieAuthenticationOptions
+            {
                 AutomaticAuthenticate = true,
                 AutomaticChallenge = true,
                 LoginPath = new PathString("/signin"),
                 LogoutPath = new PathString("/signout")
             });
 
-            app.UseOpenIdAuthentication(new OpenIdAuthenticationOptions {
+            app.UseOpenIdAuthentication(new OpenIdAuthenticationOptions
+            {
                 AuthenticationScheme = "Orange",
                 DisplayName = "Orange",
                 Authority = new Uri("http://orange.fr/"),
                 CallbackPath = new PathString("/signin-orange")
             });
 
-            app.UseOpenIdAuthentication(new OpenIdAuthenticationOptions {
+            app.UseOpenIdAuthentication(new OpenIdAuthenticationOptions
+            {
                 AuthenticationScheme = "StackExchange",
                 DisplayName = "StackExchange",
                 Authority = new Uri("https://openid.stackexchange.com/"),
                 CallbackPath = new PathString("/signin-stackexchange")
             });
 
-            app.UseOpenIdAuthentication(new OpenIdAuthenticationOptions {
+            app.UseOpenIdAuthentication(new OpenIdAuthenticationOptions
+            {
                 AuthenticationScheme = "Intuit",
                 DisplayName = "Intuit",
                 CallbackPath = new PathString("/signin-intuit"),

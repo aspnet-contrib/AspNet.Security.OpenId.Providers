@@ -6,12 +6,14 @@
 
 using Microsoft.AspNetCore.Builder;
 
-namespace AspNet.Security.OpenId {
+namespace AspNet.Security.OpenId
+{
     /// <summary>
     /// Contains various constants used as default values
     /// for the OpenID authentication middleware.
     /// </summary>
-    public static class OpenIdAuthenticationDefaults {
+    public static class OpenIdAuthenticationDefaults
+    {
         /// <summary>
         /// Gets the default value associated with <see cref="AuthenticationOptions.AuthenticationScheme"/>.
         /// </summary>

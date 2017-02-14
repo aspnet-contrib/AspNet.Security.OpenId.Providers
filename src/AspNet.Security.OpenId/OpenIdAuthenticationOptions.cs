@@ -13,9 +13,12 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Authentication;
 
-namespace AspNet.Security.OpenId {
-    public class OpenIdAuthenticationOptions : RemoteAuthenticationOptions {
-        public OpenIdAuthenticationOptions() {
+namespace AspNet.Security.OpenId
+{
+    public class OpenIdAuthenticationOptions : RemoteAuthenticationOptions
+    {
+        public OpenIdAuthenticationOptions()
+        {
             AuthenticationScheme = OpenIdAuthenticationDefaults.AuthenticationScheme;
             DisplayName = OpenIdAuthenticationDefaults.DisplayName;
             CallbackPath = new PathString(OpenIdAuthenticationDefaults.CallbackPath);
@@ -48,7 +51,8 @@ namespace AspNet.Security.OpenId {
         /// <summary>
         /// Gets or sets the default AX attributes added to the OpenID request.
         /// </summary>
-        public IDictionary<string, string> Attributes { get; } = new Dictionary<string, string> {
+        public IDictionary<string, string> Attributes { get; } = new Dictionary<string, string>
+        {
             ["email"] = "http://axschema.org/contact/email",
             ["name"] = "http://axschema.org/namePerson",
             ["first"] = "http://axschema.org/namePerson/first",
@@ -63,7 +67,8 @@ namespace AspNet.Security.OpenId {
         /// <summary>
         /// Gets or sets the events provider associated with this instance.
         /// </summary>
-        public new OpenIdAuthenticationEvents Events {
+        public new OpenIdAuthenticationEvents Events
+        {
             get { return base.Events as OpenIdAuthenticationEvents; }
             set { base.Events = value; }
         }

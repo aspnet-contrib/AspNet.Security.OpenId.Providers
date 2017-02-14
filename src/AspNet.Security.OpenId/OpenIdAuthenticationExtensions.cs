@@ -9,12 +9,14 @@ using AspNet.Security.OpenId;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Options;
 
-namespace Microsoft.AspNetCore.Builder {
+namespace Microsoft.AspNetCore.Builder
+{
     /// <summary>
     /// Exposes convenient extensions that can be used to add an instance
     /// of the OpenID authentication middleware in an ASP.NET 5 pipeline.
     /// </summary>
-    public static class OpenIdAuthenticationExtensions {
+    public static class OpenIdAuthenticationExtensions
+    {
         /// <summary>
         /// Adds <see cref="OpenIdAuthenticationMiddleware{TOptions}"/> to the specified
         /// <see cref="IApplicationBuilder"/>, which enables OpenID2 authentication capabilities.
@@ -24,12 +26,15 @@ namespace Microsoft.AspNetCore.Builder {
         /// <returns>The <see cref="IApplicationBuilder"/>.</returns>
         public static IApplicationBuilder UseOpenIdAuthentication(
             [NotNull] this IApplicationBuilder app,
-            [NotNull] OpenIdAuthenticationOptions options) {
-            if (app == null) {
+            [NotNull] OpenIdAuthenticationOptions options)
+        {
+            if (app == null)
+            {
                 throw new ArgumentNullException(nameof(app));
             }
 
-            if (options == null) {
+            if (options == null)
+            {
                 throw new ArgumentNullException(nameof(options));
             }
 
@@ -45,12 +50,15 @@ namespace Microsoft.AspNetCore.Builder {
         /// <returns>The <see cref="IApplicationBuilder"/>.</returns>
         public static IApplicationBuilder UseOpenIdAuthentication(
             [NotNull] this IApplicationBuilder app,
-            [NotNull] Action<OpenIdAuthenticationOptions> configuration) {
-            if (app == null) {
+            [NotNull] Action<OpenIdAuthenticationOptions> configuration)
+        {
+            if (app == null)
+            {
                 throw new ArgumentNullException(nameof(app));
             }
 
-            if (configuration == null) {
+            if (configuration == null)
+            {
                 throw new ArgumentNullException(nameof(configuration));
             }
 
