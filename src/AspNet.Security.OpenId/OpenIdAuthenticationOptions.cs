@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Authentication;
+using Microsoft.IdentityModel.Protocols;
 
 namespace AspNet.Security.OpenId
 {
@@ -32,14 +33,37 @@ namespace AspNet.Security.OpenId
         public ISecureDataFormat<AuthenticationProperties> StateDataFormat { get; set; }
 
         /// <summary>
-        /// Gets or sets the address used to discover the OpenID provider.
+        /// Gets or sets the absolute URL of the OpenID 2.0 authentication server.
+        /// Note: this property is ignored when <see cref="Configuration"/>
+        /// or <see cref="ConfigurationManager"/> are set.
         /// </summary>
         public Uri Authority { get; set; }
 
         /// <summary>
-        /// Gets or sets the address of the OpenID provider.
+        /// Gets or sets the URL of the OpenID 2.0 authentication XRDS discovery document.
+        /// When the URL is relative, <see cref="Authority"/> must be set and absolute.
+        /// Note: this property is ignored when <see cref="Configuration"/>
+        /// or <see cref="ConfigurationManager"/> are set.
         /// </summary>
-        public Uri Endpoint { get; set; }
+        public Uri MetadataAddress { get; set; }
+
+        /// <summary>
+        /// Gets or sets a boolean indicating whether HTTPS is required to retrieve the XRDS discovery document.
+        /// The default value is <c>true</c>. This option should be used only in development environments.
+        /// Note: this property is ignored when <see cref="Configuration"/> or <see cref="ConfigurationManager"/> are set.
+        /// </summary>
+        public bool RequireHttpsMetadata { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets the configuration used by the OpenID 2.0 authentication middleware.
+        /// Note: this property is ignored when <see cref="ConfigurationManager"/> is set.
+        /// </summary>
+        public OpenIdAuthenticationConfiguration Configuration { get; set; }
+
+        /// <summary>
+        /// Gets or sets the configuration manager used by the OpenID 2.0 authentication middleware.
+        /// </summary>
+        public IConfigurationManager<OpenIdAuthenticationConfiguration> ConfigurationManager { get; set; }
 
         /// <summary>
         /// Gets or sets the realm associated with this instance.

@@ -32,11 +32,11 @@ namespace AspNet.Security.OpenId.Steam
         /// <summary>
         /// Gets the default value associated with <see cref="OpenIdAuthenticationOptions.Authority"/>.
         /// </summary>
-        public const string Authority = "http://steamcommunity.com/openid/";
+        public const string Authority = "https://steamcommunity.com/openid/";
 
         /// <summary>
         /// Gets the default value associated with <see cref="SteamAuthenticationOptions.UserInformationEndpoint"/>.
         /// </summary>
-        public const string UserInformationEndpoint = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/";
+        public const string UserInformationEndpoint = "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/";
     }
 }

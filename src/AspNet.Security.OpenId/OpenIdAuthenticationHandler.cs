@@ -6,16 +6,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using System.Xml;
-using System.Xml.Linq;
-using AngleSharp.Dom.Html;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http.Authentication;
@@ -227,19 +222,17 @@ namespace AspNet.Security.OpenId
         {
             var properties = new AuthenticationProperties(context.Properties);
 
-            if (Options.Endpoint == null)
+            var configuration = await Options.ConfigurationManager.GetConfigurationAsync(Context.RequestAborted);
+            if (configuration == null)
             {
-                // Note: altering options during a request is not thread safe but
-                // would only result in multiple discovery requests in the worst case.
-                Options.Endpoint = await DiscoverEndpointAsync(Options.Authority);
+                throw new InvalidOperationException("The OpenID 2.0 authentication middleware was unable to retrieve " +
+                                                    "the provider configuration from the OpenID 2.0 authentication server.");
             }
 
-            if (Options.Endpoint == null)
+            if (string.IsNullOrEmpty(configuration.AuthenticationEndpoint))
             {
-                Logger.LogError("The user agent cannot be redirected to the identity provider because no " +
-                                "endpoint was registered in the options or discovered through Yadis.");
-
-                return true;
+                throw new InvalidOperationException("The OpenID 2.0 authentication middleware was unable to retrieve " +
+                                                    "the authentication endpoint address from the discovery document.");
             }
 
             // Determine the realm using the current address
@@ -311,138 +304,28 @@ namespace AspNet.Security.OpenId
                     value: string.Join(",", Options.Attributes.Select(attribute => attribute.Key)));
             }
 
-            Response.Redirect(await GenerateChallengeUrlAsync(message));
+            var address = QueryHelpers.AddQueryString(configuration.AuthenticationEndpoint, message.Parameters);
+
+            Response.Redirect(address);
 
             return true;
         }
 
-        protected virtual Task<string> GenerateChallengeUrlAsync([NotNull] OpenIdAuthenticationMessage message)
+        private async Task<bool> VerifyAssertionAsync([NotNull] OpenIdAuthenticationMessage message)
         {
-            return Task.FromResult(QueryHelpers.AddQueryString(Options.Endpoint.AbsoluteUri, message.Parameters));
-        }
-
-        protected virtual async Task<Uri> DiscoverEndpointAsync([NotNull] Uri address, int redirections = 0)
-        {
-            // Limit the total redirections to 5 roundtrips.
-            if (redirections >= 5)
+            var configuration = await Options.ConfigurationManager.GetConfigurationAsync(Context.RequestAborted);
+            if (configuration == null)
             {
-                Logger.LogWarning("The Yadis discovery process failed because it " +
-                                  "exceeded the maximum number of redirections.");
-
-                return null;
+                throw new InvalidOperationException("The OpenID 2.0 authentication middleware was unable to retrieve " +
+                                                    "the provider configuration from the OpenID 2.0 authentication server.");
             }
 
-            // application/xrds+xml MUST be the preferred content type to avoid a second round-trip.
-            // See http://openid.net/specs/yadis-v1.0.pdf (chapter 6.2.4)
-            var request = new HttpRequestMessage(HttpMethod.Get, address);
-            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(OpenIdAuthenticationConstants.Media.Xrds));
-            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(OpenIdAuthenticationConstants.Media.Html));
-            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(OpenIdAuthenticationConstants.Media.Xhtml));
-
-            var response = await Options.HttpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, Context.RequestAborted);
-            if (!response.IsSuccessStatusCode)
+            if (string.IsNullOrEmpty(configuration.AuthenticationEndpoint))
             {
-                Logger.LogWarning("The Yadis discovery failed because an invalid response was received: the identity provider " +
-                                  "returned returned a {Status} response with the following payload: {Headers} {Body}.",
-                                  /* Status: */ response.StatusCode,
-                                  /* Headers: */ response.Headers.ToString(),
-                                  /* Body: */ await response.Content.ReadAsStringAsync());
-
-                return null;
+                throw new InvalidOperationException("The OpenID 2.0 authentication middleware was unable to retrieve " +
+                                                    "the authentication endpoint address from the discovery document.");
             }
 
-            // Note: application/xrds+xml is the standard content type but text/xml is frequent.
-            // See http://openid.net/specs/yadis-v1.0.pdf (chapter 6.2.6)
-            if (string.Equals(response.Content.Headers.ContentType?.MediaType,
-                              OpenIdAuthenticationConstants.Media.Xrds, StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(response.Content.Headers.ContentType?.MediaType,
-                              OpenIdAuthenticationConstants.Media.Xml, StringComparison.OrdinalIgnoreCase))
-            {
-                using (var stream = await response.Content.ReadAsStreamAsync())
-                using (var reader = XmlReader.Create(stream, new XmlReaderSettings { Async = true }))
-                {
-                    var document = XDocument.Load(reader);
-
-                    var endpoint = (from service in document.Root.Element(XName.Get("XRD", "xri://$xrd*($v*2.0)"))
-                                                                 .Descendants(XName.Get("Service", "xri://$xrd*($v*2.0)"))
-                                    where service.Descendants(XName.Get("Type", "xri://$xrd*($v*2.0)"))
-                                                 .Any(type => type.Value == "http://specs.openid.net/auth/2.0/server")
-                                    orderby service.Attribute("priority")?.Value
-                                    select service.Element(XName.Get("URI", "xri://$xrd*($v*2.0)"))?.Value).FirstOrDefault();
-
-                    if (!string.IsNullOrEmpty(endpoint) && Uri.TryCreate(endpoint, UriKind.Absolute, out address))
-                    {
-                        return address;
-                    }
-
-                    Logger.LogWarning("The Yadis discovery failed because the XRDS document returned by the " +
-                                      "identity provider was invalid or didn't contain the endpoint address.");
-
-                    return null;
-                }
-            }
-
-            // Try to extract the XRDS location from the response headers before parsing the body.
-            // See http://openid.net/specs/yadis-v1.0.pdf (chapter 6.2.6)
-            var location = (from header in response.Headers
-                            where string.Equals(header.Key, OpenIdAuthenticationConstants.Headers.XrdsLocation, StringComparison.OrdinalIgnoreCase)
-                            from value in header.Value
-                            select value).FirstOrDefault();
-
-            if (!string.IsNullOrEmpty(location))
-            {
-                if (!Uri.TryCreate(location, UriKind.Absolute, out address) &&
-                    !Uri.TryCreate(Options.Authority, location, out address))
-                {
-                    Logger.LogWarning("The Yadis discovery failed because the X-XRDS-Location " +
-                                      "header returned by the identity provider was invalid.");
-
-                    return null;
-                }
-
-                return await DiscoverEndpointAsync(address, ++redirections);
-            }
-
-            // Only text/html or application/xhtml+xml can be safely parsed.
-            // See http://openid.net/specs/yadis-v1.0.pdf
-            if (string.Equals(response.Content.Headers.ContentType?.MediaType,
-                              OpenIdAuthenticationConstants.Media.Html, StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(response.Content.Headers.ContentType?.MediaType,
-                              OpenIdAuthenticationConstants.Media.Xhtml, StringComparison.OrdinalIgnoreCase))
-            {
-                IHtmlDocument document = null;
-
-                try
-                {
-                    document = Options.HtmlParser.Parse(await response.Content.ReadAsStreamAsync());
-                    Debug.Assert(document != null);
-                }
-
-                catch (Exception exception)
-                {
-                    Logger.LogWarning("An exception occurred when parsing the HTML document.", exception);
-
-                    return null;
-                }
-
-                var endpoint = (from element in document.Head.GetElementsByTagName(OpenIdAuthenticationConstants.Metadata.Meta)
-                                let attribute = element.Attributes[OpenIdAuthenticationConstants.Metadata.HttpEquiv]
-                                where string.Equals(attribute?.Value, OpenIdAuthenticationConstants.Metadata.XrdsLocation, StringComparison.OrdinalIgnoreCase)
-                                select element.Attributes[OpenIdAuthenticationConstants.Metadata.Content]?.Value).FirstOrDefault();
-
-                if (!string.IsNullOrEmpty(endpoint) && Uri.TryCreate(endpoint, UriKind.Absolute, out address))
-                {
-                    return address;
-                }
-            }
-
-            Logger.LogWarning("The Yadis discovery failed because the XRDS document location was not found.");
-
-            return null;
-        }
-
-        protected virtual async Task<bool> VerifyAssertionAsync([NotNull] OpenIdAuthenticationMessage message)
-        {
             // Create a new message to store the parameters sent to the identity provider.
             // Note: using a dictionary is safe as OpenID 2.0 parameters are supposed to be unique.
             // See http://openid.net/specs/openid-authentication-2_0.html#anchor4
@@ -472,7 +355,7 @@ namespace AspNet.Security.OpenId
             }
 
             // Create a new check_authentication request to verify the assertion.
-            var request = new HttpRequestMessage(HttpMethod.Post, Options.Endpoint);
+            var request = new HttpRequestMessage(HttpMethod.Post, configuration.AuthenticationEndpoint);
             request.Content = new FormUrlEncodedContent(payload);
 
             var response = await Options.HttpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, Context.RequestAborted);

@@ -41,7 +41,7 @@ namespace Mvc.Client
             {
                 AuthenticationScheme = "Orange",
                 DisplayName = "Orange",
-                Authority = new Uri("http://orange.fr/"),
+                Authority = new Uri("https://orange.fr/"),
                 CallbackPath = new PathString("/signin-orange")
             });
 
@@ -58,7 +58,10 @@ namespace Mvc.Client
                 AuthenticationScheme = "Intuit",
                 DisplayName = "Intuit",
                 CallbackPath = new PathString("/signin-intuit"),
-                Endpoint = new Uri("https://openid.intuit.com/OpenId/Provider")
+                Configuration = new OpenIdAuthenticationConfiguration
+                {
+                    AuthenticationEndpoint = "https://openid.intuit.com/OpenId/Provider"
+                }
             });
 
             app.UseSteamAuthentication();
