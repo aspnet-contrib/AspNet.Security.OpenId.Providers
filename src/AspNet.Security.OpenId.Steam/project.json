@@ -33,17 +33,11 @@
 
   "dependencies": {
     "AspNet.Security.OpenId": { "target": "project" },
-    "JetBrains.Annotations": { "type": "build", "version": "10.1.4" }
+    "JetBrains.Annotations": { "type": "build", "version": "10.3.0" }
   },
 
   "frameworks": {
     "net451": { },
-
-    "netstandard1.4": {
-      "imports": [
-        "dotnet5.5",
-        "portable-net451+win8"
-      ]
-    }
+    "netstandard1.4": { }
   }
 }
