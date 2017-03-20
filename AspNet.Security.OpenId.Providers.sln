@@ -1,17 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.22823.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{EFBB5EFD-334C-487E-8C31-9F21FB106FFF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{8D5ED59A-C3FC-4E35-9E73-A8FF5492DFCD}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "AspNet.Security.OpenId", "src\AspNet.Security.OpenId\AspNet.Security.OpenId.xproj", "{9254C4F1-2305-457F-A7DB-9BEE8B2A76B7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNet.Security.OpenId", "src\AspNet.Security.OpenId\AspNet.Security.OpenId.csproj", "{9254C4F1-2305-457F-A7DB-9BEE8B2A76B7}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Mvc.Client", "samples\Mvc.Client\Mvc.Client.xproj", "{6FD2F651-A074-4C07-93A3-0527EB19F3BF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mvc.Client", "samples\Mvc.Client\Mvc.Client.csproj", "{6FD2F651-A074-4C07-93A3-0527EB19F3BF}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "AspNet.Security.OpenId.Steam", "src\AspNet.Security.OpenId.Steam\AspNet.Security.OpenId.Steam.xproj", "{49400532-7B7B-4C8F-877F-FDB21D3717CC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNet.Security.OpenId.Steam", "src\AspNet.Security.OpenId.Steam\AspNet.Security.OpenId.Steam.csproj", "{49400532-7B7B-4C8F-877F-FDB21D3717CC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
