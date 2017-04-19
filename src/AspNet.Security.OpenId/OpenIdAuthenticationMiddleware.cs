@@ -27,19 +27,30 @@ namespace AspNet.Security.OpenId
             [NotNull] IDataProtectionProvider dataProtectionProvider,
             [NotNull] ILoggerFactory loggerFactory,
             [NotNull] UrlEncoder encoder,
-            [NotNull] IOptions<SharedAuthenticationOptions> externalOptions)
+            [NotNull] IOptions<SharedAuthenticationOptions> sharedOptions)
             : base(next, options, loggerFactory, encoder)
         {
             if (string.IsNullOrEmpty(Options.SignInScheme))
             {
-                Options.SignInScheme = externalOptions.Value.SignInScheme;
+                Options.SignInScheme = sharedOptions.Value.SignInScheme;
+            }
+
+            if (string.IsNullOrEmpty(Options.SignInScheme))
+            {
+                throw new ArgumentException("The sign-in scheme cannot be null or empty.", nameof(options));
+            }
+
+            if (Options.DataProtectionProvider == null)
+            {
+                Options.DataProtectionProvider = dataProtectionProvider;
             }
 
             if (Options.StateDataFormat == null)
             {
-                Options.StateDataFormat = new PropertiesDataFormat(
-                    dataProtectionProvider.CreateProtector(
-                        GetType().FullName, Options.AuthenticationScheme, "v1"));
+                var protector = Options.DataProtectionProvider.CreateProtector(
+                    GetType().FullName, Options.AuthenticationScheme, "v1");
+
+                Options.StateDataFormat = new PropertiesDataFormat(protector);
             }
 
             if (Options.HtmlParser == null)

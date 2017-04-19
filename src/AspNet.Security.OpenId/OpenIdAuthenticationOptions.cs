@@ -10,6 +10,7 @@ using System.Net.Http;
 using AngleSharp.Parser.Html;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Authentication;
 using Microsoft.IdentityModel.Protocols;
@@ -25,12 +26,6 @@ namespace AspNet.Security.OpenId
             CallbackPath = new PathString(OpenIdAuthenticationDefaults.CallbackPath);
             Events = new OpenIdAuthenticationEvents();
         }
-
-        /// <summary>
-        /// Gets or sets the data format used to serialize the
-        /// authentication properties used for the "state" parameter.
-        /// </summary>
-        public ISecureDataFormat<AuthenticationProperties> StateDataFormat { get; set; }
 
         /// <summary>
         /// Gets or sets the absolute URL of the OpenID 2.0 authentication server.
@@ -96,6 +91,20 @@ namespace AspNet.Security.OpenId
             get { return base.Events as OpenIdAuthenticationEvents; }
             set { base.Events = value; }
         }
+
+        /// <summary>
+        /// Gets or sets the data format used to serialize the
+        /// authentication properties used for the "state" parameter.
+        /// </summary>
+        public ISecureDataFormat<AuthenticationProperties> StateDataFormat { get; set; }
+
+        /// <summary>
+        /// Gets or sets the data protection provider used to create the default
+        /// data protectors used by the OpenID 2.0 authentication middleware.
+        /// When this property is set to <c>null</c>, the data protection provider
+        /// is directly retrieved from the dependency injection container.
+        /// </summary>
+        public IDataProtectionProvider DataProtectionProvider { get; set; }
 
         /// <summary>
         /// Gets or sets the HTTP client used to communicate with the OpenID provider.
