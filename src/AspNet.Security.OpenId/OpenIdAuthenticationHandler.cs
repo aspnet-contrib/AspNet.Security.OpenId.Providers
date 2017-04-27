@@ -259,8 +259,6 @@ namespace AspNet.Security.OpenId
             // Generate a new anti-forgery token.
             GenerateCorrelationId(properties);
 
-            var state = UrlEncoder.Encode(Options.StateDataFormat.Protect(properties));
-
             // Create a new message containing the OpenID 2.0 request parameters.
             // See http://openid.net/specs/openid-authentication-2_0.html#requesting_authentication
             var message = new OpenIdAuthenticationMessage
@@ -272,7 +270,8 @@ namespace AspNet.Security.OpenId
                 Realm = realm,
                 ReturnTo = QueryHelpers.AddQueryString(
                     uri: properties.Items[OpenIdAuthenticationConstants.Properties.ReturnTo],
-                    name: OpenIdAuthenticationConstants.Parameters.State, value: state)
+                    name: OpenIdAuthenticationConstants.Parameters.State,
+                    value: Options.StateDataFormat.Protect(properties))
             };
 
             if (Options.Attributes.Count != 0)
@@ -355,8 +354,10 @@ namespace AspNet.Security.OpenId
             }
 
             // Create a new check_authentication request to verify the assertion.
-            var request = new HttpRequestMessage(HttpMethod.Post, configuration.AuthenticationEndpoint);
-            request.Content = new FormUrlEncodedContent(payload);
+            var request = new HttpRequestMessage(HttpMethod.Post, configuration.AuthenticationEndpoint)
+            {
+                Content = new FormUrlEncodedContent(payload)
+            };
 
             var response = await Options.HttpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, Context.RequestAborted);
             if (!response.IsSuccessStatusCode)

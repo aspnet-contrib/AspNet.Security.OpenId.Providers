@@ -37,31 +37,31 @@ namespace Mvc.Client
                 LogoutPath = new PathString("/signout")
             });
 
-            app.UseOpenIdAuthentication(new OpenIdAuthenticationOptions
+            app.UseOpenIdAuthentication(options =>
             {
-                AuthenticationScheme = "Orange",
-                DisplayName = "Orange",
-                Authority = new Uri("https://orange.fr/"),
-                CallbackPath = new PathString("/signin-orange")
+                options.AuthenticationScheme = "Orange";
+                options.DisplayName = "Orange";
+                options.Authority = new Uri("https://openid.orange.fr/");
+                options.CallbackPath = new PathString("/signin-orange");
             });
 
-            app.UseOpenIdAuthentication(new OpenIdAuthenticationOptions
+            app.UseOpenIdAuthentication(options =>
             {
-                AuthenticationScheme = "StackExchange",
-                DisplayName = "StackExchange",
-                Authority = new Uri("https://openid.stackexchange.com/"),
-                CallbackPath = new PathString("/signin-stackexchange")
+                options.AuthenticationScheme = "StackExchange";
+                options.DisplayName = "StackExchange";
+                options.Authority = new Uri("https://openid.stackexchange.com/");
+                options.CallbackPath = new PathString("/signin-stackexchange");
             });
 
-            app.UseOpenIdAuthentication(new OpenIdAuthenticationOptions
+            app.UseOpenIdAuthentication(options =>
             {
-                AuthenticationScheme = "Intuit",
-                DisplayName = "Intuit",
-                CallbackPath = new PathString("/signin-intuit"),
-                Configuration = new OpenIdAuthenticationConfiguration
+                options.AuthenticationScheme = "Intuit";
+                options.DisplayName = "Intuit";
+                options.CallbackPath = new PathString("/signin-intuit");
+                options.Configuration = new OpenIdAuthenticationConfiguration
                 {
                     AuthenticationEndpoint = "https://openid.intuit.com/OpenId/Provider"
-                }
+                };
             });
 
             app.UseSteamAuthentication();

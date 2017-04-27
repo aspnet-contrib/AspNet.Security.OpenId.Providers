@@ -13,16 +13,16 @@ namespace Microsoft.AspNetCore.Builder
 {
     /// <summary>
     /// Exposes convenient extensions that can be used to add an instance
-    /// of the OpenID authentication middleware in an ASP.NET 5 pipeline.
+    /// of the OpenID authentication middleware in an ASP.NET Core pipeline.
     /// </summary>
     public static class OpenIdAuthenticationExtensions
     {
         /// <summary>
         /// Adds <see cref="OpenIdAuthenticationMiddleware{TOptions}"/> to the specified
-        /// <see cref="IApplicationBuilder"/>, which enables OpenID2 authentication capabilities.
+        /// <see cref="IApplicationBuilder"/>, which enables OpenID 2.0 authentication capabilities.
         /// </summary>
         /// <param name="app">The <see cref="IApplicationBuilder"/>.</param>
-        /// <param name="options">The <see cref="OpenIdAuthenticationOptions"/> used to configure the OAuth2 options.</param>
+        /// <param name="options">The <see cref="OpenIdAuthenticationOptions"/> used to configure the OpenID 2.0 options.</param>
         /// <returns>The <see cref="IApplicationBuilder"/>.</returns>
         public static IApplicationBuilder UseOpenIdAuthentication(
             [NotNull] this IApplicationBuilder app,
@@ -43,10 +43,10 @@ namespace Microsoft.AspNetCore.Builder
 
         /// <summary>
         /// Adds <see cref="OpenIdAuthenticationMiddleware{TOptions}"/> to the specified
-        /// <see cref="IApplicationBuilder"/>, which enables OpenID2 authentication capabilities.
+        /// <see cref="IApplicationBuilder"/>, which enables OpenID 2.0 authentication capabilities.
         /// </summary>
         /// <param name="app">The <see cref="IApplicationBuilder"/>.</param>
-        /// <param name="configuration">The delegate used to configure the OAuth2 options.</param>
+        /// <param name="configuration">The delegate used to configure the OpenID 2.0 options.</param>
         /// <returns>The <see cref="IApplicationBuilder"/>.</returns>
         public static IApplicationBuilder UseOpenIdAuthentication(
             [NotNull] this IApplicationBuilder app,
