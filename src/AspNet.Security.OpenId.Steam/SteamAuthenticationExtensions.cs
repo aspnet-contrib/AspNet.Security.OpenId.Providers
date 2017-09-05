@@ -7,9 +7,9 @@
 using System;
 using AspNet.Security.OpenId.Steam;
 using JetBrains.Annotations;
-using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Authentication;
 
-namespace Microsoft.AspNetCore.Builder
+namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
     /// Exposes convenient extensions that can be used to add an instance
@@ -18,65 +18,60 @@ namespace Microsoft.AspNetCore.Builder
     public static class SteamAuthenticationExtensions
     {
         /// <summary>
-        /// Adds <see cref="SteamAuthenticationMiddleware"/> to the specified
-        /// <see cref="IApplicationBuilder"/>, which enables Steam authentication capabilities.
+        /// Adds <see cref="SteamAuthenticationHandler"/> to the specified
+        /// <see cref="AuthenticationBuilder"/>, which enables Steam authentication capabilities.
         /// </summary>
-        /// <param name="app">The <see cref="IApplicationBuilder"/>.</param>
-        /// <returns>The <see cref="IApplicationBuilder"/>.</returns>
-        public static IApplicationBuilder UseSteamAuthentication([NotNull] this IApplicationBuilder app)
+        /// <param name="builder">The authentication builder.</param>
+        /// <returns>The <see cref="AuthenticationBuilder"/>.</returns>
+        public static AuthenticationBuilder AddSteam([NotNull] this AuthenticationBuilder builder)
         {
-            return app.UseSteamAuthentication(new SteamAuthenticationOptions());
+            return builder.AddSteam(SteamAuthenticationDefaults.AuthenticationScheme, options => { });
         }
 
         /// <summary>
-        /// Adds <see cref="SteamAuthenticationMiddleware"/> to the specified
-        /// <see cref="IApplicationBuilder"/>, which enables Steam authentication capabilities.
+        /// Adds <see cref="SteamAuthenticationHandler"/> to the specified
+        /// <see cref="AuthenticationBuilder"/>, which enables Steam authentication capabilities.
         /// </summary>
-        /// <param name="app">The <see cref="IApplicationBuilder"/>.</param>
-        /// <param name="options">The <see cref="SteamAuthenticationOptions"/> used to configure the Steam options.</param>
-        /// <returns>The <see cref="IApplicationBuilder"/>.</returns>
-        public static IApplicationBuilder UseSteamAuthentication(
-            [NotNull] this IApplicationBuilder app,
-            [NotNull] SteamAuthenticationOptions options)
-        {
-            if (app == null)
-            {
-                throw new ArgumentNullException(nameof(app));
-            }
-
-            if (options == null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
-
-            return app.UseMiddleware<SteamAuthenticationMiddleware>(Options.Create(options));
-        }
-
-        /// <summary>
-        /// Adds <see cref="SteamAuthenticationMiddleware"/> to the specified
-        /// <see cref="IApplicationBuilder"/>, which enables Steam authentication capabilities.
-        /// </summary>
-        /// <param name="app">The <see cref="IApplicationBuilder"/>.</param>
-        /// <param name="configuration">The delegate used to configure the Steam options.</param>
-        /// <returns>The <see cref="IApplicationBuilder"/>.</returns>
-        public static IApplicationBuilder UseSteamAuthentication(
-            [NotNull] this IApplicationBuilder app,
+        /// <param name="builder">The authentication builder.</param>
+        /// <param name="configuration">The delegate used to configure the OpenID 2.0 options.</param>
+        /// <returns>The <see cref="AuthenticationBuilder"/>.</returns>
+        public static AuthenticationBuilder AddSteam(
+            [NotNull] this AuthenticationBuilder builder,
             [NotNull] Action<SteamAuthenticationOptions> configuration)
         {
-            if (app == null)
-            {
-                throw new ArgumentNullException(nameof(app));
-            }
+            return builder.AddSteam(SteamAuthenticationDefaults.AuthenticationScheme, configuration);
+        }
 
-            if (configuration == null)
-            {
-                throw new ArgumentNullException(nameof(configuration));
-            }
+        /// <summary>
+        /// Adds <see cref="SteamAuthenticationHandler"/> to the specified
+        /// <see cref="AuthenticationBuilder"/>, which enables Steam authentication capabilities.
+        /// </summary>
+        /// <param name="builder">The authentication builder.</param>
+        /// <param name="scheme">The authentication scheme associated with this instance.</param>
+        /// <param name="configuration">The delegate used to configure the Steam options.</param>
+        /// <returns>The <see cref="AuthenticationBuilder"/>.</returns>
+        public static AuthenticationBuilder AddSteam(
+            [NotNull] this AuthenticationBuilder builder, [NotNull] string scheme,
+            [NotNull] Action<SteamAuthenticationOptions> configuration)
+        {
+            return builder.AddSteam(scheme, SteamAuthenticationDefaults.DisplayName, configuration);
+        }
 
-            var options = new SteamAuthenticationOptions();
-            configuration(options);
-
-            return app.UseMiddleware<SteamAuthenticationMiddleware>(Options.Create(options));
+        /// <summary>
+        /// Adds <see cref="SteamAuthenticationHandler"/> to the specified
+        /// <see cref="AuthenticationBuilder"/>, which enables Steam authentication capabilities.
+        /// </summary>
+        /// <param name="builder">The authentication builder.</param>
+        /// <param name="scheme">The authentication scheme associated with this instance.</param>
+        /// <param name="name">The optional display name associated with this instance.</param>
+        /// <param name="configuration">The delegate used to configure the Steam options.</param>
+        /// <returns>The <see cref="AuthenticationBuilder"/>.</returns>
+        public static AuthenticationBuilder AddSteam(
+            [NotNull] this AuthenticationBuilder builder,
+            [NotNull] string scheme, [CanBeNull] string name,
+            [NotNull] Action<SteamAuthenticationOptions> configuration)
+        {
+            return builder.AddOpenId<SteamAuthenticationOptions, SteamAuthenticationHandler>(scheme, name, configuration);
         }
     }
 }

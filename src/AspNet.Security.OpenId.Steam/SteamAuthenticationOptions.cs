@@ -5,7 +5,6 @@
  */
 
 using System;
-using Microsoft.AspNetCore.Http;
 
 namespace AspNet.Security.OpenId.Steam
 {
@@ -13,10 +12,8 @@ namespace AspNet.Security.OpenId.Steam
     {
         public SteamAuthenticationOptions()
         {
-            AuthenticationScheme = SteamAuthenticationDefaults.AuthenticationScheme;
-            DisplayName = SteamAuthenticationDefaults.DisplayName;
             Authority = new Uri(SteamAuthenticationDefaults.Authority);
-            CallbackPath = new PathString(SteamAuthenticationDefaults.CallbackPath);
+            CallbackPath = SteamAuthenticationDefaults.CallbackPath;
         }
 
         /// <summary>

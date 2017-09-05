@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Authentication;
 namespace AspNet.Security.OpenId
 {
     /// <summary>
-    /// Specifies callback methods that the <see cref="OpenIdAuthenticationMiddleware{TOptions}"/>
+    /// Specifies callback methods that the <see cref="OpenIdAuthenticationHandler{TOptions}"/>
     /// invokes to enable developer control over the OpenID2 authentication process.
     /// </summary>
     public class OpenIdAuthenticationEvents : RemoteAuthenticationEvents
