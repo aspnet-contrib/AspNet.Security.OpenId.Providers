@@ -5,6 +5,7 @@
  */
 
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Authentication;
 
 namespace AspNet.Security.OpenId
 {
@@ -15,12 +16,12 @@ namespace AspNet.Security.OpenId
     public static class OpenIdAuthenticationDefaults
     {
         /// <summary>
-        /// Gets the default value associated with <see cref="AuthenticationOptions.AuthenticationScheme"/>.
+        /// Gets the default value associated with <see cref="AuthenticationScheme.Name"/>.
         /// </summary>
         public const string AuthenticationScheme = "OpenId";
 
         /// <summary>
-        /// Gets the default value associated with <see cref="RemoteAuthenticationOptions.DisplayName"/>.
+        /// Gets the default value associated with <see cref="AuthenticationScheme.DisplayName"/>.
         /// </summary>
         public const string DisplayName = "OpenId";
 
