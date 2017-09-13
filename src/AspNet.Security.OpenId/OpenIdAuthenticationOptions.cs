@@ -20,7 +20,7 @@ namespace AspNet.Security.OpenId
     {
         public OpenIdAuthenticationOptions()
         {
-            CallbackPath = new PathString(OpenIdAuthenticationDefaults.CallbackPath);
+            CallbackPath = OpenIdAuthenticationDefaults.CallbackPath;
             Events = new OpenIdAuthenticationEvents();
         }
 

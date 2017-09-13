@@ -14,7 +14,7 @@ namespace AspNet.Security.OpenId.Steam
         public SteamAuthenticationOptions()
         {
             Authority = new Uri(SteamAuthenticationDefaults.Authority);
-            CallbackPath = new PathString(SteamAuthenticationDefaults.CallbackPath);
+            CallbackPath = SteamAuthenticationDefaults.CallbackPath;
         }
 
         /// <summary>
