@@ -6,27 +6,36 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
+using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Http.Authentication;
+using Microsoft.AspNetCore.Http.Features.Authentication;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
+using AspNet.Security.OpenId;
 
 namespace AspNet.Security.OpenId.Steam
 {
     public class SteamAuthenticationHandler : OpenIdAuthenticationHandler<SteamAuthenticationOptions>
     {
+        public SteamAuthenticationHandler(IOptionsMonitor<SteamAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock)
+            : base(options, logger, encoder, clock)
+        { }
+
         protected override async Task<AuthenticationTicket> CreateTicketAsync(
             [NotNull] ClaimsIdentity identity, [NotNull] AuthenticationProperties properties,
             [NotNull] string identifier, [NotNull] IDictionary<string, string> attributes)
         {
             var principal = new ClaimsPrincipal(identity);
-            var ticket = new AuthenticationTicket(principal, properties, Options.AuthenticationScheme);
+            var ticket = new AuthenticationTicket(principal, properties, Scheme.Name);
 
             // Return the authentication ticket as-is if the
             // user information endpoint has not been set.
@@ -88,7 +97,7 @@ namespace AspNet.Security.OpenId.Steam
                 identity.AddClaim(new Claim(ClaimTypes.Name, profile, ClaimValueTypes.String, Options.ClaimsIssuer));
             }
 
-            var context = new OpenIdAuthenticatedContext(Context, Options, ticket)
+            var context = new OpenIdAuthenticatedContext(Context, Scheme, Options, ticket)
             {
                 User = payload
             };

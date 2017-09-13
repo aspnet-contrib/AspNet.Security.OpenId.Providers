@@ -17,10 +17,30 @@ namespace Mvc.Client
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddAuthentication(options =>
-            {
-                options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            });
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(o => {
+                    o.LoginPath = new PathString("/login");
+                    o.LogoutPath = new PathString("/signout");
+                })
+                .AddOpenId("Orange", "Orange", options =>
+                {
+                    options.Authority = new Uri("https://openid.orange.fr/");
+                    options.CallbackPath = "/signin-orange";
+                })
+                .AddOpenId("StackExchange", "StackExchange", options =>
+                {
+                    options.Authority = new Uri("https://openid.stackexchange.com/");
+                    options.CallbackPath = "/signin-stackexchange";
+                })
+                .AddOpenId("Intuit", "Intuit", options =>
+                {
+                    options.CallbackPath = "/signin-intuit";
+                    options.Configuration = new OpenIdAuthenticationConfiguration
+                    {
+                        AuthenticationEndpoint = "https://openid.intuit.com/OpenId/Provider"
+                    };
+                })
+                .AddSteam();
 
             services.AddMvc();
         }
@@ -29,42 +49,7 @@ namespace Mvc.Client
         {
             app.UseStaticFiles();
 
-            app.UseCookieAuthentication(new CookieAuthenticationOptions
-            {
-                AutomaticAuthenticate = true,
-                AutomaticChallenge = true,
-                LoginPath = new PathString("/signin"),
-                LogoutPath = new PathString("/signout")
-            });
-
-            app.UseOpenIdAuthentication(options =>
-            {
-                options.AuthenticationScheme = "Orange";
-                options.DisplayName = "Orange";
-                options.Authority = new Uri("https://openid.orange.fr/");
-                options.CallbackPath = new PathString("/signin-orange");
-            });
-
-            app.UseOpenIdAuthentication(options =>
-            {
-                options.AuthenticationScheme = "StackExchange";
-                options.DisplayName = "StackExchange";
-                options.Authority = new Uri("https://openid.stackexchange.com/");
-                options.CallbackPath = new PathString("/signin-stackexchange");
-            });
-
-            app.UseOpenIdAuthentication(options =>
-            {
-                options.AuthenticationScheme = "Intuit";
-                options.DisplayName = "Intuit";
-                options.CallbackPath = new PathString("/signin-intuit");
-                options.Configuration = new OpenIdAuthenticationConfiguration
-                {
-                    AuthenticationEndpoint = "https://openid.intuit.com/OpenId/Provider"
-                };
-            });
-
-            app.UseSteamAuthentication();
+            app.UseAuthentication();
 
             app.UseMvc();
         }

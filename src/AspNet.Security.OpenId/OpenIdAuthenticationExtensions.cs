@@ -5,67 +5,75 @@
  */
 
 using System;
-using AspNet.Security.OpenId;
 using JetBrains.Annotations;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
+using AspNet.Security.OpenId;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace Microsoft.AspNetCore.Builder
+namespace Microsoft.Extensions.DependencyInjection
 {
-    /// <summary>
-    /// Exposes convenient extensions that can be used to add an instance
-    /// of the OpenID authentication middleware in an ASP.NET Core pipeline.
-    /// </summary>
     public static class OpenIdAuthenticationExtensions
     {
         /// <summary>
-        /// Adds <see cref="OpenIdAuthenticationMiddleware{TOptions}"/> to the specified
-        /// <see cref="IApplicationBuilder"/>, which enables OpenID 2.0 authentication capabilities.
+        /// Adds <see cref="OpenIdAuthenticationHandler{TOptions}"/> to the specified
+        /// <see cref="AuthenticationBuilder"/>, which enables OpenId authentication capabilities.
         /// </summary>
-        /// <param name="app">The <see cref="IApplicationBuilder"/>.</param>
-        /// <param name="options">The <see cref="OpenIdAuthenticationOptions"/> used to configure the OpenID 2.0 options.</param>
-        /// <returns>The <see cref="IApplicationBuilder"/>.</returns>
-        public static IApplicationBuilder UseOpenIdAuthentication(
-            [NotNull] this IApplicationBuilder app,
-            [NotNull] OpenIdAuthenticationOptions options)
+        /// <param name="builder">The <see cref="AuthenticationBuilder"/>.</param>
+        /// <returns>The <see cref="AuthenticationBuilder"/>.</returns>
+        public static AuthenticationBuilder AddOpenId([NotNull] this AuthenticationBuilder builder)
+            => builder.AddOpenId(OpenIdAuthenticationDefaults.AuthenticationScheme, _ => { });
+
+        /// <summary>
+        /// Adds <see cref="OpenIdAuthenticationHandler{TOptions}"/> to the specified
+        /// <see cref="AuthenticationBuilder"/>, which enables OpenId authentication capabilities.
+        /// </summary>
+        /// <param name="builder">The <see cref="AuthenticationBuilder"/>.</param>
+        /// <param name="configuration">The delegate used to configure the OpenId options.</param>
+        /// <returns>The <see cref="AuthenticationBuilder"/>.</returns>
+        public static AuthenticationBuilder AddOpenId([NotNull] this AuthenticationBuilder builder, [NotNull] Action<OpenIdAuthenticationOptions> configuration)
+            => builder.AddOpenId(OpenIdAuthenticationDefaults.AuthenticationScheme, configuration);
+
+        /// <summary>
+        /// Adds <see cref="OpenIdAuthenticationHandler{TOptions}"/> to the specified
+        /// <see cref="AuthenticationBuilder"/>, which enables OpenId authentication capabilities.
+        /// </summary>
+        /// <param name="builder">The <see cref="AuthenticationBuilder"/>.</param>
+        /// <param name="authenticationScheme">The AuthenticationScheme name for the scheme.</param>
+        /// <param name="configuration">The delegate used to configure the OpenId options.</param>
+        /// <returns>The <see cref="AuthenticationBuilder"/>.</returns>
+        public static AuthenticationBuilder AddOpenId([NotNull] this AuthenticationBuilder builder, [NotNull] string authenticationScheme, [NotNull] Action<OpenIdAuthenticationOptions> configuration)
+            => builder.AddOpenId(authenticationScheme, OpenIdAuthenticationDefaults.DisplayName, configuration);
+
+        /// <summary>
+        /// Adds <see cref="OpenIdAuthenticationHandler{TOptions}"/> to the specified
+        /// <see cref="AuthenticationBuilder"/>, which enables OpenId authentication capabilities.
+        /// </summary>
+        /// <param name="builder">The <see cref="AuthenticationBuilder"/>.</param>
+        /// <param name="authenticationScheme">The AuthenticationScheme name for the scheme.</param>
+        /// <param name="displayName">The DisplayName for the scheme.</param>
+        /// <param name="configuration">The delegate used to configure the OpenId options.</param>
+        /// <returns>The <see cref="AuthenticationBuilder"/>.</returns>
+        public static AuthenticationBuilder AddOpenId([NotNull] this AuthenticationBuilder builder, [NotNull] string authenticationScheme, [NotNull] string displayName, [NotNull] Action<OpenIdAuthenticationOptions> configuration)
         {
-            if (app == null)
-            {
-                throw new ArgumentNullException(nameof(app));
-            }
-
-            if (options == null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
-
-            return app.UseMiddleware<OpenIdAuthenticationMiddleware<OpenIdAuthenticationOptions>>(Options.Create(options));
+            return builder.AddOpenId<OpenIdAuthenticationOptions, OpenIdAuthenticationHandler<OpenIdAuthenticationOptions>>(authenticationScheme, displayName, configuration);
         }
 
         /// <summary>
-        /// Adds <see cref="OpenIdAuthenticationMiddleware{TOptions}"/> to the specified
-        /// <see cref="IApplicationBuilder"/>, which enables OpenID 2.0 authentication capabilities.
+        /// Adds <see cref="OpenIdAuthenticationHandler{TOptions}"/> to the specified
+        /// <see cref="AuthenticationBuilder"/>, which enables OpenId authentication capabilities.
         /// </summary>
-        /// <param name="app">The <see cref="IApplicationBuilder"/>.</param>
-        /// <param name="configuration">The delegate used to configure the OpenID 2.0 options.</param>
-        /// <returns>The <see cref="IApplicationBuilder"/>.</returns>
-        public static IApplicationBuilder UseOpenIdAuthentication(
-            [NotNull] this IApplicationBuilder app,
-            [NotNull] Action<OpenIdAuthenticationOptions> configuration)
+        /// <param name="builder">The <see cref="AuthenticationBuilder"/>.</param>
+        /// <param name="authenticationScheme">The AuthenticationScheme name for the scheme.</param>
+        /// <param name="displayName">The DisplayName for the scheme.</param>
+        /// <param name="configuration">The delegate used to configure the OpenId options.</param>
+        /// <returns>The <see cref="AuthenticationBuilder"/>.</returns>
+        public static AuthenticationBuilder AddOpenId<TOptions, THandler>([NotNull] this AuthenticationBuilder builder, [NotNull] string authenticationScheme, [NotNull] string displayName, [NotNull] Action<TOptions> configuration)
+            where TOptions : OpenIdAuthenticationOptions, new()
+            where THandler : OpenIdAuthenticationHandler<TOptions>
         {
-            if (app == null)
-            {
-                throw new ArgumentNullException(nameof(app));
-            }
-
-            if (configuration == null)
-            {
-                throw new ArgumentNullException(nameof(configuration));
-            }
-
-            var options = new OpenIdAuthenticationOptions();
-            configuration(options);
-
-            return app.UseMiddleware<OpenIdAuthenticationMiddleware<OpenIdAuthenticationOptions>>(Options.Create(options));
+            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IPostConfigureOptions<TOptions>, OpenIdAuthenticationInitializer<TOptions, THandler>>());
+            return builder.AddRemoteScheme<TOptions, THandler>(authenticationScheme, displayName, configuration);
         }
     }
 }
