@@ -62,7 +62,7 @@ namespace Microsoft.Extensions.DependencyInjection
             if (options.StateDataFormat == null)
             {
                 var protector = options.DataProtectionProvider.CreateProtector(
-                    GetType().FullName, name, "v1");
+                    nameof(OpenIdAuthenticationHandler), name);
 
                 options.StateDataFormat = new PropertiesDataFormat(protector);
             }
@@ -94,6 +94,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
                     options.ConfigurationManager = new StaticConfigurationManager<OpenIdAuthenticationConfiguration>(options.Configuration);
                 }
+
                 else
                 {
                     if (options.Authority == null && options.MetadataAddress == null)

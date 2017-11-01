@@ -6,8 +6,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -15,12 +13,10 @@ using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Http.Features.Authentication;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
-using AspNet.Security.OpenId;
 
 namespace AspNet.Security.OpenId.Steam
 {
@@ -108,11 +104,13 @@ namespace AspNet.Security.OpenId.Steam
                 context.Attributes.Add(attribute);
             }
 
-            await Options.Events.Authenticated(context);
+            await Events.Authenticated(context);
 
             // Note: return the authentication ticket associated
             // with the notification to allow replacing the ticket.
             return context.Ticket;
         }
+
+        private new OpenIdAuthenticationEvents Events => (OpenIdAuthenticationEvents) base.Events;
     }
 }

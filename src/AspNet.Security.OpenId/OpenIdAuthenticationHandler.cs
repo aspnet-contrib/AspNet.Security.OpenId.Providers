@@ -20,6 +20,16 @@ using Microsoft.Extensions.Options;
 
 namespace AspNet.Security.OpenId
 {
+    public class OpenIdAuthenticationHandler : OpenIdAuthenticationHandler<OpenIdAuthenticationOptions>
+    {
+        public OpenIdAuthenticationHandler(
+            [NotNull] IOptionsMonitor<OpenIdAuthenticationOptions> options,
+            [NotNull] ILoggerFactory logger,
+            [NotNull] UrlEncoder encoder,
+            [NotNull] ISystemClock clock)
+            : base(options, logger, encoder, clock) { }
+    }
+
     public class OpenIdAuthenticationHandler<TOptions> : RemoteAuthenticationHandler<TOptions>
         where TOptions : OpenIdAuthenticationOptions, new()
     {
@@ -28,8 +38,7 @@ namespace AspNet.Security.OpenId
             [NotNull] ILoggerFactory logger,
             [NotNull] UrlEncoder encoder,
             [NotNull] ISystemClock clock)
-            : base(options, logger, encoder, clock)
-        { }
+            : base(options, logger, encoder, clock) { }
 
         protected override async Task<HandleRequestResult> HandleRemoteAuthenticateAsync()
         {
@@ -220,7 +229,7 @@ namespace AspNet.Security.OpenId
                 context.Attributes.Add(attribute);
             }
 
-            await Options.Events.Authenticated(context);
+            await Events.Authenticated(context);
 
             // Note: return the authentication ticket associated
             // with the notification to allow replacing the ticket.
