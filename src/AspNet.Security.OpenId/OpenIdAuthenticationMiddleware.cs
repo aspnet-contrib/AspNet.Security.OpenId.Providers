@@ -48,7 +48,7 @@ namespace AspNet.Security.OpenId
             if (Options.StateDataFormat == null)
             {
                 var protector = Options.DataProtectionProvider.CreateProtector(
-                    GetType().FullName, Options.AuthenticationScheme, "v1");
+                    nameof(OpenIdAuthenticationHandler), Options.AuthenticationScheme);
 
                 Options.StateDataFormat = new PropertiesDataFormat(protector);
             }
