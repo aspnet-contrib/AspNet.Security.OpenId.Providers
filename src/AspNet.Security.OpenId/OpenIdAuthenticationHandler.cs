@@ -42,6 +42,15 @@ namespace AspNet.Security.OpenId
 
         protected override async Task<HandleRequestResult> HandleRemoteAuthenticateAsync()
         {
+            // OpenID 2.0 responses MUST necessarily be made using either GET or POST.
+            // See http://openid.net/specs/openid-authentication-2_0.html#anchor4
+            if (!string.Equals(Request.Method, "GET", StringComparison.OrdinalIgnoreCase) &&
+                !string.Equals(Request.Method, "POST", StringComparison.OrdinalIgnoreCase))
+            {
+                return HandleRequestResult.Fail("The authentication response was rejected because it was made " +
+                                                "using an invalid method: make sure to use either GET or POST.");
+            }
+
             // Always extract the "state" parameter from the query string.
             var state = Request.Query[OpenIdAuthenticationConstants.Parameters.State];
             if (string.IsNullOrEmpty(state))
@@ -65,15 +74,6 @@ namespace AspNet.Security.OpenId
             }
 
             OpenIdAuthenticationMessage message;
-
-            // OpenID 2.0 responses MUST necessarily be made using either GET or POST.
-            // See http://openid.net/specs/openid-authentication-2_0.html#anchor4
-            if (!string.Equals(Request.Method, "GET", StringComparison.OrdinalIgnoreCase) &&
-                !string.Equals(Request.Method, "POST", StringComparison.OrdinalIgnoreCase))
-            {
-                return HandleRequestResult.Fail("The authentication response was rejected because it was made " +
-                                                "using an invalid method: make sure to use either GET or POST.");
-            }
 
             if (string.Equals(Request.Method, "GET", StringComparison.OrdinalIgnoreCase))
             {
