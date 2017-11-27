@@ -63,15 +63,15 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="builder">The authentication builder.</param>
         /// <param name="scheme">The authentication scheme associated with this instance.</param>
-        /// <param name="name">The optional display name associated with this instance.</param>
+        /// <param name="caption">The optional display name associated with this instance.</param>
         /// <param name="configuration">The delegate used to configure the Steam options.</param>
         /// <returns>The <see cref="AuthenticationBuilder"/>.</returns>
         public static AuthenticationBuilder AddSteam(
             [NotNull] this AuthenticationBuilder builder,
-            [NotNull] string scheme, [CanBeNull] string name,
+            [NotNull] string scheme, [CanBeNull] string caption,
             [NotNull] Action<SteamAuthenticationOptions> configuration)
         {
-            return builder.AddOpenId<SteamAuthenticationOptions, SteamAuthenticationHandler>(scheme, name, configuration);
+            return builder.AddOpenId<SteamAuthenticationOptions, SteamAuthenticationHandler>(scheme, caption, configuration);
         }
     }
 }

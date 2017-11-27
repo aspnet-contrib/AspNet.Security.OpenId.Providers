@@ -61,15 +61,15 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="builder">The authentication builder.</param>
         /// <param name="scheme">The authentication scheme associated with this instance.</param>
-        /// <param name="name">The optional display name associated with this instance.</param>
+        /// <param name="caption">The optional display name associated with this instance.</param>
         /// <param name="configuration">The delegate used to configure the OpenID 2.0 options.</param>
         /// <returns>The <see cref="AuthenticationBuilder"/>.</returns>
         public static AuthenticationBuilder AddOpenId(
             [NotNull] this AuthenticationBuilder builder,
-            [NotNull] string scheme, [CanBeNull] string name,
+            [NotNull] string scheme, [CanBeNull] string caption,
             [NotNull] Action<OpenIdAuthenticationOptions> configuration)
         {
-            return builder.AddOpenId<OpenIdAuthenticationOptions, OpenIdAuthenticationHandler<OpenIdAuthenticationOptions>>(scheme, name, configuration);
+            return builder.AddOpenId<OpenIdAuthenticationOptions, OpenIdAuthenticationHandler<OpenIdAuthenticationOptions>>(scheme, caption, configuration);
         }
 
         /// <summary>
@@ -78,12 +78,12 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="builder">The authentication builder.</param>
         /// <param name="scheme">The authentication scheme associated with this instance.</param>
-        /// <param name="name">The optional display name associated with this instance.</param>
+        /// <param name="caption">The optional display name associated with this instance.</param>
         /// <param name="configuration">The delegate used to configure the OpenID 2.0 options.</param>
         /// <returns>The <see cref="AuthenticationBuilder"/>.</returns>
         public static AuthenticationBuilder AddOpenId<TOptions, THandler>(
             [NotNull] this AuthenticationBuilder builder,
-            [NotNull] string scheme, [CanBeNull] string name,
+            [NotNull] string scheme, [CanBeNull] string caption,
             [NotNull] Action<TOptions> configuration)
             where TOptions : OpenIdAuthenticationOptions, new()
             where THandler : OpenIdAuthenticationHandler<TOptions>
@@ -108,7 +108,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 ServiceDescriptor.Singleton<IPostConfigureOptions<TOptions>,
                                             OpenIdAuthenticationInitializer<TOptions, THandler>>());
 
-            return builder.AddRemoteScheme<TOptions, THandler>(scheme, name, configuration);
+            return builder.AddRemoteScheme<TOptions, THandler>(scheme, caption, configuration);
         }
     }
 }
