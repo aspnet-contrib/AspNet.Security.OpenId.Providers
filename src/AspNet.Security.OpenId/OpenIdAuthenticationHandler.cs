@@ -27,7 +27,9 @@ namespace AspNet.Security.OpenId
             [NotNull] ILoggerFactory logger,
             [NotNull] UrlEncoder encoder,
             [NotNull] ISystemClock clock)
-            : base(options, logger, encoder, clock) { }
+            : base(options, logger, encoder, clock)
+        {
+        }
     }
 
     public class OpenIdAuthenticationHandler<TOptions> : RemoteAuthenticationHandler<TOptions>
@@ -38,7 +40,9 @@ namespace AspNet.Security.OpenId
             [NotNull] ILoggerFactory logger,
             [NotNull] UrlEncoder encoder,
             [NotNull] ISystemClock clock)
-            : base(options, logger, encoder, clock) { }
+            : base(options, logger, encoder, clock)
+        {
+        }
 
         protected override async Task<HandleRequestResult> HandleRemoteAuthenticateAsync()
         {
@@ -145,7 +149,7 @@ namespace AspNet.Security.OpenId
                                                       name: OpenIdAuthenticationConstants.Parameters.State, value: state);
 
             // Validate the return_to parameter by comparing it to the address stored in the properties.
-            // See http://openid.net/specs/openid-authentication-2_0.html#verify_return_to
+            // See http://openid.net/specs/openid-authentication-2_0.html#verify_return_to for more information.
             if (!string.Equals(message.ReturnTo, address, StringComparison.Ordinal))
             {
                 return HandleRequestResult.Fail("The authentication response was rejected because the return_to parameter was invalid.");
@@ -216,7 +220,7 @@ namespace AspNet.Security.OpenId
 
         protected virtual async Task<AuthenticationTicket> CreateTicketAsync(
             [NotNull] ClaimsIdentity identity, [NotNull] AuthenticationProperties properties,
-            [NotNull] string identifier, [NotNull] IDictionary<string, string> attributes)
+            [NotNull] string identifier, [NotNull] IReadOnlyDictionary<string, string> attributes)
         {
             var principal = new ClaimsPrincipal(identity);
             var ticket = new AuthenticationTicket(principal, properties, Scheme.Name);
@@ -319,7 +323,10 @@ namespace AspNet.Security.OpenId
                     value: string.Join(",", Options.Attributes.Select(attribute => attribute.Key)));
             }
 
-            var address = QueryHelpers.AddQueryString(configuration.AuthenticationEndpoint, message.Parameters);
+            var address = QueryHelpers.AddQueryString(configuration.AuthenticationEndpoint, 
+                message.GetParameters()
+                    .ToDictionary(parameter => parameter.Key,
+                                  parameter => parameter.Value));
 
             Response.Redirect(address);
         }
@@ -349,7 +356,7 @@ namespace AspNet.Security.OpenId
             };
 
             // Copy the parameters extracted from the assertion.
-            foreach (var parameter in message.Parameters)
+            foreach (var parameter in message.GetParameters())
             {
                 if (string.Equals(parameter.Key, $"{OpenIdAuthenticationConstants.Prefixes.OpenId}." +
                                                     OpenIdAuthenticationConstants.Parameters.Mode, StringComparison.Ordinal))
