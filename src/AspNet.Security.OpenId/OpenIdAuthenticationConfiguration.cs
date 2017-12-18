@@ -73,13 +73,20 @@ namespace AspNet.Security.OpenId
             public HttpClient HttpClient { get; }
 
             /// <summary>
+            /// Gets the maximal number of roundtrips that are allowed
+            /// before the discovery process is automatically aborted.
+            /// By default, this property is set to <c>5</c>.
+            /// </summary>
+            public int MaximumRedirections { get; set; } = 5;
+
+            /// <summary>
             /// Retrieves the OpenID 2.0 configuration from the specified address.
             /// </summary>
             /// <param name="address">The address of the discovery document.</param>
             /// <param name="retriever">The object used to retrieve the discovery document.</param>
             /// <param name="cancellationToken">The <see cref="CancellationToken"/> that can be used to abort the operation.</param>
             /// <returns>An <see cref="OpenIdAuthenticationConfiguration"/> instance.</returns>
-            public async Task<OpenIdAuthenticationConfiguration> GetConfigurationAsync(
+            public Task<OpenIdAuthenticationConfiguration> GetConfigurationAsync(
                 [NotNull] string address, [NotNull] IDocumentRetriever retriever, CancellationToken cancellationToken)
             {
                 if (retriever == null)
@@ -97,12 +104,12 @@ namespace AspNet.Security.OpenId
                     throw new ArgumentException("The address must be an absolute URI.", nameof(address));
                 }
 
-                using (var cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken))
+                if (MaximumRedirections < 1)
                 {
-                    cancellationTokenSource.CancelAfter(HttpClient.Timeout);
-
-                    return await DiscoverConfigurationAsync(uri, cancellationTokenSource.Token);
+                    throw new InvalidOperationException("The maximal number of redirections must be a non-zero positive number.");
                 }
+
+                return DiscoverConfigurationAsync(uri, cancellationToken);
             }
 
             private async Task<OpenIdAuthenticationConfiguration> DiscoverConfigurationAsync(
@@ -110,8 +117,11 @@ namespace AspNet.Security.OpenId
             {
                 Debug.Assert(address != null, "The address shouldn't be null or empty.");
 
-                while (!cancellationToken.IsCancellationRequested)
+                for (var index = 0; index < MaximumRedirections; index++)
                 {
+                    // Abort the operation if cancellation was requested.
+                    cancellationToken.ThrowIfCancellationRequested();
+
                     // application/xrds+xml MUST be the preferred content type to avoid a second round-trip.
                     // See http://openid.net/specs/yadis-v1.0.pdf (chapter 6.2.4)
                     var request = new HttpRequestMessage(HttpMethod.Get, address);
@@ -154,7 +164,7 @@ namespace AspNet.Security.OpenId
                     // See http://openid.net/specs/yadis-v1.0.pdf (chapter 6.2.6)
                     if (response.Headers.Contains(OpenIdAuthenticationConstants.Headers.XrdsLocation))
                     {
-                        var location = ProcessUnknownDocument(response);
+                        var location = ProcessGenericDocument(response);
                         if (location != null)
                         {
                             // Retry the discovery operation, but using the
@@ -221,7 +231,7 @@ namespace AspNet.Security.OpenId
                 }
             }
 
-            private Uri ProcessUnknownDocument([NotNull] HttpResponseMessage response)
+            private Uri ProcessGenericDocument([NotNull] HttpResponseMessage response)
             {
                 Debug.Assert(response != null, "The HTTP response shouldn't be null.");
 

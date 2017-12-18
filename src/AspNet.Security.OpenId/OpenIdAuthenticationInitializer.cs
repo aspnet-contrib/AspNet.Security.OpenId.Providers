@@ -54,6 +54,11 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new ArgumentException("The options instance name cannot be null or empty.", nameof(name));
             }
 
+            if (options.MaximumRedirections < 1)
+            {
+                throw new ArgumentException("The maximal number of redirections must be a non-zero positive number.", nameof(options));
+            }
+
             if (options.DataProtectionProvider == null)
             {
                 options.DataProtectionProvider = _dataProtectionProvider;
@@ -135,7 +140,10 @@ namespace Microsoft.Extensions.DependencyInjection
 
                     options.ConfigurationManager = new ConfigurationManager<OpenIdAuthenticationConfiguration>(
                         options.MetadataAddress?.AbsoluteUri ?? options.Authority.AbsoluteUri,
-                        new OpenIdAuthenticationConfiguration.Retriever(options.HttpClient, options.HtmlParser),
+                        new OpenIdAuthenticationConfiguration.Retriever(options.HttpClient, options.HtmlParser)
+                        {
+                            MaximumRedirections = options.MaximumRedirections
+                        },
                         new HttpDocumentRetriever(options.HttpClient) { RequireHttps = options.RequireHttpsMetadata });
                 }
             }
