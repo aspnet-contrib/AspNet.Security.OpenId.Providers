@@ -23,7 +23,7 @@ namespace AspNet.Security.OpenId.Steam
     {
         protected override async Task<AuthenticationTicket> CreateTicketAsync(
             [NotNull] ClaimsIdentity identity, [NotNull] AuthenticationProperties properties,
-            [NotNull] string identifier, [NotNull] IDictionary<string, string> attributes)
+            [NotNull] string identifier, [NotNull] IReadOnlyDictionary<string, string> attributes)
         {
             var principal = new ClaimsPrincipal(identity);
             var ticket = new AuthenticationTicket(principal, properties, Options.AuthenticationScheme);
