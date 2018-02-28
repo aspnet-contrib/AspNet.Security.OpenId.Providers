@@ -1,6 +1,6 @@
 <Project>
 
-  <PropertyGroup>
+  <PropertyGroup Label="Package Versions">
     <AngleSharpVersion>0.9.9</AngleSharpVersion>
     <AspNetCoreVersion>2.0.0</AspNetCoreVersion>
     <IdentityModelCoreVersion>2.1.4</IdentityModelCoreVersion>
