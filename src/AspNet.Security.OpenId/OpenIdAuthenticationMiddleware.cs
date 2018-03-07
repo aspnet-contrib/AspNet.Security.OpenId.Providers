@@ -40,6 +40,11 @@ namespace AspNet.Security.OpenId
                 throw new ArgumentException("The sign-in scheme cannot be null or empty.", nameof(options));
             }
 
+            if (Options.MaximumRedirections < 1)
+            {
+                throw new ArgumentException("The maximal number of redirections must be a non-zero positive number.", nameof(options));
+            }
+
             if (Options.DataProtectionProvider == null)
             {
                 Options.DataProtectionProvider = dataProtectionProvider;
@@ -121,7 +126,10 @@ namespace AspNet.Security.OpenId
 
                     Options.ConfigurationManager = new ConfigurationManager<OpenIdAuthenticationConfiguration>(
                         Options.MetadataAddress?.AbsoluteUri ?? Options.Authority.AbsoluteUri,
-                        new OpenIdAuthenticationConfiguration.Retriever(Options.HttpClient, Options.HtmlParser),
+                        new OpenIdAuthenticationConfiguration.Retriever(Options.HttpClient, Options.HtmlParser)
+                        {
+                            MaximumRedirections = Options.MaximumRedirections
+                        },
                         new HttpDocumentRetriever(Options.HttpClient) { RequireHttps = Options.RequireHttpsMetadata });
                 }
             }

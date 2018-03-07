@@ -115,5 +115,12 @@ namespace AspNet.Security.OpenId
         /// Gets or sets the HTML parser used to parse discovery documents.
         /// </summary>
         public HtmlParser HtmlParser { get; set; }
+
+        /// <summary>
+        /// Gets the maximal number of roundtrips that are allowed
+        /// before the discovery process is automatically aborted.
+        /// By default, this property is set to <c>5</c>.
+        /// </summary>
+        public int MaximumRedirections { get; set; } = 5;
     }
 }
