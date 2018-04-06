@@ -57,7 +57,7 @@ namespace AspNet.Security.OpenId.Steam
             }
 
             // Return the authentication ticket as-is if the claimed identifier is malformed.
-            if (!identifier.StartsWith(SteamAuthenticationConstants.Namespaces.Identifier, StringComparison.Ordinal))
+            if (!identifier.StartsWith(SteamAuthenticationConstants.Namespaces.Identifier, StringComparison.Ordinal) && !identifier.StartsWith(SteamAuthenticationConstants.Namespaces.UnsecureIdentifier, StringComparison.Ordinal))
             {
                 Logger.LogWarning("The userinfo request was skipped because an invalid identifier was received: {Identifier}.", identifier);
 
