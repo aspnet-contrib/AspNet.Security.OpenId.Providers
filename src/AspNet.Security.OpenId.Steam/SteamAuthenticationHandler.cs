@@ -46,8 +46,20 @@ namespace AspNet.Security.OpenId.Steam
                 return ticket;
             }
 
+            // Note: prior to April 2018, the Steam identifier was prefixed with an HTTP base address.
+            // Since then, the prefix is now an HTTPS address. The following logic supports both prefixes.
+            if (identifier.StartsWith(SteamAuthenticationConstants.Namespaces.Identifier, StringComparison.Ordinal))
+            {
+                identifier = identifier.Substring(SteamAuthenticationConstants.Namespaces.Identifier.Length);
+            }
+
+            else if (identifier.StartsWith(SteamAuthenticationConstants.Namespaces.LegacyIdentifier, StringComparison.Ordinal))
+            {
+                identifier = identifier.Substring(SteamAuthenticationConstants.Namespaces.LegacyIdentifier.Length);
+            }
+
             // Return the authentication ticket as-is if the claimed identifier is malformed.
-            if (!identifier.StartsWith(SteamAuthenticationConstants.Namespaces.Identifier, StringComparison.Ordinal))
+            else
             {
                 Logger.LogWarning("The userinfo request was skipped because an invalid identifier was received: {Identifier}.", identifier);
 
@@ -57,7 +69,7 @@ namespace AspNet.Security.OpenId.Steam
             var address = QueryHelpers.AddQueryString(Options.UserInformationEndpoint, new Dictionary<string, string>
             {
                 [SteamAuthenticationConstants.Parameters.Key] = Options.ApplicationKey,
-                [SteamAuthenticationConstants.Parameters.SteamId] = identifier.Substring(SteamAuthenticationConstants.Namespaces.Identifier.Length)
+                [SteamAuthenticationConstants.Parameters.SteamId] = identifier
             });
 
             var request = new HttpRequestMessage(HttpMethod.Get, address);
