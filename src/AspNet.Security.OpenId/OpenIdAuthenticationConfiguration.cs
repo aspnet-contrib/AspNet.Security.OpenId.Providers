@@ -48,18 +48,8 @@ namespace AspNet.Security.OpenId
             /// <param name="parser">The HTML parser used to parse the discovery documents.</param>
             public Retriever([NotNull] HttpClient client, [NotNull] HtmlParser parser)
             {
-                if (client == null)
-                {
-                    throw new ArgumentNullException(nameof(client));
-                }
-
-                if (parser == null)
-                {
-                    throw new ArgumentNullException(nameof(parser));
-                }
-
-                HttpClient = client;
-                HtmlParser = parser;
+                HttpClient = client ?? throw new ArgumentNullException(nameof(client));
+                HtmlParser = parser ?? throw new ArgumentNullException(nameof(parser));
             }
 
             /// <summary>
