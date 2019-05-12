@@ -13,7 +13,7 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
     /// Exposes convenient extensions that can be used to add an instance
-    /// of the Steam authentication middleware in an ASP.NET 5 pipeline.
+    /// of the Steam authentication middleware in an ASP.NET Core pipeline.
     /// </summary>
     public static class SteamAuthenticationExtensions
     {
