@@ -26,6 +26,40 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{9830BBC8-5
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNet.Security.OpenId.Providers.Tests", "test\AspNet.Security.OpenId.Providers.Tests\AspNet.Security.OpenId.Providers.Tests.csproj", "{F25AB0AB-F046-4D4B-97DD-634C2725D050}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6C70B0E8-0729-41F6-8A4F-E6E30F960717}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		.travis.yml = .travis.yml
+		build.cmd = build.cmd
+		build.ps1 = build.ps1
+		build.sh = build.sh
+		CODE_OF_CONDUCT.md = CODE_OF_CONDUCT.md
+		global.json = global.json
+		korebuild-lock.txt = korebuild-lock.txt
+		korebuild.json = korebuild.json
+		NuGet.config = NuGet.config
+		README.md = README.md
+		run.cmd = run.cmd
+		run.ps1 = run.ps1
+		run.sh = run.sh
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{738BD06E-33F6-4A29-B416-90F574A06D7D}"
+	ProjectSection(SolutionItems) = preProject
+		.github\CODEOWNERS = .github\CODEOWNERS
+		.github\CONTRIBUTING.md = .github\CONTRIBUTING.md
+		.github\ISSUE_TEMPLATE.md = .github\ISSUE_TEMPLATE.md
+		.github\PULL_REQUEST_TEMPLATE.md = .github\PULL_REQUEST_TEMPLATE.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ISSUE_TEMPLATE", "ISSUE_TEMPLATE", "{E248C01E-FC23-4967-B598-4804634A6952}"
+	ProjectSection(SolutionItems) = preProject
+		.github\ISSUE_TEMPLATE\bug_report.md = .github\ISSUE_TEMPLATE\bug_report.md
+		.github\ISSUE_TEMPLATE\feature_request.md = .github\ISSUE_TEMPLATE\feature_request.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +91,8 @@ Global
 		{6FD2F651-A074-4C07-93A3-0527EB19F3BF} = {8D5ED59A-C3FC-4E35-9E73-A8FF5492DFCD}
 		{49400532-7B7B-4C8F-877F-FDB21D3717CC} = {EFBB5EFD-334C-487E-8C31-9F21FB106FFF}
 		{F25AB0AB-F046-4D4B-97DD-634C2725D050} = {9830BBC8-5A1C-4FC7-AFC8-C3F5247B2151}
+		{738BD06E-33F6-4A29-B416-90F574A06D7D} = {6C70B0E8-0729-41F6-8A4F-E6E30F960717}
+		{E248C01E-FC23-4967-B598-4804634A6952} = {738BD06E-33F6-4A29-B416-90F574A06D7D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5B7EB520-AC1E-4B28-96B6-EC550256D338}
