@@ -4,8 +4,10 @@
 
 **The latest official release can be found on [NuGet](https://www.nuget.org/profiles/aspnet-contrib) and the nightly builds on [MyGet](https://www.myget.org/gallery/aspnet-contrib)**.
 
-[![Build status](https://ci.appveyor.com/api/projects/status/tc9n807mwi4sr5jd/branch/dev?svg=true)](https://ci.appveyor.com/project/aspnet-contrib/aspnet-security-openid-providers/branch/dev)
-[![Build status](https://travis-ci.org/aspnet-contrib/AspNet.Security.OpenId.Providers.svg?branch=dev)](https://travis-ci.org/aspnet-contrib/AspNet.Security.OpenId.Providers)
+| | Linux/macOS | Windows |
+|:-:|:-:|:-:|
+| **Build Status** | [![Build status](https://img.shields.io/travis/aspnet-contrib/AspNet.Security.OpenId.Providers/dev.svg)](https://travis-ci.org/aspnet-contrib/AspNet.Security.OpenId.Providers) | [![Build status](https://img.shields.io/appveyor/ci/aspnet-contrib/aspnet-security-openid-providers/dev.svg)](https://ci.appveyor.com/project/aspnet-contrib/aspnet-security-openid-providers) |
+| **Build History** | [![Build history](https://buildstats.info/travisci/chart/aspnet-contrib/AspNet.Security.OpenId.Providers?branch=dev&includeBuildsFromPullRequest=false)](https://travis-ci.org/aspnet-contrib/AspNet.Security.OpenId.Providers) |  [![Build history](https://buildstats.info/appveyor/chart/aspnet-contrib/aspnet-security-openid-providers?branch=dev&includeBuildsFromPullRequest=false)](https://ci.appveyor.com/project/aspnet-contrib/aspnet-security-openid-providers) |
 
 ## Getting started
 
