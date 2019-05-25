@@ -14,13 +14,18 @@
 ```csharp
 public void ConfigureServices(IServiceCollection services)
 {
-    services.AddAuthentication()
-        .UseSteam()
-        .UseOpenId("StackExchange", "StackExchange", options =>
-        {
-            options.Authority = new Uri("https://openid.stackexchange.com/");
-            options.CallbackPath = "/signin-stackexchange";
-        });
+    services.AddAuthentication(options => { /* Authentication options */ })
+            .UseSteam()
+            .UseOpenId("StackExchange", "StackExchange", options =>
+            {
+                options.Authority = new Uri("https://openid.stackexchange.com/");
+                options.CallbackPath = "/signin-stackexchange";
+            });
+}
+
+public void Configure(IApplicationBuilder app)
+{
+    app.UseAuthentication();
 }
 ```
 
