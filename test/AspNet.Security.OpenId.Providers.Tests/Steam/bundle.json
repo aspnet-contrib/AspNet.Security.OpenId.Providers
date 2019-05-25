@@ -1,0 +1,31 @@
+{
+  "$schema": "https://raw.githubusercontent.com/justeat/httpclient-interception/master/src/HttpClientInterception/Bundles/http-request-bundle-schema.json",
+  "items": [
+    {
+      "uri": "https://steamcommunity.com/openid/",
+      "contentString": "<xrds:XRDS xmlns:xrds=\"xri:\/\/$xrds\" xmlns=\"xri:\/\/$xrd*($v*2.0)\"><XRD><Service priority=\"0\"><Type>http://specs.openid.net/auth/2.0/server</Type><URI>https://steamcommunity.com/openid/login</URI></Service></XRD></xrds:XRDS>",
+      "contentHeaders": {
+        "content-type": [ "application/xrds+xml" ]
+      }
+    },
+    {
+      "uri": "https://steamcommunity.com/openid/login",
+      "method": "POST",
+      "contentString": "is_valid:true"
+    },
+    {
+      "uri": "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=steam-application-key&steamids=my-id",
+      "contentFormat": "json",
+      "contentJson": {
+        "response": {
+          "players": [
+            {
+              "steamid": "my-id",
+              "personaname": "John Smith"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
