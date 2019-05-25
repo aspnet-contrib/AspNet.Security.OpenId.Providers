@@ -128,6 +128,6 @@ namespace AspNet.Security.OpenId.Steam
             return context.Ticket;
         }
 
-        private new OpenIdAuthenticationEvents Events => (OpenIdAuthenticationEvents) base.Events;
+        private new OpenIdAuthenticationEvents Events => (OpenIdAuthenticationEvents)base.Events;
     }
 }
