@@ -1,5 +1,4 @@
-AspNet.Security.OpenId.Providers
-==================================
+# AspNet.Security.OpenId.Providers
 
 **AspNet.Security.OpenId.Providers** is a **collection of security middleware** that you can use in your **ASP.NET Core 1.0** application to support OpenID 2.0 authentication providers like **[Steam](http://steampowered.com/)**, **[Wargaming](http://wargaming.net/)** or **[Orange](http://www.orange.fr/)**. It is directly inspired by **[Jerrie Pelser](https://github.com/jerriep)**'s initiative, **[Owin.Security.Providers](https://github.com/RockstarLabs/OwinOAuthProviders)**.
 
