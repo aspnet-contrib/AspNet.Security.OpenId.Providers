@@ -323,7 +323,7 @@ namespace AspNet.Security.OpenId
                     value: string.Join(",", Options.Attributes.Select(attribute => attribute.Key)));
             }
 
-            var address = QueryHelpers.AddQueryString(configuration.AuthenticationEndpoint, 
+            var address = QueryHelpers.AddQueryString(configuration.AuthenticationEndpoint,
                 message.GetParameters()
                     .ToDictionary(parameter => parameter.Key,
                                   parameter => parameter.Value));
@@ -434,6 +434,6 @@ namespace AspNet.Security.OpenId
             return true;
         }
 
-        private new OpenIdAuthenticationEvents Events => (OpenIdAuthenticationEvents) base.Events;
+        private new OpenIdAuthenticationEvents Events => (OpenIdAuthenticationEvents)base.Events;
     }
 }
