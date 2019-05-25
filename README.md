@@ -31,7 +31,18 @@ public void Configure(IApplicationBuilder app)
 }
 ```
 
-See [https://github.com/aspnet-contrib/AspNet.Security.OpenId.Providers/tree/dev/samples/Mvc.Client](https://github.com/aspnet-contrib/AspNet.Security.OpenId.Providers/tree/dev/samples/Mvc.Client) for a complete sample **using ASP.NET Core MVC and supporting multiple external providers**.
+See the [/samples](https://github.com/aspnet-contrib/AspNet.Security.OpenId.Providers/tree/dev/samples) directory for a complete sample **using ASP.NET Core MVC and supporting multiple external providers**.
+
+## Contributing
+
+**AspNet.Security.OpenId.Providers** is actively maintained by:
+
+  * **[Kévin Chalet](https://github.com/PinpointTownes)** ([@PinpointTownes](https://twitter.com/PinpointTownes)).
+  * **[Jerrie Pelser](https://github.com/jerriep)** ([@jerriepelser](https://twitter.com/jerriepelser))
+  * **[Martin Costello](https://github.com/martincostello)** ([@martin_costello](https://twitter.com/martin_costello)).
+  * **[Patrick Westerhoff](https://github.com/poke)** ([@poke](https://twitter.com/poke)).
+
+We would love it if you could help contributing to this repository.
 
 ## Support
 
@@ -40,10 +51,21 @@ See [https://github.com/aspnet-contrib/AspNet.Security.OpenId.Providers/tree/dev
 - **Gitter: [https://gitter.im/aspnet-contrib/AspNet.Security.OpenId.Providers](https://gitter.im/aspnet-contrib/AspNet.Security.OpenId.Providers)**
 - **StackOverflow: [https://stackoverflow.com/questions/tagged/aspnet-contrib](https://stackoverflow.com/questions/tagged/aspnet-contrib)**
 
-## Contributors
-
-**AspNet.Security.OpenId.Providers** is actively maintained by **[Kévin Chalet](https://github.com/PinpointTownes)** ([@PinpointTownes](https://twitter.com/PinpointTownes)) and **[Jerrie Pelser](https://github.com/jerriep)** ([@jerriepelser](https://twitter.com/jerriepelser)). Contributions are welcome and can be submitted using pull requests.
-
 ## License
 
-This project is licensed under the **Apache License**. This means that you can use, modify and distribute it freely. See [http://www.apache.org/licenses/LICENSE-2.0.html](http://www.apache.org/licenses/LICENSE-2.0.html) for more details.
+This project is licensed under the **Apache License**. This means that you can use, modify and distribute it freely. See [https://www.apache.org/licenses/LICENSE-2.0.html](https://www.apache.org/licenses/LICENSE-2.0.html) for more details.
+
+## Providers
+
+Links to the latest stable and nightly NuGet packages for each provider, as well as a link to their integration documentation are listed in the table below.
+
+If a provider you're looking for does not exist, consider making a PR to add one.
+
+| Provider | Stable | Nightly | Documentation |
+|:-:|:-:|:-:|:-:|
+| OpenId | [![NuGet](https://buildstats.info/nuget/AspNet.Security.OpenId?includePreReleases=false)](http://www.nuget.org/packages/AspNet.Security.OpenId/ "Download AspNet.Security.OpenId from NuGet.org") | [![MyGet](https://buildstats.info/myget/aspnet-contrib/AspNet.Security.OpenId?includePreReleases=false)](https://www.myget.org/feed/aspnet-contrib/package/nuget/AspNet.Security.OpenId "Download AspNet.Security.OpenId from MyGet.org") | N/A |
+| Steam | [![NuGet](https://buildstats.info/nuget/AspNet.Security.OpenId.Steam?includePreReleases=false)](http://www.nuget.org/packages/AspNet.Security.OpenId.Steam/ "Download AspNet.Security.OpenId.Steam from NuGet.org") | [![MyGet](https://buildstats.info/myget/aspnet-contrib/AspNet.Security.OpenId.Steam?includePreReleases=false)](https://www.myget.org/feed/aspnet-contrib/package/nuget/AspNet.Security.OpenId.Steam "Download AspNet.Security.OpenId.Steam from MyGet.org") | [Documentation](https://steamcommunity.com/dev "Steam developer documentation") |
+
+<!--
+| CHANGEME | [![NuGet](https://buildstats.info/nuget/AspNet.Security.OpenId.CHANGEME?includePreReleases=false)](http://www.nuget.org/packages/AspNet.Security.OpenId.CHANGEME/ "Download AspNet.Security.OpenId.CHANGEME from NuGet.org") | [![MyGet](https://buildstats.info/myget/aspnet-contrib/AspNet.Security.OpenId.CHANGEME?includePreReleases=false)](https://www.myget.org/feed/aspnet-contrib/package/nuget/AspNet.Security.OpenId.CHANGEME "Download AspNet.Security.OpenId.CHANGEME from MyGet.org") | [Documentation](CHANGEME "CHANGEME developer documentation") |
+-->
