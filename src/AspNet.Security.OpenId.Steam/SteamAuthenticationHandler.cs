@@ -38,22 +38,20 @@ namespace AspNet.Security.OpenId.Steam
             var principal = new ClaimsPrincipal(identity);
             var ticket = new AuthenticationTicket(principal, properties, Scheme.Name);
 
-            // Return the authentication ticket as-is if the
-            // user information endpoint has not been set.
+            // Return the authentication ticket as-is if the user information endpoint has not been set.
             if (string.IsNullOrEmpty(Options.UserInformationEndpoint))
             {
                 Logger.LogInformation("The userinfo request was skipped because no userinfo endpoint was configured.");
 
-                return ticket;
+                return await RunAuthenticatedEventAsync();
             }
 
-            // Return the authentication ticket as-is
-            // if the application key has not been set.
+            // Return the authentication ticket as-is if the application key has not been set.
             if (string.IsNullOrEmpty(Options.ApplicationKey))
             {
                 Logger.LogInformation("The userinfo request was skipped because no application key was configured.");
 
-                return ticket;
+                return await RunAuthenticatedEventAsync();
             }
 
             // Note: prior to April 2018, the Steam identifier was prefixed with an HTTP base address.
@@ -68,12 +66,12 @@ namespace AspNet.Security.OpenId.Steam
                 identifier = identifier.Substring(SteamAuthenticationConstants.Namespaces.LegacyIdentifier.Length);
             }
 
-            // Return the authentication ticket as-is if the claimed identifier is malformed.
+            // Prevent the sign-in operation from completing if the claimed identifier is malformed.
             else
             {
                 Logger.LogWarning("The userinfo request was skipped because an invalid identifier was received: {Identifier}.", identifier);
 
-                return ticket;
+                throw new InvalidOperationException($"The OpenID claimed identifier '{identifier}' is not valid.");
             }
 
             var address = QueryHelpers.AddQueryString(Options.UserInformationEndpoint, new Dictionary<string, string>
@@ -95,7 +93,7 @@ namespace AspNet.Security.OpenId.Steam
                                   /* Headers: */ response.Headers.ToString(),
                                   /* Body: */ await response.Content.ReadAsStringAsync());
 
-                return ticket;
+                throw new HttpRequestException("An error occurred while retrieving the user profile from Steam.");
             }
 
             var payload = JObject.Parse(await response.Content.ReadAsStringAsync());
@@ -110,22 +108,27 @@ namespace AspNet.Security.OpenId.Steam
                 identity.AddClaim(new Claim(ClaimTypes.Name, profile, ClaimValueTypes.String, Options.ClaimsIssuer));
             }
 
-            var context = new OpenIdAuthenticatedContext(Context, Scheme, Options, ticket)
-            {
-                User = payload
-            };
+            return await RunAuthenticatedEventAsync(payload);
 
-            // Copy the attributes to the context object.
-            foreach (var attribute in attributes)
+            async Task<AuthenticationTicket> RunAuthenticatedEventAsync(JObject user = null)
             {
-                context.Attributes.Add(attribute);
+                var context = new OpenIdAuthenticatedContext(Context, Scheme, Options, ticket)
+                {
+                    User = user ?? new JObject()
+                };
+
+                // Copy the attributes to the context object.
+                foreach (var attribute in attributes)
+                {
+                    context.Attributes.Add(attribute);
+                }
+
+                await Events.Authenticated(context);
+
+                // Note: return the authentication ticket associated
+                // with the notification to allow replacing the ticket.
+                return context.Ticket;
             }
-
-            await Events.Authenticated(context);
-
-            // Note: return the authentication ticket associated
-            // with the notification to allow replacing the ticket.
-            return context.Ticket;
         }
 
         private new OpenIdAuthenticationEvents Events => (OpenIdAuthenticationEvents)base.Events;
