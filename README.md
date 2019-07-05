@@ -17,8 +17,8 @@
 public void ConfigureServices(IServiceCollection services)
 {
     services.AddAuthentication(options => { /* Authentication options */ })
-            .UseSteam()
-            .UseOpenId("StackExchange", "StackExchange", options =>
+            .AddSteam()
+            .AddOpenId("StackExchange", "StackExchange", options =>
             {
                 options.Authority = new Uri("https://openid.stackexchange.com/");
                 options.CallbackPath = "/signin-stackexchange";
