@@ -20,4 +20,4 @@ os:
   - osx
 osx_image: xcode8.3
 script:
-  - ./build.sh
+  - ./eng/common/cibuild.sh -configuration Release -prepareMachine
