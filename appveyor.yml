@@ -14,3 +14,8 @@ nuget:
 
 skip_tags: false
 test: off
+
+after_build:
+- ps: >-
+    $wc = New-Object 'System.Net.WebClient'
+    $wc.UploadFile("https://ci.appveyor.com/api/testresults/xunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\artifacts\TestResults\Release\AspNet.Security.OpenId.Providers.Tests_netcoreapp2.2_x64.xml))
