@@ -17,6 +17,7 @@ project.lock.json
 # Build results
 
 artifacts/
+coverage.*
 [Dd]ebug/
 [Rr]elease/
 x64/
