@@ -17,6 +17,7 @@ project.lock.json
 # Build results
 
 artifacts/
+coverage.*
 [Dd]ebug/
 [Rr]elease/
 x64/
@@ -101,6 +102,7 @@ DocProject/Help/html
 publish/
 
 # Publish Web Output
+*.pubxml
 *.Publish.xml
 
 # NuGet Packages Directory
@@ -161,3 +163,16 @@ $RECYCLE.BIN/
 
 # Mac desktop service store files
 .DS_Store
+
+# Domain verification files
+.well-known/
+
+# Public and Private keys
+*.cer
+*.csr
+*.key
+*.p7b
+*.p8
+*.p12
+*.pem
+*.pfx

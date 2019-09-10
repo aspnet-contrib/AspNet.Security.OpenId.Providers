@@ -1,0 +1,16 @@
+<Project>
+  <PropertyGroup>
+    <VersionPrefix>2.1.1</VersionPrefix>
+    <PreReleaseVersionLabel>alpha1</PreReleaseVersionLabel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AngleSharpVersion>0.9.9</AngleSharpVersion>
+    <AspNetCoreVersion>2.0.0</AspNetCoreVersion>
+    <IdentityModelCoreVersion>2.1.4</IdentityModelCoreVersion>
+    <JetBrainsVersion>2019.1.1</JetBrainsVersion>
+    <JsonNetVersion>10.0.3</JsonNetVersion>
+    <JustEatHttpClientInterceptionVersion>2.0.2</JustEatHttpClientInterceptionVersion>
+    <MartinCostelloLoggingXUnitVersion>0.1.0</MartinCostelloLoggingXUnitVersion>
+    <ShouldlyVersion>3.0.2</ShouldlyVersion>
+  </PropertyGroup>
+</Project>
