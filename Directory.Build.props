@@ -1,7 +1,7 @@
 <Project>
   <Import Project="Sdk.props" Sdk="Microsoft.DotNet.Arcade.Sdk" />
   <PropertyGroup>
-    <LangVersion>preview</LangVersion>
+    <LangVersion>latest</LangVersion>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <DebugSymbols>true</DebugSymbols>
@@ -28,7 +28,8 @@
   </PropertyGroup>
   <PropertyGroup>
     <Product>aspnet-contrib</Product>
-    <Copyright>© AspNet.Security.OpenId.Providers contributors. All rights reserved.</Copyright>
+    <Company>$(Authors)</Company>
+    <_ProjectCopyright>© AspNet.Security.OAuth.Providers contributors. All rights reserved.</_ProjectCopyright>
     <PackageIconUrl>https://avatars3.githubusercontent.com/u/7998081?s=64</PackageIconUrl>
     <PackageProjectUrl>https://github.com/aspnet-contrib/AspNet.Security.OpenId.Providers</PackageProjectUrl>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
