@@ -85,26 +85,31 @@ namespace AspNet.Security.OpenId.Infrastructure
         {
             // Configure a single HTTP resource that challenges the client if unauthenticated
             // or returns the logged in user's claims as XML if the request is authenticated.
-            app.UseAuthentication();
+            app.UseRouting();
 
-            app.Map("/me", childApp => childApp.Run(
-                async context =>
-                {
-                    if (context.User.Identity.IsAuthenticated)
-                    {
-                        string xml = IdentityToXmlString(context.User);
-                        byte[] buffer = Encoding.UTF8.GetBytes(xml.ToString());
+            app.UseAuthentication()
+               .UseEndpoints(endpoints =>
+               {
+                   endpoints.MapGet(
+                       "/me",
+                       async context =>
+                       {
+                           if (context.User.Identity.IsAuthenticated)
+                           {
+                               var xml = IdentityToXmlString(context.User);
+                               var buffer = Encoding.UTF8.GetBytes(xml.ToString());
 
-                        context.Response.StatusCode = 200;
-                        context.Response.ContentType = "text/xml";
+                               context.Response.StatusCode = 200;
+                               context.Response.ContentType = "text/xml";
 
-                        await context.Response.Body.WriteAsync(buffer, 0, buffer.Length);
-                    }
-                    else
-                    {
-                        await context.ChallengeAsync();
-                    }
-                }));
+                               await context.Response.Body.WriteAsync(buffer, 0, buffer.Length);
+                           }
+                           else
+                           {
+                               await context.ChallengeAsync();
+                           }
+                        });
+               });
         }
 
         private static string IdentityToXmlString(ClaimsPrincipal user)
