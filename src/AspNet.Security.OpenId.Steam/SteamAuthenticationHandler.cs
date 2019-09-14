@@ -84,7 +84,7 @@ namespace AspNet.Security.OpenId.Steam
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(OpenIdAuthenticationConstants.Media.Json));
 
             // Return the authentication ticket as-is if the userinfo request failed.
-            var response = await Options.HttpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, Context.RequestAborted);
+            var response = await Options.Backchannel.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, Context.RequestAborted);
             if (!response.IsSuccessStatusCode)
             {
                 Logger.LogWarning("The userinfo request failed because an invalid response was received: the identity provider " +

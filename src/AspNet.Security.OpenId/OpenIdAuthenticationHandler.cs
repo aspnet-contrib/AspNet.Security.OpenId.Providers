@@ -380,7 +380,7 @@ namespace AspNet.Security.OpenId
                 Content = new FormUrlEncodedContent(payload)
             };
 
-            var response = await Options.HttpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, Context.RequestAborted);
+            var response = await Options.Backchannel.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, Context.RequestAborted);
             if (!response.IsSuccessStatusCode)
             {
                 Logger.LogWarning("The authentication failed because an invalid check_authentication response was received: " +

@@ -85,7 +85,6 @@ namespace AspNet.Security.OpenId
         protected virtual void ConfigureDefaults(AuthenticationBuilder builder, TOptions options)
         {
             options.Backchannel = CreateBackchannel(builder);
-            options.HttpClient = options.Backchannel;
         }
 
         /// <summary>

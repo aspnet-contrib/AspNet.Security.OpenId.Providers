@@ -77,15 +77,12 @@ namespace Microsoft.Extensions.DependencyInjection
                 options.HtmlParser = new HtmlParser();
             }
 
-            if (options.HttpClient == null)
+            if (options.Backchannel == null)
             {
-                options.HttpClient = new HttpClient
-                {
-                    Timeout = TimeSpan.FromSeconds(30),
-                    MaxResponseContentBufferSize = 1024 * 1024 * 10
-                };
-
-                options.HttpClient.DefaultRequestHeaders.UserAgent.ParseAdd("ASP.NET Core OpenID 2.0 middleware");
+                options.Backchannel = new HttpClient(options.BackchannelHttpHandler ?? new HttpClientHandler());
+                options.Backchannel.DefaultRequestHeaders.UserAgent.ParseAdd("ASP.NET Core OpenID 2.0 middleware");
+                options.Backchannel.Timeout = options.BackchannelTimeout;
+                options.Backchannel.MaxResponseContentBufferSize = 1024 * 1024 * 10; // 10 MB
             }
 
             if (options.ConfigurationManager == null)
@@ -140,11 +137,11 @@ namespace Microsoft.Extensions.DependencyInjection
 
                     options.ConfigurationManager = new ConfigurationManager<OpenIdAuthenticationConfiguration>(
                         options.MetadataAddress?.AbsoluteUri ?? options.Authority.AbsoluteUri,
-                        new OpenIdAuthenticationConfiguration.Retriever(options.HttpClient, options.HtmlParser)
+                        new OpenIdAuthenticationConfiguration.Retriever(options.Backchannel, options.HtmlParser)
                         {
                             MaximumRedirections = options.MaximumRedirections
                         },
-                        new HttpDocumentRetriever(options.HttpClient) { RequireHttps = options.RequireHttpsMetadata });
+                        new HttpDocumentRetriever(options.Backchannel) { RequireHttps = options.RequireHttpsMetadata });
                 }
             }
         }
