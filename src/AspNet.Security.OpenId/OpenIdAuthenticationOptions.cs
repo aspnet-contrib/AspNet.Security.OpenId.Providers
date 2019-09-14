@@ -95,7 +95,12 @@ namespace AspNet.Security.OpenId
         /// <summary>
         /// Gets or sets the HTTP client used to communicate with the OpenID provider.
         /// </summary>
-        public HttpClient HttpClient { get; set; }
+        [Obsolete("Use the Backchannel property instead.")]
+        public HttpClient HttpClient
+        {
+            get => Backchannel;
+            set => Backchannel = value;
+        }
 
         /// <summary>
         /// Gets or sets the HTML parser used to parse discovery documents.
