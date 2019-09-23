@@ -78,6 +78,8 @@ namespace AspNet.Security.OpenId.Infrastructure
                             .AddCookie("External", o => o.ForwardChallenge = tests.DefaultScheme);
 
                         tests.RegisterAuthentication(authentication);
+
+                        services.AddAuthorization();
                     });
         }
 
@@ -88,6 +90,7 @@ namespace AspNet.Security.OpenId.Infrastructure
             app.UseRouting();
 
             app.UseAuthentication()
+               .UseAuthorization()
                .UseEndpoints(endpoints =>
                {
                    endpoints.MapGet(
