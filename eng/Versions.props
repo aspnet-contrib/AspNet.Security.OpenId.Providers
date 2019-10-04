@@ -1,8 +1,9 @@
 <Project>
   <PropertyGroup>
-    <MajorVersion>3</MajorVersion>
-    <MinorVersion>0</MinorVersion>
-    <VersionPrefix></VersionPrefix>
+    <OpenIdProvidersMajorVersion>3</OpenIdProvidersMajorVersion>
+    <OpenIdProvidersMinorVersion>0</OpenIdProvidersMinorVersion>
+    <OpenIdProvidersPatchVersion>0</OpenIdProvidersPatchVersion>
+    <VersionPrefix>$(OpenIdProvidersMajorVersion).$(OpenIdProvidersMinorVersion).$(OpenIdProvidersPatchVersion)</VersionPrefix>
     <PreReleaseVersionLabel></PreReleaseVersionLabel>
     <StabilizePackageVersion Condition="'$(StabilizePackageVersion)' == ''">true</StabilizePackageVersion>
     <DotNetFinalVersionKind Condition="'$(StabilizePackageVersion)' == 'true'">release</DotNetFinalVersionKind>
