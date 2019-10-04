@@ -1,10 +1,10 @@
 <Project>
   <PropertyGroup>
-    <OpenIdProvidersMajorVersion>3</OpenIdProvidersMajorVersion>
-    <OpenIdProvidersMinorVersion>0</OpenIdProvidersMinorVersion>
-    <OpenIdProvidersPatchVersion>0</OpenIdProvidersPatchVersion>
-    <VersionPrefix>$(OpenIdProvidersMajorVersion).$(OpenIdProvidersMinorVersion).$(OpenIdProvidersPatchVersion)</VersionPrefix>
-    <PreReleaseVersionLabel></PreReleaseVersionLabel>
+    <MajorVersion>3</MajorVersion>
+    <MinorVersion>0</MinorVersion>
+    <PatchVersion>0</PatchVersion>
+    <VersionPrefix>$(MajorVersion).$(MinorVersion).$(PatchVersion)</VersionPrefix>
+    <PreReleaseVersionLabel>release</PreReleaseVersionLabel>
     <StabilizePackageVersion Condition="'$(StabilizePackageVersion)' == ''">true</StabilizePackageVersion>
     <DotNetFinalVersionKind Condition="'$(StabilizePackageVersion)' == 'true'">release</DotNetFinalVersionKind>
   </PropertyGroup>
