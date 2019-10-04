@@ -2,6 +2,8 @@
   <PropertyGroup>
     <VersionPrefix>3.0.0</VersionPrefix>
     <PreReleaseVersionLabel></PreReleaseVersionLabel>
+    <StabilizePackageVersion Condition="'$(StabilizePackageVersion)' == ''">true</StabilizePackageVersion>
+    <DotNetFinalVersionKind Condition="'$(StabilizePackageVersion)' == 'true'">release</DotNetFinalVersionKind>
   </PropertyGroup>
   <PropertyGroup>
     <AngleSharpVersion>0.9.9</AngleSharpVersion>
