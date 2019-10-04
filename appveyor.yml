@@ -1,4 +1,4 @@
-version: 2.1.1.{build}
+version: 3.0.0.{build}
 
 build_script:
   - eng\common\CIBuild.cmd -configuration Release -prepareMachine
