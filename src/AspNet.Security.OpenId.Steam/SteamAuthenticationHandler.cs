@@ -6,17 +6,18 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
+using System.Text.Json;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json.Linq;
 
 namespace AspNet.Security.OpenId.Steam
 {
@@ -96,25 +97,26 @@ namespace AspNet.Security.OpenId.Steam
                 throw new HttpRequestException("An error occurred while retrieving the user profile from Steam.");
             }
 
-            var payload = JObject.Parse(await response.Content.ReadAsStringAsync());
+            using var payload = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
 
             // Try to extract the profile name of the authenticated user.
-            var profile = payload.Value<JObject>(SteamAuthenticationConstants.Parameters.Response)
-                                ?.Value<JArray>(SteamAuthenticationConstants.Parameters.Players)
-                            ?[0]?.Value<string>(SteamAuthenticationConstants.Parameters.Name);
+            var profile = payload.RootElement.GetProperty(SteamAuthenticationConstants.Parameters.Response)
+                                .GetProperty(SteamAuthenticationConstants.Parameters.Players)
+                                .EnumerateArray()
+                                .FirstOrDefault();
 
-            if (!string.IsNullOrEmpty(profile))
+            if (profile.ValueKind == JsonValueKind.Object && profile.TryGetProperty(SteamAuthenticationConstants.Parameters.Name, out var name))
             {
-                identity.AddClaim(new Claim(ClaimTypes.Name, profile, ClaimValueTypes.String, Options.ClaimsIssuer));
+                identity.AddClaim(new Claim(ClaimTypes.Name, name.GetString(), ClaimValueTypes.String, Options.ClaimsIssuer));
             }
 
             return await RunAuthenticatedEventAsync(payload);
 
-            async Task<AuthenticationTicket> RunAuthenticatedEventAsync(JObject user = null)
+            async Task<AuthenticationTicket> RunAuthenticatedEventAsync(JsonDocument user = null)
             {
                 var context = new OpenIdAuthenticatedContext(Context, Scheme, Options, ticket)
                 {
-                    User = user ?? new JObject()
+                    User = user
                 };
 
                 // Copy the attributes to the context object.
