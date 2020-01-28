@@ -37,8 +37,7 @@ See the [/samples](https://github.com/aspnet-contrib/AspNet.Security.OpenId.Prov
 
 **AspNet.Security.OpenId.Providers** is actively maintained by:
 
-  * **[Kévin Chalet](https://github.com/PinpointTownes)** ([@PinpointTownes](https://twitter.com/PinpointTownes)).
-  * **[Jerrie Pelser](https://github.com/jerriep)** ([@jerriepelser](https://twitter.com/jerriepelser))
+  * **[Kévin Chalet](https://github.com/kevinchalet)** ([@PinpointTownes](https://twitter.com/PinpointTownes)).
   * **[Martin Costello](https://github.com/martincostello)** ([@martin_costello](https://twitter.com/martin_costello)).
   * **[Patrick Westerhoff](https://github.com/poke)** ([@poke](https://twitter.com/poke)).
 
