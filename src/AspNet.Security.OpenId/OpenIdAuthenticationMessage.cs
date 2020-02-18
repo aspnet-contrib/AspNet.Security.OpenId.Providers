@@ -132,7 +132,7 @@ namespace AspNet.Security.OpenId
         /// <summary>
         /// Gets the parameters associated with this OpenID message.
         /// </summary>
-        public IDictionary<string, string> Parameters { get; } =
+        protected IDictionary<string, string> Parameters { get; } =
             new Dictionary<string, string>(StringComparer.Ordinal);
 
         /// <summary>

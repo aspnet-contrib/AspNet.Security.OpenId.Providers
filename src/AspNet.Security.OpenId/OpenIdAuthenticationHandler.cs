@@ -12,6 +12,7 @@ using System.Net.Http;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using AspNet.Security.OpenId.Events;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.WebUtilities;
@@ -310,17 +311,10 @@ namespace AspNet.Security.OpenId
 
                 foreach (var attribute in Options.Attributes)
                 {
-                    if (attribute.Key.StartsWith("openid.ns"))
-                    {
-                        message.Parameters.Add(attribute.Key, attribute.Value);
-                    }
-                    else
-                    {
-                        message.SetParameter(
-                            prefix: OpenIdAuthenticationConstants.Prefixes.Ax,
-                            name: $"{OpenIdAuthenticationConstants.Prefixes.Type}.{attribute.Key}",
-                            value: attribute.Value);
-                    }
+                    message.SetParameter(
+                        prefix: OpenIdAuthenticationConstants.Prefixes.Ax,
+                        name: $"{OpenIdAuthenticationConstants.Prefixes.Type}.{attribute.Key}",
+                        value: attribute.Value);
                 }
 
                 // openid.ax.required
@@ -330,14 +324,9 @@ namespace AspNet.Security.OpenId
                     value: string.Join(",", Options.Attributes.Select(attribute => attribute.Key)));
             }
 
-            foreach (var prop in properties.Parameters)
-            {
-                if (prop.Value is string && message.GetParameter(prop.Key) == null)
-                {
-                    message.SetParameter(prop.Key,
-                        prop.Value.ToString());
-                }
-            }
+            var context = new OpenIdRedirectContext(Context, Scheme, Options, properties, message);
+
+            await Events.RedirectToIdentityProvider(context);
 
             var address = QueryHelpers.AddQueryString(configuration.AuthenticationEndpoint,
                 message.GetParameters()
