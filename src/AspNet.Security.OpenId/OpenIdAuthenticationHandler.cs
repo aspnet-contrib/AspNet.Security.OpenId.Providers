@@ -337,7 +337,6 @@ namespace AspNet.Security.OpenId
                     message.SetParameter(prop.Key,
                         prop.Value.ToString());
                 }
-
             }
 
             var address = QueryHelpers.AddQueryString(configuration.AuthenticationEndpoint,
