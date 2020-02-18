@@ -310,7 +310,7 @@ namespace AspNet.Security.OpenId
 
                 foreach (var attribute in Options.Attributes)
                 {
-                    if (attribute.Key.Contains("openid.ns"))
+                    if (attribute.Key.StartsWith("openid.ns"))
                     {
                         message.Parameters.Add(attribute.Key, attribute.Value);
                     }
