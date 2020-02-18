@@ -310,10 +310,17 @@ namespace AspNet.Security.OpenId
 
                 foreach (var attribute in Options.Attributes)
                 {
-                    message.SetParameter(
-                        prefix: OpenIdAuthenticationConstants.Prefixes.Ax,
-                        name: $"{OpenIdAuthenticationConstants.Prefixes.Type}.{attribute.Key}",
-                        value: attribute.Value);
+                    if (attribute.Key.Contains("openid.ns"))
+                    {
+                        message.Parameters.Add(attribute.Key, attribute.Value);
+                    }
+                    else
+                    {
+                        message.SetParameter(
+                            prefix: OpenIdAuthenticationConstants.Prefixes.Ax,
+                            name: $"{OpenIdAuthenticationConstants.Prefixes.Type}.{attribute.Key}",
+                            value: attribute.Value);
+                    }
                 }
 
                 // openid.ax.required
@@ -321,6 +328,16 @@ namespace AspNet.Security.OpenId
                     prefix: OpenIdAuthenticationConstants.Prefixes.Ax,
                     name: OpenIdAuthenticationConstants.Parameters.Required,
                     value: string.Join(",", Options.Attributes.Select(attribute => attribute.Key)));
+            }
+
+            foreach (var prop in properties.Parameters)
+            {
+                if (prop.Value is string && message.GetParameter(prop.Key) == null)
+                {
+                    message.SetParameter(prop.Key,
+                        prop.Value.ToString());
+                }
+
             }
 
             var address = QueryHelpers.AddQueryString(configuration.AuthenticationEndpoint,
