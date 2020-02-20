@@ -8,7 +8,8 @@ namespace AspNet.Security.OpenId.Events
         public OpenIdRedirectContext(HttpContext context,
             AuthenticationScheme scheme,
             OpenIdAuthenticationOptions options,
-            AuthenticationProperties properties, OpenIdAuthenticationMessage message)
+            AuthenticationProperties properties,
+            OpenIdAuthenticationMessage message)
             : base(context, scheme, options, properties)
         {
             ProtocolMessage = message;
