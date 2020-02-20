@@ -40,7 +40,5 @@ namespace AspNet.Security.OpenId
         /// <param name="context">The context of the event carries information in and results out.</param>
         /// <returns>Task to enable asynchronous execution</returns>
         public virtual Task RedirectToIdentityProvider(OpenIdRedirectContext context) => OnRedirectToIdentityProvider(context);
-
-
     }
 }
