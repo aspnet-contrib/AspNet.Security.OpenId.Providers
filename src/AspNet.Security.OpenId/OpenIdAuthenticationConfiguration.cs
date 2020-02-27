@@ -14,7 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
-using AngleSharp.Parser.Html;
+using AngleSharp.Html.Parser;
 using JetBrains.Annotations;
 using Microsoft.IdentityModel.Protocols;
 
@@ -254,7 +254,7 @@ namespace AspNet.Security.OpenId
                 cancellationToken.ThrowIfCancellationRequested();
 
                 using (var stream = await response.Content.ReadAsStreamAsync())
-                using (var document = await HtmlParser.ParseAsync(stream, cancellationToken))
+                using (var document = await HtmlParser.ParseDocumentAsync(stream, cancellationToken))
                 {
                     var endpoint = (from element in document.Head.GetElementsByTagName(OpenIdAuthenticationConstants.Metadata.Meta)
                                     let attribute = element.Attributes[OpenIdAuthenticationConstants.Metadata.HttpEquiv]
