@@ -12,6 +12,7 @@ using System.Net.Http;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using AspNet.Security.OpenId.Events;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.WebUtilities;
@@ -322,6 +323,10 @@ namespace AspNet.Security.OpenId
                     name: OpenIdAuthenticationConstants.Parameters.Required,
                     value: string.Join(",", Options.Attributes.Select(attribute => attribute.Key)));
             }
+
+            var context = new OpenIdRedirectContext(Context, Scheme, Options, properties, message);
+
+            await Events.RedirectToIdentityProvider(context);
 
             var address = QueryHelpers.AddQueryString(configuration.AuthenticationEndpoint,
                 message.GetParameters()
