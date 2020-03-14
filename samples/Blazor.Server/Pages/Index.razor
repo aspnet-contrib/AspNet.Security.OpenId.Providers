@@ -1,0 +1,22 @@
+﻿@page "/"
+<h1>Hi</h1>
+<div class="jumbotron">
+    <AuthorizeView>
+        <Authorized>
+            <h1>Welcome, @context.User.Identity.Name</h1>
+
+            <p>
+                @foreach (var claim in context.User.Claims)
+                {
+                    <div><code>@claim.Type</code>: <strong>@claim.Value</strong></div>
+                }
+            </p>
+
+            <a class="btn btn-lg btn-danger" href="/signout">Sign out</a>
+        </Authorized>
+        <NotAuthorized>
+            <h1>Welcome, anonymous</h1>
+            <a class="btn btn-lg btn-success" href="/signin">Sign in</a>
+        </NotAuthorized>
+    </AuthorizeView>
+</div>
