@@ -4,12 +4,14 @@
  * for more information concerning the license and the contributors participating to this project.
  */
 
+using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Text.Json;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json.Linq;
 
 namespace AspNet.Security.OpenId
 {
@@ -57,6 +59,13 @@ namespace AspNet.Security.OpenId
         /// Gets or sets the optional JSON payload extracted from the current request.
         /// This property is not set by the generic middleware but can be used by specialized middleware.
         /// </summary>
-        public JsonDocument User { get; set; }
+        [Obsolete("Use the UserPayload property instead. This property's type will change from JObject to JsonDocument in a future release.")]
+        public JObject User { get; set; } = new JObject();
+
+        /// <summary>
+        /// Gets or sets the optional JSON payload extracted from the current request.
+        /// This property is not set by the generic middleware but can be used by specialized middleware.
+        /// </summary>
+        public JsonDocument UserPayload { get; set; }
     }
 }
