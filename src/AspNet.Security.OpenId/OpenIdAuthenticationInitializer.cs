@@ -7,7 +7,7 @@
 using System;
 using System.ComponentModel;
 using System.Net.Http;
-using AngleSharp.Parser.Html;
+using AngleSharp.Html.Parser;
 using AspNet.Security.OpenId;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Authentication;

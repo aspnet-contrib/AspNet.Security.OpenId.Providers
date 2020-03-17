@@ -7,7 +7,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using AngleSharp.Parser.Html;
+using AngleSharp.Html.Parser;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.IdentityModel.Protocols;
 
