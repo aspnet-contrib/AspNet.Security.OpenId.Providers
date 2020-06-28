@@ -18,7 +18,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json.Linq;
 
 namespace AspNet.Security.OpenId.Steam
 {
@@ -120,13 +119,6 @@ namespace AspNet.Security.OpenId.Steam
                 {
                     UserPayload = user
                 };
-
-                if (user != null)
-                {
-#pragma warning disable CS0618
-                    context.User = JObject.Parse(user.RootElement.ToString());
-#pragma warning restore CS0618
-                }
 
                 // Copy the attributes to the context object.
                 foreach (var attribute in attributes)

@@ -11,7 +11,6 @@ using System.Text.Json;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json.Linq;
 
 namespace AspNet.Security.OpenId
 {
@@ -54,13 +53,6 @@ namespace AspNet.Security.OpenId
         /// Gets or sets the attributes associated with the current user.
         /// </summary>
         public IDictionary<string, string> Attributes { get; } = new Dictionary<string, string>();
-
-        /// <summary>
-        /// Gets or sets the optional JSON payload extracted from the current request.
-        /// This property is not set by the generic middleware but can be used by specialized middleware.
-        /// </summary>
-        [Obsolete("Use the UserPayload property instead. This property's type will change from JObject to JsonDocument in a future release.")]
-        public JObject User { get; set; } = new JObject();
 
         /// <summary>
         /// Gets or sets the optional JSON payload extracted from the current request.
