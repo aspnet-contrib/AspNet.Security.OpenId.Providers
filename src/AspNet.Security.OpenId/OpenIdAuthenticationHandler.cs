@@ -64,7 +64,7 @@ namespace AspNet.Security.OpenId
                                                 "because the state parameter was missing.");
             }
 
-            var properties = Options.StateDataFormat.Unprotect(state);
+            var properties = Options.StateDataFormat!.Unprotect(state);
             if (properties == null)
             {
                 return HandleRequestResult.Fail("The authentication response was rejected " +
@@ -203,8 +203,8 @@ namespace AspNet.Security.OpenId
                  identity.HasClaim(claim => string.Equals(claim.Type, ClaimTypes.GivenName, StringComparison.OrdinalIgnoreCase)) &&
                  identity.HasClaim(claim => string.Equals(claim.Type, ClaimTypes.Surname, StringComparison.OrdinalIgnoreCase)))
             {
-                identity.AddClaim(new Claim(ClaimTypes.Name, $"{identity.FindFirst(ClaimTypes.GivenName).Value} " +
-                                                             $"{identity.FindFirst(ClaimTypes.Surname).Value}",
+                identity.AddClaim(new Claim(ClaimTypes.Name, $"{identity.FindFirst(ClaimTypes.GivenName)!.Value} " +
+                                                             $"{identity.FindFirst(ClaimTypes.Surname)!.Value}",
                                             ClaimValueTypes.String, Options.ClaimsIssuer));
             }
 
@@ -243,7 +243,7 @@ namespace AspNet.Security.OpenId
 
         protected override async Task HandleChallengeAsync(AuthenticationProperties properties)
         {
-            var configuration = await Options.ConfigurationManager.GetConfigurationAsync(Context.RequestAborted);
+            var configuration = await Options.ConfigurationManager!.GetConfigurationAsync(Context.RequestAborted);
             if (configuration == null)
             {
                 throw new InvalidOperationException("The OpenID 2.0 authentication middleware was unable to retrieve " +
@@ -292,7 +292,7 @@ namespace AspNet.Security.OpenId
                 ReturnTo = QueryHelpers.AddQueryString(
                     uri: properties.Items[OpenIdAuthenticationConstants.Properties.ReturnTo],
                     name: OpenIdAuthenticationConstants.Parameters.State,
-                    value: Options.StateDataFormat.Protect(properties))
+                    value: Options.StateDataFormat!.Protect(properties))
             };
 
             if (Options.Attributes.Count != 0)
@@ -338,7 +338,7 @@ namespace AspNet.Security.OpenId
 
         private async Task<bool> VerifyAssertionAsync([NotNull] OpenIdAuthenticationMessage message)
         {
-            var configuration = await Options.ConfigurationManager.GetConfigurationAsync(Context.RequestAborted);
+            var configuration = await Options.ConfigurationManager!.GetConfigurationAsync(Context.RequestAborted);
             if (configuration == null)
             {
                 throw new InvalidOperationException("The OpenID 2.0 authentication middleware was unable to retrieve " +
@@ -382,7 +382,7 @@ namespace AspNet.Security.OpenId
             // Create a new check_authentication request to verify the assertion.
             var request = new HttpRequestMessage(HttpMethod.Post, configuration.AuthenticationEndpoint)
             {
-                Content = new FormUrlEncodedContent(payload)
+                Content = new FormUrlEncodedContent(payload!)
             };
 
             var response = await Options.Backchannel.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, Context.RequestAborted);

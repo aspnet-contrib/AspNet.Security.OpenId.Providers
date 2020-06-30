@@ -106,7 +106,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
                     if (options.MetadataAddress == null)
                     {
-                        options.MetadataAddress = options.Authority;
+                        options.MetadataAddress = options.Authority!;
                     }
 
                     if (!options.MetadataAddress.IsAbsoluteUri)
@@ -136,7 +136,7 @@ namespace Microsoft.Extensions.DependencyInjection
                     }
 
                     options.ConfigurationManager = new ConfigurationManager<OpenIdAuthenticationConfiguration>(
-                        options.MetadataAddress?.AbsoluteUri ?? options.Authority.AbsoluteUri,
+                        options.MetadataAddress?.AbsoluteUri ?? options.Authority!.AbsoluteUri,
                         new OpenIdAuthenticationConfiguration.Retriever(options.Backchannel, options.HtmlParser)
                         {
                             MaximumRedirections = options.MaximumRedirections

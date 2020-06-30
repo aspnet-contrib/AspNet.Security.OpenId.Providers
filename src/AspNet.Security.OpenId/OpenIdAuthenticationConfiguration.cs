@@ -33,7 +33,7 @@ namespace AspNet.Security.OpenId
         /// <summary>
         /// Gets or sets the authentication endpoint address.
         /// </summary>
-        public string AuthenticationEndpoint { get; set; }
+        public string? AuthenticationEndpoint { get; set; }
 
         /// <summary>
         /// Represents a configuration retriever able to deserialize
@@ -89,7 +89,7 @@ namespace AspNet.Security.OpenId
                     throw new ArgumentException("The address cannot be null or empty.", nameof(address));
                 }
 
-                if (!Uri.TryCreate(address, UriKind.Absolute, out Uri uri))
+                if (!Uri.TryCreate(address, UriKind.Absolute, out Uri? uri))
                 {
                     throw new ArgumentException("The address must be an absolute URI.", nameof(address));
                 }
@@ -185,7 +185,7 @@ namespace AspNet.Security.OpenId
                 throw new InvalidOperationException("The Yadis discovery failed because the XRDS document location was not found.");
             }
 
-            private async Task<Uri> ProcessXrdsDocumentAsync(
+            private async Task<Uri?> ProcessXrdsDocumentAsync(
                 [NotNull] HttpResponseMessage response, CancellationToken cancellationToken)
             {
                 Debug.Assert(response != null, "The HTTP response shouldn't be null.");
@@ -210,7 +210,7 @@ namespace AspNet.Security.OpenId
                         return null;
                     }
 
-                    if (!Uri.TryCreate(endpoint, UriKind.Absolute, out Uri uri))
+                    if (!Uri.TryCreate(endpoint, UriKind.Absolute, out Uri? uri))
                     {
                         throw new InvalidOperationException(
                             "The Yadis discovery failed because the XRDS document " +
@@ -221,7 +221,7 @@ namespace AspNet.Security.OpenId
                 }
             }
 
-            private Uri ProcessGenericDocument([NotNull] HttpResponseMessage response)
+            private Uri? ProcessGenericDocument([NotNull] HttpResponseMessage response)
             {
                 Debug.Assert(response != null, "The HTTP response shouldn't be null.");
 
@@ -235,7 +235,7 @@ namespace AspNet.Security.OpenId
                     return null;
                 }
 
-                if (!Uri.TryCreate(endpoint, UriKind.Absolute, out Uri uri))
+                if (!Uri.TryCreate(endpoint, UriKind.Absolute, out Uri? uri))
                 {
                     throw new InvalidOperationException(
                         "The Yadis discovery failed because the X-XRDS-Location " +
@@ -245,7 +245,7 @@ namespace AspNet.Security.OpenId
                 return uri;
             }
 
-            private async Task<Uri> ProcessHtmlDocumentAsync(
+            private async Task<Uri?> ProcessHtmlDocumentAsync(
                 [NotNull] HttpResponseMessage response, CancellationToken cancellationToken)
             {
                 Debug.Assert(response != null, "The HTTP response shouldn't be null.");
@@ -266,7 +266,7 @@ namespace AspNet.Security.OpenId
                         return null;
                     }
 
-                    if (!Uri.TryCreate(endpoint, UriKind.Absolute, out Uri uri))
+                    if (!Uri.TryCreate(endpoint, UriKind.Absolute, out Uri? uri))
                     {
                         throw new InvalidOperationException(
                             "The Yadis discovery failed because the X-XRDS-Location " +

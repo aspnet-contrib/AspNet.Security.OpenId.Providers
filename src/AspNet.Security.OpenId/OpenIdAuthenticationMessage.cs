@@ -69,7 +69,7 @@ namespace AspNet.Security.OpenId
         /// <summary>
         /// Gets or sets the openid.claimed_id property.
         /// </summary>
-        public string ClaimedIdentifier
+        public string? ClaimedIdentifier
         {
             get => GetParameter(OpenIdAuthenticationConstants.Parameters.ClaimedId);
             set => SetParameter(OpenIdAuthenticationConstants.Parameters.ClaimedId, value);
@@ -78,7 +78,7 @@ namespace AspNet.Security.OpenId
         /// <summary>
         /// Gets or sets the openid.identity property.
         /// </summary>
-        public string Identity
+        public string? Identity
         {
             get => GetParameter(OpenIdAuthenticationConstants.Parameters.Identity);
             set => SetParameter(OpenIdAuthenticationConstants.Parameters.Identity, value);
@@ -87,7 +87,7 @@ namespace AspNet.Security.OpenId
         /// <summary>
         /// Gets or sets the openid.error property.
         /// </summary>
-        public string Error
+        public string? Error
         {
             get => GetParameter(OpenIdAuthenticationConstants.Parameters.Error);
             set => SetParameter(OpenIdAuthenticationConstants.Parameters.Error, value);
@@ -96,7 +96,7 @@ namespace AspNet.Security.OpenId
         /// <summary>
         /// Gets or sets the openid.mode property.
         /// </summary>
-        public string Mode
+        public string? Mode
         {
             get => GetParameter(OpenIdAuthenticationConstants.Parameters.Mode);
             set => SetParameter(OpenIdAuthenticationConstants.Parameters.Mode, value);
@@ -105,7 +105,7 @@ namespace AspNet.Security.OpenId
         /// <summary>
         /// Gets or sets the openid.ns property.
         /// </summary>
-        public string Namespace
+        public string? Namespace
         {
             get => GetParameter(OpenIdAuthenticationConstants.Parameters.Namespace);
             set => SetParameter(OpenIdAuthenticationConstants.Parameters.Namespace, value);
@@ -114,7 +114,7 @@ namespace AspNet.Security.OpenId
         /// <summary>
         /// Gets or sets the openid.realm property.
         /// </summary>
-        public string Realm
+        public string? Realm
         {
             get => GetParameter(OpenIdAuthenticationConstants.Parameters.Realm);
             set => SetParameter(OpenIdAuthenticationConstants.Parameters.Realm, value);
@@ -123,7 +123,7 @@ namespace AspNet.Security.OpenId
         /// <summary>
         /// Gets or sets the openid.return_to property.
         /// </summary>
-        public string ReturnTo
+        public string? ReturnTo
         {
             get => GetParameter(OpenIdAuthenticationConstants.Parameters.ReturnTo);
             set => SetParameter(OpenIdAuthenticationConstants.Parameters.ReturnTo, value);
@@ -182,7 +182,7 @@ namespace AspNet.Security.OpenId
 
             // If the ax alias cannot be found, return an empty dictionary.
             var extensions = GetExtensions();
-            if (!extensions.TryGetValue(OpenIdAuthenticationConstants.Namespaces.Ax, out string alias))
+            if (!extensions.TryGetValue(OpenIdAuthenticationConstants.Namespaces.Ax, out string? alias))
             {
                 return attributes;
             }
@@ -213,7 +213,7 @@ namespace AspNet.Security.OpenId
 
                 // Exclude attributes whose value is missing.
                 if (!Parameters.TryGetValue($"{OpenIdAuthenticationConstants.Prefixes.OpenId}.{alias}." +
-                                            $"{OpenIdAuthenticationConstants.Suffixes.Value}.{name}", out string value))
+                                            $"{OpenIdAuthenticationConstants.Suffixes.Value}.{name}", out string? value))
                 {
                     continue;
                 }
@@ -257,7 +257,7 @@ namespace AspNet.Security.OpenId
         /// </summary>
         /// <param name="name">The parameter to retrieve.</param>
         /// <returns>The value extracted from the parameter.</returns>
-        public string GetParameter([NotNull] string name)
+        public string? GetParameter([NotNull] string name)
             => GetParameter(OpenIdAuthenticationConstants.Prefixes.OpenId, name);
 
         /// <summary>
@@ -267,7 +267,7 @@ namespace AspNet.Security.OpenId
         /// <param name="prefix">The prefix used to discriminate the parameter.</param>
         /// <param name="name">The parameter to retrieve.</param>
         /// <returns>The value extracted from the parameter.</returns>
-        public string GetParameter([NotNull] string prefix, [NotNull] string name)
+        public string? GetParameter([NotNull] string prefix, [NotNull] string name)
         {
             if (string.IsNullOrEmpty(prefix))
             {
@@ -279,7 +279,7 @@ namespace AspNet.Security.OpenId
                 throw new ArgumentNullException(nameof(name));
             }
 
-            if (Parameters.TryGetValue($"{prefix}.{name}", out string value))
+            if (Parameters.TryGetValue($"{prefix}.{name}", out string? value))
             {
                 return value;
             }
@@ -301,7 +301,7 @@ namespace AspNet.Security.OpenId
         /// <param name="name">The parameter to store.</param>
         /// <param name="value">The value associated with the parameter.</param>
         /// <returns>The current instance, which allows chaining calls.</returns>
-        public OpenIdAuthenticationMessage SetParameter([NotNull] string name, [CanBeNull] string value)
+        public OpenIdAuthenticationMessage SetParameter([NotNull] string name, [CanBeNull] string? value)
             => SetParameter(OpenIdAuthenticationConstants.Prefixes.OpenId, name, value);
 
         /// <summary>
@@ -312,7 +312,7 @@ namespace AspNet.Security.OpenId
         /// <param name="name">The parameter to store.</param>
         /// <param name="value">The value associated with the parameter.</param>
         /// <returns>The current instance, which allows chaining calls.</returns>
-        public OpenIdAuthenticationMessage SetParameter([NotNull] string prefix, [NotNull] string name, [CanBeNull] string value)
+        public OpenIdAuthenticationMessage SetParameter([NotNull] string prefix, [NotNull] string name, [CanBeNull] string? value)
         {
             if (string.IsNullOrEmpty(prefix))
             {

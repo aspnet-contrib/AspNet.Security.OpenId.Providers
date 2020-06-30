@@ -37,17 +37,17 @@ namespace AspNet.Security.OpenId
         /// <summary>
         /// Gets the identity containing the claims associated with the current user.
         /// </summary>
-        public ClaimsIdentity Identity => Ticket?.Principal?.Identity as ClaimsIdentity;
+        public ClaimsIdentity? Identity => Ticket?.Principal?.Identity as ClaimsIdentity;
 
         /// <summary>
         /// Gets the identifier returned by the identity provider.
         /// </summary>
-        public string Identifier => Ticket?.Principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        public string? Identifier => Ticket?.Principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
         /// <summary>
         /// Gets the authentication properties associated with the ticket.
         /// </summary>
-        public AuthenticationProperties Properties => Ticket?.Properties;
+        public AuthenticationProperties? Properties => Ticket?.Properties;
 
         /// <summary>
         /// Gets or sets the attributes associated with the current user.
@@ -58,6 +58,6 @@ namespace AspNet.Security.OpenId
         /// Gets or sets the optional JSON payload extracted from the current request.
         /// This property is not set by the generic middleware but can be used by specialized middleware.
         /// </summary>
-        public JsonDocument UserPayload { get; set; }
+        public JsonDocument? UserPayload { get; set; }
     }
 }

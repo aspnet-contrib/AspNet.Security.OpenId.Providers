@@ -108,12 +108,12 @@ namespace AspNet.Security.OpenId.Steam
 
             if (profile.ValueKind == JsonValueKind.Object && profile.TryGetProperty(SteamAuthenticationConstants.Parameters.Name, out var name))
             {
-                identity.AddClaim(new Claim(ClaimTypes.Name, name.GetString(), ClaimValueTypes.String, Options.ClaimsIssuer));
+                identity.AddClaim(new Claim(ClaimTypes.Name, name.GetString()!, ClaimValueTypes.String, Options.ClaimsIssuer));
             }
 
             return await RunAuthenticatedEventAsync(payload);
 
-            async Task<AuthenticationTicket> RunAuthenticatedEventAsync(JsonDocument user = null)
+            async Task<AuthenticationTicket> RunAuthenticatedEventAsync(JsonDocument? user = null)
             {
                 var context = new OpenIdAuthenticatedContext(Context, Scheme, Options, ticket)
                 {
