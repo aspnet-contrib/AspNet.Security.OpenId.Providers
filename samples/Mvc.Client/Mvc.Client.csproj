@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netcoreapp3.1</TargetFrameworks>
+    <UserSecretsId>AspNet.Security.OpenId.Providers.Mvc.Client</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
