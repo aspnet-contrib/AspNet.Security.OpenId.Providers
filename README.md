@@ -4,10 +4,7 @@
 
 **The latest official release can be found on [NuGet](https://www.nuget.org/profiles/aspnet-contrib) and the nightly builds on [MyGet](https://www.myget.org/gallery/aspnet-contrib)**.
 
-| | Linux/macOS | Windows |
-|:-:|:-:|:-:|
-| **Build Status** | [![Build status](https://img.shields.io/travis/aspnet-contrib/AspNet.Security.OpenId.Providers/dev.svg)](https://travis-ci.org/aspnet-contrib/AspNet.Security.OpenId.Providers) | [![Build status](https://img.shields.io/appveyor/ci/aspnet-contrib/aspnet-security-openid-providers/dev.svg)](https://ci.appveyor.com/project/aspnet-contrib/aspnet-security-openid-providers) |
-| **Build History** | [![Build history](https://buildstats.info/travisci/chart/aspnet-contrib/AspNet.Security.OpenId.Providers?branch=dev&includeBuildsFromPullRequest=false)](https://travis-ci.org/aspnet-contrib/AspNet.Security.OpenId.Providers) |  [![Build history](https://buildstats.info/appveyor/chart/aspnet-contrib/aspnet-security-openid-providers?branch=dev&includeBuildsFromPullRequest=false)](https://ci.appveyor.com/project/aspnet-contrib/aspnet-security-openid-providers) |
+[![Build status](https://github.com/aspnet-contrib/AspNet.Security.OpenId.Providers/workflows/build/badge.svg?branch=dev&event=push)](https://github.com/aspnet-contrib/AspNet.Security.OpenId.Providers/actions?query=workflow%3Abuild+branch%3Adev+event%3Apush)
 
 ## Getting started
 
