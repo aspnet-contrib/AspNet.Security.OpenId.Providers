@@ -146,7 +146,7 @@ namespace AspNet.Security.OpenId
                 return HandleRequestResult.Fail("The authentication response was rejected by the identity provider.");
             }
 
-            var address = QueryHelpers.AddQueryString(uri: properties.Items[OpenIdAuthenticationConstants.Properties.ReturnTo],
+            var address = QueryHelpers.AddQueryString(uri: properties.Items[OpenIdAuthenticationConstants.Properties.ReturnTo]!,
                                                       name: OpenIdAuthenticationConstants.Parameters.State, value: state);
 
             // Validate the return_to parameter by comparing it to the address stored in the properties.
@@ -290,7 +290,7 @@ namespace AspNet.Security.OpenId
                 Namespace = OpenIdAuthenticationConstants.Namespaces.OpenId,
                 Realm = realm,
                 ReturnTo = QueryHelpers.AddQueryString(
-                    uri: properties.Items[OpenIdAuthenticationConstants.Properties.ReturnTo],
+                    uri: properties.Items[OpenIdAuthenticationConstants.Properties.ReturnTo]!,
                     name: OpenIdAuthenticationConstants.Parameters.State,
                     value: Options.StateDataFormat!.Protect(properties))
             };
@@ -328,10 +328,12 @@ namespace AspNet.Security.OpenId
 
             await Events.RedirectToIdentityProvider(context);
 
-            var address = QueryHelpers.AddQueryString(configuration.AuthenticationEndpoint,
-                message.GetParameters()
-                    .ToDictionary(parameter => parameter.Key,
-                                  parameter => parameter.Value));
+            var parameters = new Dictionary<string, string?>();
+            foreach (var parameter in message.GetParameters())
+            {
+                parameters[parameter.Key] = parameter.Value;
+            }
+            var address = QueryHelpers.AddQueryString(configuration.AuthenticationEndpoint, parameters);
 
             Response.Redirect(address);
         }

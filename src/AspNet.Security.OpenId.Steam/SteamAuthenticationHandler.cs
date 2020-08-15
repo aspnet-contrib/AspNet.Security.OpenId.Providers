@@ -75,7 +75,7 @@ namespace AspNet.Security.OpenId.Steam
                 throw new InvalidOperationException($"The OpenID claimed identifier '{identifier}' is not valid.");
             }
 
-            var address = QueryHelpers.AddQueryString(Options.UserInformationEndpoint, new Dictionary<string, string>
+            var address = QueryHelpers.AddQueryString(Options.UserInformationEndpoint, new Dictionary<string, string?>
             {
                 [SteamAuthenticationConstants.Parameters.Key] = Options.ApplicationKey,
                 [SteamAuthenticationConstants.Parameters.SteamId] = identifier
