@@ -198,11 +198,11 @@ namespace AspNet.Security.OpenId
                 {
                     var document = XDocument.Load(reader);
 
-                    var endpoint = (from service in document.Root.Element(XName.Get("XRD", "xri://$xrd*($v*2.0)"))
+                    var endpoint = (from service in document.Root!.Element(XName.Get("XRD", "xri://$xrd*($v*2.0)"))!
                                                                  .Descendants(XName.Get("Service", "xri://$xrd*($v*2.0)"))
                                     where service.Descendants(XName.Get("Type", "xri://$xrd*($v*2.0)"))
                                                  .Any(type => type.Value == "http://specs.openid.net/auth/2.0/server")
-                                    orderby service.Attribute("priority")?.Value
+                                    orderby service.Attribute("priority"!)?.Value
                                     select service.Element(XName.Get("URI", "xri://$xrd*($v*2.0)"))?.Value).FirstOrDefault();
 
                     if (string.IsNullOrEmpty(endpoint))
@@ -221,7 +221,7 @@ namespace AspNet.Security.OpenId
                 }
             }
 
-            private Uri? ProcessGenericDocument([NotNull] HttpResponseMessage response)
+            private Uri? ProcessGenericDocument(HttpResponseMessage? response)
             {
                 Debug.Assert(response != null, "The HTTP response shouldn't be null.");
 

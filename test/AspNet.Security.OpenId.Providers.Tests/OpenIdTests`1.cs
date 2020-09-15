@@ -154,7 +154,7 @@ namespace AspNet.Security.OpenId
                 }
             }
 
-            element.Name.ShouldBe("claims");
+            element.Name.ShouldBe("claims"!);
             element.Elements("claim").Count().ShouldBeGreaterThanOrEqualTo(1);
 
             var claims = new List<Claim>();
@@ -163,10 +163,10 @@ namespace AspNet.Security.OpenId
             {
                 claims.Add(
                     new Claim(
-                        claim.Attribute("type").Value,
-                        claim.Attribute("value").Value,
-                        claim.Attribute("valueType").Value,
-                        claim.Attribute("issuer").Value));
+                        claim.Attribute("type"!)!.Value,
+                        claim.Attribute("value"!)!.Value,
+                        claim.Attribute("valueType"!)!.Value,
+                        claim.Attribute("issuer"!)!.Value));
             }
 
             return claims.ToDictionary((key) => key.Type, (value) => value);

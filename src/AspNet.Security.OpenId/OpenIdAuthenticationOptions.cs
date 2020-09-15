@@ -83,7 +83,7 @@ namespace AspNet.Security.OpenId
         public new OpenIdAuthenticationEvents? Events
         {
             get { return base.Events as OpenIdAuthenticationEvents; }
-            set { base.Events = value; }
+            set { base.Events = value!; }
         }
 
         /// <summary>
