@@ -221,10 +221,8 @@ namespace AspNet.Security.OpenId
                 }
             }
 
-            private Uri? ProcessGenericDocument(HttpResponseMessage? response)
+            private Uri? ProcessGenericDocument(HttpResponseMessage response)
             {
-                Debug.Assert(response != null, "The HTTP response shouldn't be null.");
-
                 var endpoint = (from header in response.Headers
                                 where string.Equals(header.Key, OpenIdAuthenticationConstants.Headers.XrdsLocation, StringComparison.OrdinalIgnoreCase)
                                 from value in header.Value
