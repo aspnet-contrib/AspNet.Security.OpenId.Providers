@@ -20,7 +20,7 @@ namespace AspNet.Security.OpenId
         /// <summary>
         /// Defines a notification invoked when the user is authenticated by the identity provider.
         /// </summary>
-        public Func<OpenIdAuthenticatedContext, Task> OnAuthenticated { get; set; } = context => Task.FromResult<object>(null!);
+        public Func<OpenIdAuthenticatedContext, Task> OnAuthenticated { get; set; } = context => Task.CompletedTask;
 
         /// <summary>
         /// Defines a notification invoked prior to redirecting to the identity provider.
