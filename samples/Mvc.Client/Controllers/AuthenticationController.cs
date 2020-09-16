@@ -39,7 +39,7 @@ namespace Mvc.Client.Controllers
         }
 
         [HttpGet("~/signout"), HttpPost("~/signout")]
-        public IActionResult SignOut()
+        public IActionResult SignOutCurrentUser()
         {
             // Instruct the cookies middleware to delete the local cookie created
             // when the user agent is redirected from the external identity provider

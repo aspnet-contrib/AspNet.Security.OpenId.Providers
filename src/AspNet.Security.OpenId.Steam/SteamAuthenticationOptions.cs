@@ -19,7 +19,7 @@ namespace AspNet.Security.OpenId.Steam
         /// <summary>
         /// Gets or sets the application key used to retrive user details from Steam's API.
         /// </summary>
-        public string ApplicationKey { get; set; }
+        public string? ApplicationKey { get; set; }
 
         /// <summary>
         /// Gets or sets the endpoint used to retrieve user details.

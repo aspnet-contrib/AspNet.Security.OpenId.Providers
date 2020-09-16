@@ -32,7 +32,7 @@ namespace AspNet.Security.OpenId.Infrastructure
         /// <returns>
         /// The test application to use for the authentication provider.
         /// </returns>
-        public static WebApplicationFactory<Program> CreateApplication<TOptions>(OpenIdTests<TOptions> tests, Action<IServiceCollection> configureServices = null)
+        public static WebApplicationFactory<Program> CreateApplication<TOptions>(OpenIdTests<TOptions> tests, Action<IServiceCollection>? configureServices = null)
             where TOptions : OpenIdAuthenticationOptions
         {
             return new TestApplicationFactory()
@@ -97,7 +97,7 @@ namespace AspNet.Security.OpenId.Infrastructure
                        "/me",
                        async context =>
                        {
-                           if (context.User.Identity.IsAuthenticated)
+                           if (context.User.Identity?.IsAuthenticated == true)
                            {
                                var xml = IdentityToXmlString(context.User);
                                var buffer = Encoding.UTF8.GetBytes(xml.ToString());
@@ -117,18 +117,18 @@ namespace AspNet.Security.OpenId.Infrastructure
 
         private static string IdentityToXmlString(ClaimsPrincipal user)
         {
-            var element = new XElement("claims");
+            var element = new XElement("claims"!);
 
             foreach (var identity in user.Identities)
             {
                 foreach (var claim in identity.Claims)
                 {
                     var node = new XElement(
-                        "claim",
-                        new XAttribute("type", claim.Type),
-                        new XAttribute("value", claim.Value),
-                        new XAttribute("valueType", claim.ValueType),
-                        new XAttribute("issuer", claim.Issuer));
+                        "claim"!,
+                        new XAttribute("type"!, claim.Type),
+                        new XAttribute("value"!, claim.Value),
+                        new XAttribute("valueType"!, claim.ValueType),
+                        new XAttribute("issuer"!, claim.Issuer));
 
                     element.Add(node);
                 }
