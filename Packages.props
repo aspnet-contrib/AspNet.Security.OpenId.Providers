@@ -1,0 +1,16 @@
+<Project>
+
+  <ItemGroup>
+    <PackageReference Update="AngleSharp" Version="0.13.0" />
+    <PackageReference Update="JetBrains.Annotations" Version="2020.1.0" />
+    <PackageReference Update="JustEat.HttpClientInterception" Version="3.0.0" />
+    <PackageReference Update="MartinCostello.Logging.XUnit" Version="0.1.0" />
+    <PackageReference Update="Microsoft.AspNetCore.Mvc.Testing" Version="3.1.5" />
+    <PackageReference Update="Microsoft.AspNetCore.TestHost" Version="3.1.5" />
+    <PackageReference Update="Microsoft.IdentityModel.Protocols" Version="5.6.0" />
+    <PackageReference Update="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Update="Shouldly" Version="3.0.2" />
+    <PackageReference Update="System.Text.Json" Version="4.7.2" />
+  </ItemGroup>
+
+</Project>
