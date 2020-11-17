@@ -277,6 +277,14 @@ namespace AspNet.Security.OpenId
                 Request.Scheme + "://" + Request.Host +
                 OriginalPathBase + Options.CallbackPath;
 
+            var identity = "http://specs.openid.net/auth/2.0/identifier_select";
+            object tmpValue = null;
+            properties.Parameters.TryGetValue(OpenIdAuthenticationConstants.Parameters.Identity, out tmpValue);
+            if(tmpValue != null)
+            {
+                identity = Convert.ToString(tmpValue);
+            }
+
             // Generate a new anti-forgery token.
             GenerateCorrelationId(properties);
 
@@ -284,8 +292,8 @@ namespace AspNet.Security.OpenId
             // See http://openid.net/specs/openid-authentication-2_0.html#requesting_authentication
             var message = new OpenIdAuthenticationMessage
             {
-                ClaimedIdentifier = "http://specs.openid.net/auth/2.0/identifier_select",
-                Identity = "http://specs.openid.net/auth/2.0/identifier_select",
+                ClaimedIdentifier = identity,
+                Identity = identity,
                 Mode = OpenIdAuthenticationConstants.Modes.CheckIdSetup,
                 Namespace = OpenIdAuthenticationConstants.Namespaces.OpenId,
                 Realm = realm,

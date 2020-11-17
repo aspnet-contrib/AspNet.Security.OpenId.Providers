@@ -211,11 +211,15 @@ namespace AspNet.Security.OpenId
                     continue;
                 }
 
+                var key = $"{OpenIdAuthenticationConstants.Prefixes.OpenId}.{alias}." +
+                                            $"{OpenIdAuthenticationConstants.Suffixes.Value}.{name}";
+                var value = string.Empty;
                 // Exclude attributes whose value is missing.
-                if (!Parameters.TryGetValue($"{OpenIdAuthenticationConstants.Prefixes.OpenId}.{alias}." +
-                                            $"{OpenIdAuthenticationConstants.Suffixes.Value}.{name}", out string value))
+                if (!Parameters.TryGetValue(key, out value))
                 {
-                    continue;
+                    key += ".1";
+                    if (!Parameters.TryGetValue(key, out value))
+                        continue;
                 }
 
                 // Exclude attributes whose value is null or empty.
