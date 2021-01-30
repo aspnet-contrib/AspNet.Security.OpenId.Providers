@@ -127,7 +127,7 @@ namespace AspNet.Security.OpenId
                             "returned returned a {0} response with the following payload: {1} {2}.",
                             /* Status: */ response.StatusCode,
                             /* Headers: */ response.Headers.ToString(),
-                            /* Body: */ await response.Content.ReadAsStringAsync()));
+                            /* Body: */ await response.Content.ReadAsStringAsync(cancellationToken)));
                     }
 
                     // Note: application/xrds+xml is the standard content type but text/xml is frequent.
@@ -193,7 +193,7 @@ namespace AspNet.Security.OpenId
                 // Abort the operation if cancellation was requested.
                 cancellationToken.ThrowIfCancellationRequested();
 
-                using (var stream = await response.Content.ReadAsStreamAsync())
+                using (var stream = await response.Content.ReadAsStreamAsync(cancellationToken))
                 using (var reader = XmlReader.Create(stream))
                 {
                     var document = XDocument.Load(reader);
@@ -251,7 +251,7 @@ namespace AspNet.Security.OpenId
                 // Abort the operation if cancellation was requested.
                 cancellationToken.ThrowIfCancellationRequested();
 
-                using (var stream = await response.Content.ReadAsStreamAsync())
+                using (var stream = await response.Content.ReadAsStreamAsync(cancellationToken))
                 using (var document = await HtmlParser.ParseDocumentAsync(stream, cancellationToken))
                 {
                     var endpoint = (from element in document.Head.GetElementsByTagName(OpenIdAuthenticationConstants.Metadata.Meta)

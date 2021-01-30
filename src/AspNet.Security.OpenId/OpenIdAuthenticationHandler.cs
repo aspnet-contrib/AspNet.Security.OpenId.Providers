@@ -394,12 +394,12 @@ namespace AspNet.Security.OpenId
                                   "the identity provider returned a {Status} response with the following payload: {Headers} {Body}.",
                                   /* Status: */ response.StatusCode,
                                   /* Headers: */ response.Headers.ToString(),
-                                  /* Body: */ await response.Content.ReadAsStringAsync());
+                                  /* Body: */ await response.Content.ReadAsStringAsync(Context.RequestAborted));
 
                 return false;
             }
 
-            using (var stream = await response.Content.ReadAsStreamAsync())
+            using (var stream = await response.Content.ReadAsStreamAsync(Context.RequestAborted))
             using (var reader = new StreamReader(stream))
             {
                 // Create a new dictionary containing the parameters extracted from the response body.
