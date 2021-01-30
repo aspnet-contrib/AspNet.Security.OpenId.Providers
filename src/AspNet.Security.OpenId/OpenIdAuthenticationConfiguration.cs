@@ -114,7 +114,7 @@ namespace AspNet.Security.OpenId
 
                     // application/xrds+xml MUST be the preferred content type to avoid a second round-trip.
                     // See http://openid.net/specs/yadis-v1.0.pdf (chapter 6.2.4)
-                    var request = new HttpRequestMessage(HttpMethod.Get, address);
+                    using var request = new HttpRequestMessage(HttpMethod.Get, address);
                     request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(OpenIdAuthenticationConstants.Media.Xrds));
                     request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(OpenIdAuthenticationConstants.Media.Html));
                     request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(OpenIdAuthenticationConstants.Media.Xhtml));
@@ -185,7 +185,7 @@ namespace AspNet.Security.OpenId
                 throw new InvalidOperationException("The Yadis discovery failed because the XRDS document location was not found.");
             }
 
-            private async Task<Uri?> ProcessXrdsDocumentAsync(
+            private static async Task<Uri?> ProcessXrdsDocumentAsync(
                 [NotNull] HttpResponseMessage response, CancellationToken cancellationToken)
             {
                 Debug.Assert(response != null, "The HTTP response shouldn't be null.");
@@ -221,7 +221,7 @@ namespace AspNet.Security.OpenId
                 }
             }
 
-            private Uri? ProcessGenericDocument(HttpResponseMessage response)
+            private static Uri? ProcessGenericDocument(HttpResponseMessage response)
             {
                 var endpoint = (from header in response.Headers
                                 where string.Equals(header.Key, OpenIdAuthenticationConstants.Headers.XrdsLocation, StringComparison.OrdinalIgnoreCase)

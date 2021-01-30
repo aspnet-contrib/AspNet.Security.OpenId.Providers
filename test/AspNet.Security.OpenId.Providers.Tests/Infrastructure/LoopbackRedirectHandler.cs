@@ -73,7 +73,7 @@ namespace AspNet.Security.OpenId.Infrastructure
                     Query = queryStringSelf.ToString(),
                 };
 
-                var redirectRequest = new HttpRequestMessage(request.Method, builder.Uri);
+                using var redirectRequest = new HttpRequestMessage(request.Method, builder.Uri);
 
                 // Forward on the headers and cookies
                 foreach (var header in result.Headers)

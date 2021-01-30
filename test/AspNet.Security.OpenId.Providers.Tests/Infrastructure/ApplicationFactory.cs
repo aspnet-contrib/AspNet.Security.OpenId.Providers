@@ -35,6 +35,7 @@ namespace AspNet.Security.OpenId.Infrastructure
         public static WebApplicationFactory<Program> CreateApplication<TOptions>(OpenIdTests<TOptions> tests, Action<IServiceCollection>? configureServices = null)
             where TOptions : OpenIdAuthenticationOptions
         {
+#pragma warning disable CA2000
             return new TestApplicationFactory()
                 .WithWebHostBuilder(builder =>
                 {
@@ -45,6 +46,7 @@ namespace AspNet.Security.OpenId.Infrastructure
                         builder.ConfigureServices(configureServices);
                     }
                 });
+#pragma warning restore CA2000
         }
 
         private static void Configure<TOptions>(IWebHostBuilder builder, OpenIdTests<TOptions> tests)
@@ -105,7 +107,7 @@ namespace AspNet.Security.OpenId.Infrastructure
                                context.Response.StatusCode = 200;
                                context.Response.ContentType = "text/xml";
 
-                               await context.Response.Body.WriteAsync(buffer, 0, buffer.Length);
+                               await context.Response.Body.WriteAsync(buffer, context.RequestAborted);
                            }
                            else
                            {

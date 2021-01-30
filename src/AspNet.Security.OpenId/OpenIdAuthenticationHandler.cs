@@ -382,12 +382,12 @@ namespace AspNet.Security.OpenId
             }
 
             // Create a new check_authentication request to verify the assertion.
-            var request = new HttpRequestMessage(HttpMethod.Post, configuration.AuthenticationEndpoint)
+            using var request = new HttpRequestMessage(HttpMethod.Post, configuration.AuthenticationEndpoint)
             {
                 Content = new FormUrlEncodedContent(payload!)
             };
 
-            var response = await Options.Backchannel.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, Context.RequestAborted);
+            using var response = await Options.Backchannel.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, Context.RequestAborted);
             if (!response.IsSuccessStatusCode)
             {
                 Logger.LogWarning("The authentication failed because an invalid check_authentication response was received: " +

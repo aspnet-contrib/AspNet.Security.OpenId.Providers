@@ -81,11 +81,11 @@ namespace AspNet.Security.OpenId.Steam
                 [SteamAuthenticationConstants.Parameters.SteamId] = identifier
             });
 
-            var request = new HttpRequestMessage(HttpMethod.Get, address);
+            using var request = new HttpRequestMessage(HttpMethod.Get, address);
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(OpenIdAuthenticationConstants.Media.Json));
 
             // Return the authentication ticket as-is if the userinfo request failed.
-            var response = await Options.Backchannel.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, Context.RequestAborted);
+            using var response = await Options.Backchannel.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, Context.RequestAborted);
             if (!response.IsSuccessStatusCode)
             {
                 Logger.LogWarning("The userinfo request failed because an invalid response was received: the identity provider " +
