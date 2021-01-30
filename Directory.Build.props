@@ -9,6 +9,8 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>portable</DebugType>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <DefineConstants Condition=" '$(Configuration)' == 'Debug' ">$(DefineConstants);JETBRAINS_ANNOTATIONS</DefineConstants>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -40,6 +42,12 @@
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>git://github.com/aspnet-contrib/AspNet.Security.OpenId.Providers</RepositoryUrl>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <AnalysisMode>AllEnabledByDefault</AnalysisMode>
+    <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)AspNet.Security.OpenId.Providers.ruleset</CodeAnalysisRuleSet>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
   </PropertyGroup>
 
   <PropertyGroup>

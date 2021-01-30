@@ -38,13 +38,13 @@ namespace AspNet.Security.OpenId
         {
             Interceptor = new HttpClientInterceptorOptions()
                 .ThrowsOnMissingRegistration()
-                .RegisterBundle(Path.Combine(GetType().Name.Replace("Tests", string.Empty), "bundle.json"));
+                .RegisterBundle(Path.Combine(GetType().Name.Replace("Tests", string.Empty, StringComparison.Ordinal), "bundle.json"));
         }
 
         /// <summary>
         /// Gets or sets the xunit test output helper to route application logs to.
         /// </summary>
-        public ITestOutputHelper OutputHelper { get; set; }
+        public ITestOutputHelper? OutputHelper { get; set; }
 
         /// <summary>
         /// Gets the interceptor to use for configuring stubbed HTTP responses.
@@ -59,7 +59,7 @@ namespace AspNet.Security.OpenId
         /// <summary>
         /// Gets the optional redirect URI to use for OpenID Connect flows.
         /// </summary>
-        protected virtual string RedirectUri { get; }
+        protected virtual string? RedirectUri { get; }
 
         /// <summary>
         /// Gets the identity to return from the OpenID Connect server.
@@ -94,7 +94,7 @@ namespace AspNet.Security.OpenId
         /// <returns>
         /// The test application to use for authentication.
         /// </returns>
-        protected WebApplicationFactory<Program> CreateTestServer(Action<IServiceCollection> configureServices = null)
+        protected WebApplicationFactory<Program> CreateTestServer(Action<IServiceCollection>? configureServices = null)
             => ApplicationFactory.CreateApplication(this, configureServices);
 
         /// <summary>
@@ -144,7 +144,9 @@ namespace AspNet.Security.OpenId
                 {
                     // Assert
                     result.StatusCode.ShouldBe(HttpStatusCode.OK);
-                    result.Content.Headers.ContentType.MediaType.ShouldBe("text/xml");
+                    result.Content.Headers.ShouldNotBeNull();
+                    result.Content.Headers.ContentType.ShouldNotBeNull();
+                    result.Content.Headers.ContentType!.MediaType.ShouldBe("text/xml");
 
                     string xml = await result.Content.ReadAsStringAsync();
 
@@ -152,7 +154,7 @@ namespace AspNet.Security.OpenId
                 }
             }
 
-            element.Name.ShouldBe("claims");
+            element.Name.ShouldBe("claims"!);
             element.Elements("claim").Count().ShouldBeGreaterThanOrEqualTo(1);
 
             var claims = new List<Claim>();
@@ -161,10 +163,10 @@ namespace AspNet.Security.OpenId
             {
                 claims.Add(
                     new Claim(
-                        claim.Attribute("type").Value,
-                        claim.Attribute("value").Value,
-                        claim.Attribute("valueType").Value,
-                        claim.Attribute("issuer").Value));
+                        claim.Attribute("type"!)!.Value,
+                        claim.Attribute("value"!)!.Value,
+                        claim.Attribute("valueType"!)!.Value,
+                        claim.Attribute("issuer"!)!.Value));
             }
 
             return claims.ToDictionary((key) => key.Type, (value) => value);

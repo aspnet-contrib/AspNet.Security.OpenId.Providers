@@ -33,7 +33,7 @@ namespace AspNet.Security.OpenId
         /// <summary>
         /// Gets or sets the authentication endpoint address.
         /// </summary>
-        public string AuthenticationEndpoint { get; set; }
+        public string? AuthenticationEndpoint { get; set; }
 
         /// <summary>
         /// Represents a configuration retriever able to deserialize
@@ -89,7 +89,7 @@ namespace AspNet.Security.OpenId
                     throw new ArgumentException("The address cannot be null or empty.", nameof(address));
                 }
 
-                if (!Uri.TryCreate(address, UriKind.Absolute, out Uri uri))
+                if (!Uri.TryCreate(address, UriKind.Absolute, out Uri? uri))
                 {
                     throw new ArgumentException("The address must be an absolute URI.", nameof(address));
                 }
@@ -114,7 +114,7 @@ namespace AspNet.Security.OpenId
 
                     // application/xrds+xml MUST be the preferred content type to avoid a second round-trip.
                     // See http://openid.net/specs/yadis-v1.0.pdf (chapter 6.2.4)
-                    var request = new HttpRequestMessage(HttpMethod.Get, address);
+                    using var request = new HttpRequestMessage(HttpMethod.Get, address);
                     request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(OpenIdAuthenticationConstants.Media.Xrds));
                     request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(OpenIdAuthenticationConstants.Media.Html));
                     request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(OpenIdAuthenticationConstants.Media.Xhtml));
@@ -127,7 +127,7 @@ namespace AspNet.Security.OpenId
                             "returned returned a {0} response with the following payload: {1} {2}.",
                             /* Status: */ response.StatusCode,
                             /* Headers: */ response.Headers.ToString(),
-                            /* Body: */ await response.Content.ReadAsStringAsync()));
+                            /* Body: */ await response.Content.ReadAsStringAsync(cancellationToken)));
                     }
 
                     // Note: application/xrds+xml is the standard content type but text/xml is frequent.
@@ -185,7 +185,7 @@ namespace AspNet.Security.OpenId
                 throw new InvalidOperationException("The Yadis discovery failed because the XRDS document location was not found.");
             }
 
-            private async Task<Uri> ProcessXrdsDocumentAsync(
+            private static async Task<Uri?> ProcessXrdsDocumentAsync(
                 [NotNull] HttpResponseMessage response, CancellationToken cancellationToken)
             {
                 Debug.Assert(response != null, "The HTTP response shouldn't be null.");
@@ -193,16 +193,16 @@ namespace AspNet.Security.OpenId
                 // Abort the operation if cancellation was requested.
                 cancellationToken.ThrowIfCancellationRequested();
 
-                using (var stream = await response.Content.ReadAsStreamAsync())
+                using (var stream = await response.Content.ReadAsStreamAsync(cancellationToken))
                 using (var reader = XmlReader.Create(stream))
                 {
                     var document = XDocument.Load(reader);
 
-                    var endpoint = (from service in document.Root.Element(XName.Get("XRD", "xri://$xrd*($v*2.0)"))
+                    var endpoint = (from service in document.Root!.Element(XName.Get("XRD", "xri://$xrd*($v*2.0)"))!
                                                                  .Descendants(XName.Get("Service", "xri://$xrd*($v*2.0)"))
                                     where service.Descendants(XName.Get("Type", "xri://$xrd*($v*2.0)"))
                                                  .Any(type => type.Value == "http://specs.openid.net/auth/2.0/server")
-                                    orderby service.Attribute("priority")?.Value
+                                    orderby service.Attribute("priority"!)?.Value
                                     select service.Element(XName.Get("URI", "xri://$xrd*($v*2.0)"))?.Value).FirstOrDefault();
 
                     if (string.IsNullOrEmpty(endpoint))
@@ -210,7 +210,7 @@ namespace AspNet.Security.OpenId
                         return null;
                     }
 
-                    if (!Uri.TryCreate(endpoint, UriKind.Absolute, out Uri uri))
+                    if (!Uri.TryCreate(endpoint, UriKind.Absolute, out Uri? uri))
                     {
                         throw new InvalidOperationException(
                             "The Yadis discovery failed because the XRDS document " +
@@ -221,10 +221,8 @@ namespace AspNet.Security.OpenId
                 }
             }
 
-            private Uri ProcessGenericDocument([NotNull] HttpResponseMessage response)
+            private static Uri? ProcessGenericDocument(HttpResponseMessage response)
             {
-                Debug.Assert(response != null, "The HTTP response shouldn't be null.");
-
                 var endpoint = (from header in response.Headers
                                 where string.Equals(header.Key, OpenIdAuthenticationConstants.Headers.XrdsLocation, StringComparison.OrdinalIgnoreCase)
                                 from value in header.Value
@@ -235,7 +233,7 @@ namespace AspNet.Security.OpenId
                     return null;
                 }
 
-                if (!Uri.TryCreate(endpoint, UriKind.Absolute, out Uri uri))
+                if (!Uri.TryCreate(endpoint, UriKind.Absolute, out Uri? uri))
                 {
                     throw new InvalidOperationException(
                         "The Yadis discovery failed because the X-XRDS-Location " +
@@ -245,7 +243,7 @@ namespace AspNet.Security.OpenId
                 return uri;
             }
 
-            private async Task<Uri> ProcessHtmlDocumentAsync(
+            private async Task<Uri?> ProcessHtmlDocumentAsync(
                 [NotNull] HttpResponseMessage response, CancellationToken cancellationToken)
             {
                 Debug.Assert(response != null, "The HTTP response shouldn't be null.");
@@ -253,7 +251,7 @@ namespace AspNet.Security.OpenId
                 // Abort the operation if cancellation was requested.
                 cancellationToken.ThrowIfCancellationRequested();
 
-                using (var stream = await response.Content.ReadAsStreamAsync())
+                using (var stream = await response.Content.ReadAsStreamAsync(cancellationToken))
                 using (var document = await HtmlParser.ParseDocumentAsync(stream, cancellationToken))
                 {
                     var endpoint = (from element in document.Head.GetElementsByTagName(OpenIdAuthenticationConstants.Metadata.Meta)
@@ -266,7 +264,7 @@ namespace AspNet.Security.OpenId
                         return null;
                     }
 
-                    if (!Uri.TryCreate(endpoint, UriKind.Absolute, out Uri uri))
+                    if (!Uri.TryCreate(endpoint, UriKind.Absolute, out Uri? uri))
                     {
                         throw new InvalidOperationException(
                             "The Yadis discovery failed because the X-XRDS-Location " +

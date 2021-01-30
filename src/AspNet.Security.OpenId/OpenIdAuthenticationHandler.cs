@@ -64,7 +64,7 @@ namespace AspNet.Security.OpenId
                                                 "because the state parameter was missing.");
             }
 
-            var properties = Options.StateDataFormat.Unprotect(state);
+            var properties = Options.StateDataFormat!.Unprotect(state);
             if (properties == null)
             {
                 return HandleRequestResult.Fail("The authentication response was rejected " +
@@ -146,7 +146,7 @@ namespace AspNet.Security.OpenId
                 return HandleRequestResult.Fail("The authentication response was rejected by the identity provider.");
             }
 
-            var address = QueryHelpers.AddQueryString(uri: properties.Items[OpenIdAuthenticationConstants.Properties.ReturnTo],
+            var address = QueryHelpers.AddQueryString(uri: properties.Items[OpenIdAuthenticationConstants.Properties.ReturnTo]!,
                                                       name: OpenIdAuthenticationConstants.Parameters.State, value: state);
 
             // Validate the return_to parameter by comparing it to the address stored in the properties.
@@ -203,8 +203,8 @@ namespace AspNet.Security.OpenId
                  identity.HasClaim(claim => string.Equals(claim.Type, ClaimTypes.GivenName, StringComparison.OrdinalIgnoreCase)) &&
                  identity.HasClaim(claim => string.Equals(claim.Type, ClaimTypes.Surname, StringComparison.OrdinalIgnoreCase)))
             {
-                identity.AddClaim(new Claim(ClaimTypes.Name, $"{identity.FindFirst(ClaimTypes.GivenName).Value} " +
-                                                             $"{identity.FindFirst(ClaimTypes.Surname).Value}",
+                identity.AddClaim(new Claim(ClaimTypes.Name, $"{identity.FindFirst(ClaimTypes.GivenName)!.Value} " +
+                                                             $"{identity.FindFirst(ClaimTypes.Surname)!.Value}",
                                             ClaimValueTypes.String, Options.ClaimsIssuer));
             }
 
@@ -243,7 +243,7 @@ namespace AspNet.Security.OpenId
 
         protected override async Task HandleChallengeAsync(AuthenticationProperties properties)
         {
-            var configuration = await Options.ConfigurationManager.GetConfigurationAsync(Context.RequestAborted);
+            var configuration = await Options.ConfigurationManager!.GetConfigurationAsync(Context.RequestAborted);
             if (configuration == null)
             {
                 throw new InvalidOperationException("The OpenID 2.0 authentication middleware was unable to retrieve " +
@@ -290,9 +290,9 @@ namespace AspNet.Security.OpenId
                 Namespace = OpenIdAuthenticationConstants.Namespaces.OpenId,
                 Realm = realm,
                 ReturnTo = QueryHelpers.AddQueryString(
-                    uri: properties.Items[OpenIdAuthenticationConstants.Properties.ReturnTo],
+                    uri: properties.Items[OpenIdAuthenticationConstants.Properties.ReturnTo]!,
                     name: OpenIdAuthenticationConstants.Parameters.State,
-                    value: Options.StateDataFormat.Protect(properties))
+                    value: Options.StateDataFormat!.Protect(properties))
             };
 
             if (Options.Attributes.Count != 0)
@@ -328,17 +328,19 @@ namespace AspNet.Security.OpenId
 
             await Events.RedirectToIdentityProvider(context);
 
-            var address = QueryHelpers.AddQueryString(configuration.AuthenticationEndpoint,
-                message.GetParameters()
-                    .ToDictionary(parameter => parameter.Key,
-                                  parameter => parameter.Value));
+            var parameters = new Dictionary<string, string?>();
+            foreach (var parameter in message.GetParameters())
+            {
+                parameters[parameter.Key] = parameter.Value;
+            }
+            var address = QueryHelpers.AddQueryString(configuration.AuthenticationEndpoint, parameters);
 
             Response.Redirect(address);
         }
 
         private async Task<bool> VerifyAssertionAsync([NotNull] OpenIdAuthenticationMessage message)
         {
-            var configuration = await Options.ConfigurationManager.GetConfigurationAsync(Context.RequestAborted);
+            var configuration = await Options.ConfigurationManager!.GetConfigurationAsync(Context.RequestAborted);
             if (configuration == null)
             {
                 throw new InvalidOperationException("The OpenID 2.0 authentication middleware was unable to retrieve " +
@@ -380,24 +382,24 @@ namespace AspNet.Security.OpenId
             }
 
             // Create a new check_authentication request to verify the assertion.
-            var request = new HttpRequestMessage(HttpMethod.Post, configuration.AuthenticationEndpoint)
+            using var request = new HttpRequestMessage(HttpMethod.Post, configuration.AuthenticationEndpoint)
             {
-                Content = new FormUrlEncodedContent(payload)
+                Content = new FormUrlEncodedContent(payload!)
             };
 
-            var response = await Options.Backchannel.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, Context.RequestAborted);
+            using var response = await Options.Backchannel.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, Context.RequestAborted);
             if (!response.IsSuccessStatusCode)
             {
                 Logger.LogWarning("The authentication failed because an invalid check_authentication response was received: " +
                                   "the identity provider returned a {Status} response with the following payload: {Headers} {Body}.",
                                   /* Status: */ response.StatusCode,
                                   /* Headers: */ response.Headers.ToString(),
-                                  /* Body: */ await response.Content.ReadAsStringAsync());
+                                  /* Body: */ await response.Content.ReadAsStringAsync(Context.RequestAborted));
 
                 return false;
             }
 
-            using (var stream = await response.Content.ReadAsStreamAsync())
+            using (var stream = await response.Content.ReadAsStreamAsync(Context.RequestAborted))
             using (var reader = new StreamReader(stream))
             {
                 // Create a new dictionary containing the parameters extracted from the response body.

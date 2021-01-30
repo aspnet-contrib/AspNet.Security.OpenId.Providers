@@ -18,9 +18,9 @@ namespace AspNet.Security.OpenId.Infrastructure
     /// </summary>
     internal sealed class LoopbackRedirectHandler : DelegatingHandler
     {
-        internal string UserIdentity { get; set; }
+        internal string? UserIdentity { get; set; }
 
-        internal IDictionary<string, string> UserAttributes { get; set; }
+        internal IDictionary<string, string>? UserAttributes { get; set; }
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
@@ -32,9 +32,9 @@ namespace AspNet.Security.OpenId.Infrastructure
             {
                 // Rewrite the URI to loop back to the redirected URL to simulate the user having
                 // successfully authenticated with the external login page they were redirected to.
-                var queryStringServer = HttpUtility.ParseQueryString(result.Headers.Location.Query);
+                var queryStringServer = HttpUtility.ParseQueryString(result.Headers.Location!.Query);
 
-                string location = queryStringServer["openid.return_to"];
+                string location = queryStringServer["openid.return_to"]!;
 
                 var locationUri = new Uri(location, UriKind.Absolute);
                 var queryStringSelf = HttpUtility.ParseQueryString(locationUri.Query);
@@ -43,7 +43,7 @@ namespace AspNet.Security.OpenId.Infrastructure
 
                 foreach (var key in queryStringServer.AllKeys)
                 {
-                    if (key.StartsWith("openid.", StringComparison.Ordinal) &&
+                    if (key?.StartsWith("openid.", StringComparison.Ordinal) == true &&
                         !string.Equals(key, "openid.return_to", StringComparison.Ordinal))
                     {
                         queryStringSelf.Add(key, queryStringServer[key]);
@@ -73,7 +73,7 @@ namespace AspNet.Security.OpenId.Infrastructure
                     Query = queryStringSelf.ToString(),
                 };
 
-                var redirectRequest = new HttpRequestMessage(request.Method, builder.Uri);
+                using var redirectRequest = new HttpRequestMessage(request.Method, builder.Uri);
 
                 // Forward on the headers and cookies
                 foreach (var header in result.Headers)

@@ -18,7 +18,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json.Linq;
 
 namespace AspNet.Security.OpenId.Steam
 {
@@ -76,29 +75,29 @@ namespace AspNet.Security.OpenId.Steam
                 throw new InvalidOperationException($"The OpenID claimed identifier '{identifier}' is not valid.");
             }
 
-            var address = QueryHelpers.AddQueryString(Options.UserInformationEndpoint, new Dictionary<string, string>
+            var address = QueryHelpers.AddQueryString(Options.UserInformationEndpoint, new Dictionary<string, string?>
             {
                 [SteamAuthenticationConstants.Parameters.Key] = Options.ApplicationKey,
                 [SteamAuthenticationConstants.Parameters.SteamId] = identifier
             });
 
-            var request = new HttpRequestMessage(HttpMethod.Get, address);
+            using var request = new HttpRequestMessage(HttpMethod.Get, address);
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(OpenIdAuthenticationConstants.Media.Json));
 
             // Return the authentication ticket as-is if the userinfo request failed.
-            var response = await Options.Backchannel.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, Context.RequestAborted);
+            using var response = await Options.Backchannel.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, Context.RequestAborted);
             if (!response.IsSuccessStatusCode)
             {
                 Logger.LogWarning("The userinfo request failed because an invalid response was received: the identity provider " +
                                   "returned returned a {Status} response with the following payload: {Headers} {Body}.",
                                   /* Status: */ response.StatusCode,
                                   /* Headers: */ response.Headers.ToString(),
-                                  /* Body: */ await response.Content.ReadAsStringAsync());
+                                  /* Body: */ await response.Content.ReadAsStringAsync(Context.RequestAborted));
 
                 throw new HttpRequestException("An error occurred while retrieving the user profile from Steam.");
             }
 
-            using var payload = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+            using var payload = JsonDocument.Parse(await response.Content.ReadAsStringAsync(Context.RequestAborted));
 
             // Try to extract the profile name of the authenticated user.
             var profile = payload.RootElement
@@ -109,24 +108,17 @@ namespace AspNet.Security.OpenId.Steam
 
             if (profile.ValueKind == JsonValueKind.Object && profile.TryGetProperty(SteamAuthenticationConstants.Parameters.Name, out var name))
             {
-                identity.AddClaim(new Claim(ClaimTypes.Name, name.GetString(), ClaimValueTypes.String, Options.ClaimsIssuer));
+                identity.AddClaim(new Claim(ClaimTypes.Name, name.GetString()!, ClaimValueTypes.String, Options.ClaimsIssuer));
             }
 
             return await RunAuthenticatedEventAsync(payload);
 
-            async Task<AuthenticationTicket> RunAuthenticatedEventAsync(JsonDocument user = null)
+            async Task<AuthenticationTicket> RunAuthenticatedEventAsync(JsonDocument? user = null)
             {
                 var context = new OpenIdAuthenticatedContext(Context, Scheme, Options, ticket)
                 {
                     UserPayload = user
                 };
-
-                if (user != null)
-                {
-#pragma warning disable CS0618
-                    context.User = JObject.Parse(user.RootElement.ToString());
-#pragma warning restore CS0618
-                }
 
                 // Copy the attributes to the context object.
                 foreach (var attribute in attributes)

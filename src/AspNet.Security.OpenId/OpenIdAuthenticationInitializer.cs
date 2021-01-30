@@ -79,7 +79,9 @@ namespace Microsoft.Extensions.DependencyInjection
 
             if (options.Backchannel == null)
             {
+#pragma warning disable CA2000
                 options.Backchannel = new HttpClient(options.BackchannelHttpHandler ?? new HttpClientHandler());
+#pragma warning disable CA2000
                 options.Backchannel.DefaultRequestHeaders.UserAgent.ParseAdd("ASP.NET Core OpenID 2.0 middleware");
                 options.Backchannel.Timeout = options.BackchannelTimeout;
                 options.Backchannel.MaxResponseContentBufferSize = 1024 * 1024 * 10; // 10 MB
@@ -106,7 +108,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
                     if (options.MetadataAddress == null)
                     {
-                        options.MetadataAddress = options.Authority;
+                        options.MetadataAddress = options.Authority!;
                     }
 
                     if (!options.MetadataAddress.IsAbsoluteUri)
@@ -121,7 +123,7 @@ namespace Microsoft.Extensions.DependencyInjection
                             throw new ArgumentException("The authority cannot contain a fragment or a query string.", nameof(options));
                         }
 
-                        if (!options.Authority.OriginalString.EndsWith("/"))
+                        if (!options.Authority.OriginalString.EndsWith("/", StringComparison.Ordinal))
                         {
                             options.Authority = new Uri(options.Authority.OriginalString + "/", UriKind.Absolute);
                         }
@@ -136,7 +138,7 @@ namespace Microsoft.Extensions.DependencyInjection
                     }
 
                     options.ConfigurationManager = new ConfigurationManager<OpenIdAuthenticationConfiguration>(
-                        options.MetadataAddress?.AbsoluteUri ?? options.Authority.AbsoluteUri,
+                        options.MetadataAddress?.AbsoluteUri ?? options.Authority!.AbsoluteUri,
                         new OpenIdAuthenticationConfiguration.Retriever(options.Backchannel, options.HtmlParser)
                         {
                             MaximumRedirections = options.MaximumRedirections

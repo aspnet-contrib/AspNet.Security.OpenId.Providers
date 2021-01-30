@@ -26,7 +26,7 @@ namespace AspNet.Security.OpenId
         /// Note: this property is ignored when <see cref="Configuration"/>
         /// or <see cref="ConfigurationManager"/> are set.
         /// </summary>
-        public Uri Authority { get; set; }
+        public Uri? Authority { get; set; }
 
         /// <summary>
         /// Gets or sets the URL of the OpenID 2.0 authentication XRDS discovery document.
@@ -34,7 +34,7 @@ namespace AspNet.Security.OpenId
         /// Note: this property is ignored when <see cref="Configuration"/>
         /// or <see cref="ConfigurationManager"/> are set.
         /// </summary>
-        public Uri MetadataAddress { get; set; }
+        public Uri? MetadataAddress { get; set; }
 
         /// <summary>
         /// Gets or sets a boolean indicating whether HTTPS is required to retrieve the XRDS discovery document.
@@ -47,19 +47,19 @@ namespace AspNet.Security.OpenId
         /// Gets or sets the configuration used by the OpenID 2.0 authentication middleware.
         /// Note: this property is ignored when <see cref="ConfigurationManager"/> is set.
         /// </summary>
-        public OpenIdAuthenticationConfiguration Configuration { get; set; }
+        public OpenIdAuthenticationConfiguration? Configuration { get; set; }
 
         /// <summary>
         /// Gets or sets the configuration manager used by the OpenID 2.0 authentication middleware.
         /// </summary>
-        public IConfigurationManager<OpenIdAuthenticationConfiguration> ConfigurationManager { get; set; }
+        public IConfigurationManager<OpenIdAuthenticationConfiguration>? ConfigurationManager { get; set; }
 
         /// <summary>
         /// Gets or sets the realm associated with this instance.
         /// A default value is automatically inferred from the
         /// current URL when this value is left to <c>null</c>.
         /// </summary>
-        public string Realm { get; set; }
+        public string? Realm { get; set; }
 
         /// <summary>
         /// Gets or sets the default AX attributes added to the OpenID request.
@@ -80,17 +80,17 @@ namespace AspNet.Security.OpenId
         /// <summary>
         /// Gets or sets the events provider associated with this instance.
         /// </summary>
-        public new OpenIdAuthenticationEvents Events
+        public new OpenIdAuthenticationEvents? Events
         {
             get { return base.Events as OpenIdAuthenticationEvents; }
-            set { base.Events = value; }
+            set { base.Events = value!; }
         }
 
         /// <summary>
         /// Gets or sets the data format used to serialize the
         /// authentication properties used for the "state" parameter.
         /// </summary>
-        public ISecureDataFormat<AuthenticationProperties> StateDataFormat { get; set; }
+        public ISecureDataFormat<AuthenticationProperties>? StateDataFormat { get; set; }
 
         /// <summary>
         /// Gets or sets the HTTP client used to communicate with the OpenID provider.
@@ -105,7 +105,7 @@ namespace AspNet.Security.OpenId
         /// <summary>
         /// Gets or sets the HTML parser used to parse discovery documents.
         /// </summary>
-        public HtmlParser HtmlParser { get; set; }
+        public HtmlParser? HtmlParser { get; set; }
 
         /// <summary>
         /// Gets the maximal number of roundtrips that are allowed
