@@ -9,7 +9,7 @@
     {
         <form action="/signin" method="post">
             <input type="hidden" name="Provider" value="@scheme.Name" />
-            <input type="hidden" name="ReturnUrl" value="@ViewBag.ReturnUrl" />
+            <input type="hidden" name="ReturnUrl" value="@Context.Request.Query["ReturnUrl"]" />
 
             <button class="btn btn-lg btn-success m-1" type="submit">Connect using @scheme.DisplayName</button>
         </form>
