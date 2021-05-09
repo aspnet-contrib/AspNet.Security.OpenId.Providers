@@ -18,8 +18,11 @@ namespace Mvc.Client.Controllers
         public async Task<IActionResult> SignIn() => View("SignIn", await HttpContext.GetExternalProvidersAsync());
 
         [HttpPost("~/signin")]
-        public async Task<IActionResult> SignIn([FromForm] string provider)
+#pragma warning disable CA1054 // Uri parameters should not be strings
+        public async Task<IActionResult> SignIn([FromForm] string provider, [FromForm] string? returnUrl)
+#pragma warning restore CA1054 // Uri parameters should not be strings
         {
+            returnUrl ??= "/";
             // Note: the "provider" parameter corresponds to the external
             // authentication provider choosen by the user agent.
             if (string.IsNullOrWhiteSpace(provider))
@@ -35,7 +38,7 @@ namespace Mvc.Client.Controllers
             // Instruct the middleware corresponding to the requested external identity
             // provider to redirect the user agent to its own authorization endpoint.
             // Note: the authenticationScheme parameter must match the value configured in Startup.cs
-            return Challenge(new AuthenticationProperties { RedirectUri = "/" }, provider);
+            return Challenge(new AuthenticationProperties { RedirectUri = returnUrl }, provider);
         }
 
         [HttpGet("~/signout"), HttpPost("~/signout")]
@@ -44,7 +47,7 @@ namespace Mvc.Client.Controllers
             // Instruct the cookies middleware to delete the local cookie created
             // when the user agent is redirected from the external identity provider
             // after a successful authentication flow (e.g Google or Facebook).
-            return SignOut(new AuthenticationProperties { RedirectUri = "/" },
+            return SignOut(new AuthenticationProperties { RedirectUri = Request.Query["returnUrl"] },
                 CookieAuthenticationDefaults.AuthenticationScheme);
         }
     }
