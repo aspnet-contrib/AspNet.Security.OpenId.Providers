@@ -52,9 +52,6 @@ namespace AspNet.Security.OpenId.Infrastructure
         private static void Configure<TOptions>(IWebHostBuilder builder, OpenIdTests<TOptions> tests)
             where TOptions : OpenIdAuthenticationOptions
         {
-            // Use a dummy content root
-            builder.UseContentRoot(".");
-
             // Route application logs to xunit output for debugging
             builder.ConfigureLogging(logging =>
             {
@@ -142,7 +139,10 @@ namespace AspNet.Security.OpenId.Infrastructure
         private sealed class TestApplicationFactory : WebApplicationFactory<Program>
         {
             protected override IWebHostBuilder CreateWebHostBuilder()
-                => new WebHostBuilder();
+            {
+                return new WebHostBuilder()
+                    .UseSetting("TEST_CONTENTROOT_ASPNET_SECURITY_OPENID_PROVIDERS_TESTS", "."); // Use a dummy content root
+            }
         }
     }
 }
