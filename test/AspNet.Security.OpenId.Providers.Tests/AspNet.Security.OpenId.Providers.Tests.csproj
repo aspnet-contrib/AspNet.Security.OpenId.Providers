@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <RootNamespace>AspNet.Security.OpenId</RootNamespace>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFrameworks>$(DefaultNetCoreTargetFramework)</TargetFrameworks>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
     <NoWarn>$(NoWarn);CA1707</NoWarn>
