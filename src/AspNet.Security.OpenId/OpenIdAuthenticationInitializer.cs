@@ -4,13 +4,9 @@
  * for more information concerning the license and the contributors participating to this project.
  */
 
-using System;
 using System.ComponentModel;
-using System.Net.Http;
 using AngleSharp.Html.Parser;
 using AspNet.Security.OpenId;
-using JetBrains.Annotations;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols;

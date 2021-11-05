@@ -4,23 +4,14 @@
  * for more information concerning the license and the contributors participating to this project.
  */
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
-using System.Security.Claims;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 using AspNet.Security.OpenId.Infrastructure;
 using JustEat.HttpClientInterception;
 using MartinCostello.Logging.XUnit;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
-using Shouldly;
-using Xunit.Abstractions;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace AspNet.Security.OpenId
 {
@@ -70,6 +61,83 @@ namespace AspNet.Security.OpenId
         /// Gets the attributes for the identity to return from the OpenID Connect server.
         /// </summary>
         public IDictionary<string, string> UserAttributes { get; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        [Fact]
+        public async Task Custom_Events_Are_Raised_By_Handler()
+        {
+            // Arrange
+            bool onAuthenticatedEventRaised = false;
+            bool onRedirectToIdentityProviderEventRaised = false;
+
+            void ConfigureServices(IServiceCollection services)
+            {
+                services.PostConfigureAll<TOptions>((options) =>
+                {
+                    options.Events.OnAuthenticated = (context) =>
+                    {
+                        onAuthenticatedEventRaised = true;
+                        return Task.CompletedTask;
+                    };
+
+                    options.Events.OnRedirectToIdentityProvider = (context) =>
+                    {
+                        onRedirectToIdentityProviderEventRaised = true;
+                        return Task.CompletedTask;
+                    };
+                });
+            }
+
+            using var server = CreateTestServer(ConfigureServices);
+
+            // Act
+            var claims = await AuthenticateUserAsync(server);
+
+            // Assert
+            onAuthenticatedEventRaised.ShouldBeTrue();
+            onRedirectToIdentityProviderEventRaised.ShouldBeTrue();
+        }
+
+        [Fact]
+        public async Task Custom_Events_Are_Raised_By_Handler_Using_Custom_Events_Type()
+        {
+            // Arrange
+            bool onAuthenticatedEventRaised = false;
+            bool onRedirectToIdentityProviderEventRaised = false;
+
+            void ConfigureServices(IServiceCollection services)
+            {
+                services.TryAddScoped((_) =>
+                {
+                    return new CustomOpenIdAuthenticationEvents()
+                    {
+                        OnAuthenticated = (context) =>
+                        {
+                            onAuthenticatedEventRaised = true;
+                            return Task.CompletedTask;
+                        },
+                        OnRedirectToIdentityProvider = (context) =>
+                        {
+                            onRedirectToIdentityProviderEventRaised = true;
+                            return Task.CompletedTask;
+                        },
+                    };
+                });
+
+                services.PostConfigureAll<TOptions>((options) =>
+                {
+                    options.EventsType = typeof(CustomOpenIdAuthenticationEvents);
+                });
+            }
+
+            using var server = CreateTestServer(ConfigureServices);
+
+            // Act
+            var claims = await AuthenticateUserAsync(server);
+
+            // Assert
+            onAuthenticatedEventRaised.ShouldBeTrue();
+            onRedirectToIdentityProviderEventRaised.ShouldBeTrue();
+        }
 
         /// <summary>
         /// Registers authentication for the test.
@@ -123,13 +191,12 @@ namespace AspNet.Security.OpenId
             using (var client = server.CreateDefaultClient(new LoopbackRedirectHandler() { UserIdentity = UserIdentity, UserAttributes = UserAttributes }))
             {
                 // Act
-                using (var result = await client.GetAsync("/me"))
-                {
-                    // Assert
-                    result.StatusCode.ShouldBe(HttpStatusCode.Found);
+                using var result = await client.GetAsync("/me");
 
-                    cookies = result.Headers.GetValues("Set-Cookie");
-                }
+                // Assert
+                result.StatusCode.ShouldBe(HttpStatusCode.Found);
+
+                cookies = result.Headers.GetValues("Set-Cookie");
             }
 
             XElement element;
@@ -140,18 +207,17 @@ namespace AspNet.Security.OpenId
                 client.DefaultRequestHeaders.Add("Cookie", cookies);
 
                 // Act
-                using (var result = await client.GetAsync("/me"))
-                {
-                    // Assert
-                    result.StatusCode.ShouldBe(HttpStatusCode.OK);
-                    result.Content.Headers.ShouldNotBeNull();
-                    result.Content.Headers.ContentType.ShouldNotBeNull();
-                    result.Content.Headers.ContentType!.MediaType.ShouldBe("text/xml");
+                using var result = await client.GetAsync("/me");
 
-                    string xml = await result.Content.ReadAsStringAsync();
+                // Assert
+                result.StatusCode.ShouldBe(HttpStatusCode.OK);
+                result.Content.Headers.ShouldNotBeNull();
+                result.Content.Headers.ContentType.ShouldNotBeNull();
+                result.Content.Headers.ContentType!.MediaType.ShouldBe("text/xml");
 
-                    element = XElement.Parse(xml);
-                }
+                string xml = await result.Content.ReadAsStringAsync();
+
+                element = XElement.Parse(xml);
             }
 
             element.Name.ShouldBe("claims"!);
@@ -176,6 +242,10 @@ namespace AspNet.Security.OpenId
         {
             actual.ShouldContainKey(claimType);
             actual[claimType].Value.ShouldBe(claimValue);
+        }
+
+        private sealed class CustomOpenIdAuthenticationEvents : OpenIdAuthenticationEvents
+        {
         }
     }
 }

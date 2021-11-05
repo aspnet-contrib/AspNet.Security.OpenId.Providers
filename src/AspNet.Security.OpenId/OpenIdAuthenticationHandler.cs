@@ -4,17 +4,10 @@
  * for more information concerning the license and the contributors participating to this project.
  */
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
+using System.Net;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
-using System.Threading.Tasks;
 using AspNet.Security.OpenId.Events;
-using JetBrains.Annotations;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -33,7 +26,7 @@ namespace AspNet.Security.OpenId
         }
     }
 
-    public class OpenIdAuthenticationHandler<TOptions> : RemoteAuthenticationHandler<TOptions>
+    public partial class OpenIdAuthenticationHandler<TOptions> : RemoteAuthenticationHandler<TOptions>
         where TOptions : OpenIdAuthenticationOptions, new()
     {
         public OpenIdAuthenticationHandler(
@@ -43,6 +36,12 @@ namespace AspNet.Security.OpenId
             [NotNull] ISystemClock clock)
             : base(options, logger, encoder, clock)
         {
+        }
+
+        protected new OpenIdAuthenticationEvents Events
+        {
+            get { return (OpenIdAuthenticationEvents)base.Events; }
+            set { base.Events = value; }
         }
 
         protected override async Task<HandleRequestResult> HandleRemoteAuthenticateAsync()
@@ -211,7 +210,7 @@ namespace AspNet.Security.OpenId
             var ticket = await CreateTicketAsync(identity, properties, message.ClaimedIdentifier, attributes);
             if (ticket == null)
             {
-                Logger.LogInformation("The authentication process was skipped because returned a null ticket was returned.");
+                Log.SkippedDueToNullTicket(Logger);
 
                 return HandleRequestResult.SkipHandler();
             }
@@ -390,11 +389,11 @@ namespace AspNet.Security.OpenId
             using var response = await Options.Backchannel.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, Context.RequestAborted);
             if (!response.IsSuccessStatusCode)
             {
-                Logger.LogWarning("The authentication failed because an invalid check_authentication response was received: " +
-                                  "the identity provider returned a {Status} response with the following payload: {Headers} {Body}.",
-                                  /* Status: */ response.StatusCode,
-                                  /* Headers: */ response.Headers.ToString(),
-                                  /* Body: */ await response.Content.ReadAsStringAsync(Context.RequestAborted));
+                Log.InvalidCheckAuthenticationHttpError(
+                    Logger,
+                    response.StatusCode,
+                    response.Headers.ToString(),
+                    await response.Content.ReadAsStringAsync(Context.RequestAborted));
 
                 return false;
             }
@@ -422,18 +421,14 @@ namespace AspNet.Security.OpenId
                 // parameter was missing from the response body.
                 if (!parameters.ContainsKey(OpenIdAuthenticationConstants.Parameters.IsValid))
                 {
-                    Logger.LogWarning("The authentication response was rejected because the identity provider " +
-                                      "returned an invalid check_authentication response.");
-
+                    Log.InvalidCheckAuthenticationResponse(Logger);
                     return false;
                 }
 
                 // Stop processing the assertion if the authentication server declared it as invalid.
                 if (!string.Equals(parameters[OpenIdAuthenticationConstants.Parameters.IsValid], "true", StringComparison.Ordinal))
                 {
-                    Logger.LogWarning("The authentication response was rejected because the identity provider " +
-                                      "declared the security assertion as invalid.");
-
+                    Log.InvalidSecurityAssertion(Logger);
                     return false;
                 }
             }
@@ -441,6 +436,26 @@ namespace AspNet.Security.OpenId
             return true;
         }
 
-        private new OpenIdAuthenticationEvents Events => (OpenIdAuthenticationEvents)base.Events;
+        private static partial class Log
+        {
+            [LoggerMessage(1, LogLevel.Information, "The authentication process was skipped because returned a null ticket was returned.")]
+            internal static partial void SkippedDueToNullTicket(ILogger logger);
+
+            [LoggerMessage(2, LogLevel.Warning, "The authentication failed because an invalid check_authentication response was received: " +
+                                                "the identity provider returned a {Status} response with the following payload: {Headers} {Body}.")]
+            internal static partial void InvalidCheckAuthenticationHttpError(
+                ILogger logger,
+                HttpStatusCode status,
+                string headers,
+                string body);
+
+            [LoggerMessage(3, LogLevel.Warning, "The authentication response was rejected because the identity provider " +
+                                                "returned an invalid check_authentication response.")]
+            internal static partial void InvalidCheckAuthenticationResponse(ILogger logger);
+
+            [LoggerMessage(4, LogLevel.Warning, "The authentication response was rejected because the identity provider " +
+                                                "declared the security assertion as invalid.")]
+            internal static partial void InvalidSecurityAssertion(ILogger logger);
+        }
     }
 }

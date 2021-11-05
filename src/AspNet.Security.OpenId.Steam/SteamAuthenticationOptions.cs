@@ -4,8 +4,6 @@
  * for more information concerning the license and the contributors participating to this project.
  */
 
-using System;
-
 namespace AspNet.Security.OpenId.Steam
 {
     public class SteamAuthenticationOptions : OpenIdAuthenticationOptions

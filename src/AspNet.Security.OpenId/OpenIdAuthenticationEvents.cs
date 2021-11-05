@@ -4,10 +4,7 @@
  * for more information concerning the license and the contributors participating to this project.
  */
 
-using System;
-using System.Threading.Tasks;
 using AspNet.Security.OpenId.Events;
-using Microsoft.AspNetCore.Authentication;
 
 namespace AspNet.Security.OpenId
 {
