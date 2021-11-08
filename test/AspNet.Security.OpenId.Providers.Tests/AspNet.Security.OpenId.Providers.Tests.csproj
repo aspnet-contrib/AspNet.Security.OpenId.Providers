@@ -28,4 +28,11 @@
     <PackageReference Include="Shouldly" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Using Include="Shouldly" />
+    <Using Include="System.Security.Claims" />
+    <Using Include="Xunit" />
+    <Using Include="Xunit.Abstractions" />
+  </ItemGroup>
+
 </Project>

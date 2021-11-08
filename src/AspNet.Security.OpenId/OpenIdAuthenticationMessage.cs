@@ -4,10 +4,7 @@
  * for more information concerning the license and the contributors participating to this project.
  */
 
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using JetBrains.Annotations;
 using Microsoft.Extensions.Primitives;
 
 namespace AspNet.Security.OpenId

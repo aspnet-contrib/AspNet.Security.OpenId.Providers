@@ -4,11 +4,7 @@
  * for more information concerning the license and the contributors participating to this project.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
 using AngleSharp.Html.Parser;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.IdentityModel.Protocols;
 
 namespace AspNet.Security.OpenId
@@ -80,9 +76,9 @@ namespace AspNet.Security.OpenId
         /// <summary>
         /// Gets or sets the events provider associated with this instance.
         /// </summary>
-        public new OpenIdAuthenticationEvents? Events
+        public new OpenIdAuthenticationEvents Events
         {
-            get { return base.Events as OpenIdAuthenticationEvents; }
+            get { return (OpenIdAuthenticationEvents)base.Events; }
             set { base.Events = value!; }
         }
 
@@ -91,16 +87,6 @@ namespace AspNet.Security.OpenId
         /// authentication properties used for the "state" parameter.
         /// </summary>
         public ISecureDataFormat<AuthenticationProperties>? StateDataFormat { get; set; }
-
-        /// <summary>
-        /// Gets or sets the HTTP client used to communicate with the OpenID provider.
-        /// </summary>
-        [Obsolete("Use the Backchannel property instead.")]
-        public HttpClient HttpClient
-        {
-            get => Backchannel;
-            set => Backchannel = value;
-        }
 
         /// <summary>
         /// Gets or sets the HTML parser used to parse discovery documents.

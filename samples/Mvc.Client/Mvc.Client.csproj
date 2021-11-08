@@ -10,4 +10,8 @@
     <ProjectReference Include="..\..\src\AspNet.Security.OpenId.Steam\AspNet.Security.OpenId.Steam.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="JetBrains.Annotations" PrivateAssets="All" />
+  </ItemGroup>
+
 </Project>

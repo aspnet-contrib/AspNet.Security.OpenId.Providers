@@ -4,8 +4,6 @@
  * for more information concerning the license and the contributors participating to this project.
  */
 
-using Microsoft.AspNetCore.Authentication;
-
 namespace AspNet.Security.OpenId.Steam
 {
     /// <summary>
@@ -22,21 +20,21 @@ namespace AspNet.Security.OpenId.Steam
         /// <summary>
         /// Gets the default value associated with <see cref="AuthenticationScheme.DisplayName"/>.
         /// </summary>
-        public const string DisplayName = "Steam";
+        public static readonly string DisplayName = "Steam";
 
         /// <summary>
         /// Gets the default value associated with <see cref="RemoteAuthenticationOptions.CallbackPath"/>.
         /// </summary>
-        public const string CallbackPath = "/signin-steam";
+        public static readonly string CallbackPath = "/signin-steam";
 
         /// <summary>
         /// Gets the default value associated with <see cref="OpenIdAuthenticationOptions.Authority"/>.
         /// </summary>
-        public const string Authority = "https://steamcommunity.com/openid/";
+        public static readonly string Authority = "https://steamcommunity.com/openid/";
 
         /// <summary>
         /// Gets the default value associated with <see cref="SteamAuthenticationOptions.UserInformationEndpoint"/>.
         /// </summary>
-        public const string UserInformationEndpoint = "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/";
+        public static readonly string UserInformationEndpoint = "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/";
     }
 }

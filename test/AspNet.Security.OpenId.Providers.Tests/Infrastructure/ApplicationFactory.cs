@@ -4,11 +4,8 @@
  * for more information concerning the license and the contributors participating to this project.
  */
 
-using System;
-using System.Security.Claims;
 using System.Text;
 using System.Xml.Linq;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -52,9 +49,6 @@ namespace AspNet.Security.OpenId.Infrastructure
         private static void Configure<TOptions>(IWebHostBuilder builder, OpenIdTests<TOptions> tests)
             where TOptions : OpenIdAuthenticationOptions
         {
-            // Use a dummy content root
-            builder.UseContentRoot(".");
-
             // Route application logs to xunit output for debugging
             builder.ConfigureLogging(logging =>
             {
@@ -142,7 +136,10 @@ namespace AspNet.Security.OpenId.Infrastructure
         private sealed class TestApplicationFactory : WebApplicationFactory<Program>
         {
             protected override IWebHostBuilder CreateWebHostBuilder()
-                => new WebHostBuilder();
+            {
+                return new WebHostBuilder()
+                    .UseSetting("TEST_CONTENTROOT_ASPNET_SECURITY_OPENID_PROVIDERS_TESTS", "."); // Use a dummy content root
+            }
         }
     }
 }

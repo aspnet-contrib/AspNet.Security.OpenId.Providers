@@ -4,18 +4,12 @@
  * for more information concerning the license and the contributors participating to this project.
  */
 
-using System;
 using System.Diagnostics;
 using System.Globalization;
-using System.Linq;
-using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using AngleSharp.Html.Parser;
-using JetBrains.Annotations;
 using Microsoft.IdentityModel.Protocols;
 
 namespace AspNet.Security.OpenId
