@@ -146,7 +146,7 @@ public partial class OpenIdAuthenticationHandler<TOptions> : RemoteAuthenticatio
         }
 
         var address = QueryHelpers.AddQueryString(uri: properties.Items[OpenIdAuthenticationConstants.Properties.ReturnTo]!,
-                                                  name: OpenIdAuthenticationConstants.Parameters.State, value: state);
+                                                  name: OpenIdAuthenticationConstants.Parameters.State, value: state!);
 
         // Validate the return_to parameter by comparing it to the address stored in the properties.
         // See http://openid.net/specs/openid-authentication-2_0.html#verify_return_to for more information.

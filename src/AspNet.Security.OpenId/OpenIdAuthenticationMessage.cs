@@ -25,10 +25,7 @@ public class OpenIdAuthenticationMessage
     /// <param name="parameters">The parameters associated with the message.</param>
     public OpenIdAuthenticationMessage([NotNull] IDictionary<string, string> parameters)
     {
-        if (parameters == null)
-        {
-            throw new ArgumentNullException(nameof(parameters));
-        }
+        ArgumentNullException.ThrowIfNull(parameters);
 
         foreach (var parameter in parameters)
         {
@@ -47,10 +44,7 @@ public class OpenIdAuthenticationMessage
     /// <param name="parameters">The parameters associated with the message.</param>
     public OpenIdAuthenticationMessage([NotNull] IEnumerable<KeyValuePair<string, StringValues>> parameters)
     {
-        if (parameters == null)
-        {
-            throw new ArgumentNullException(nameof(parameters));
-        }
+        ArgumentNullException.ThrowIfNull(parameters);
 
         foreach (var parameter in parameters)
         {
@@ -59,7 +53,7 @@ public class OpenIdAuthenticationMessage
                 continue;
             }
 
-            Parameters.Add(parameter.Key, parameter.Value);
+            Parameters.Add(parameter.Key, parameter.Value!);
         }
     }
 
