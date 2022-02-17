@@ -73,10 +73,7 @@ public class OpenIdAuthenticationConfiguration
         public Task<OpenIdAuthenticationConfiguration> GetConfigurationAsync(
             [NotNull] string address, [NotNull] IDocumentRetriever retriever, CancellationToken cancellationToken)
         {
-            if (retriever == null)
-            {
-                throw new ArgumentNullException(nameof(retriever));
-            }
+            ArgumentNullException.ThrowIfNull(retriever);
 
             if (string.IsNullOrEmpty(address))
             {

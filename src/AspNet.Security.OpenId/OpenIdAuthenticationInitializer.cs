@@ -40,10 +40,7 @@ public class OpenIdAuthenticationInitializer<TOptions, THandler> : IPostConfigur
     /// <param name="options">The options instance to initialize.</param>
     public void PostConfigure([NotNull] string name, [NotNull] TOptions options)
     {
-        if (options == null)
-        {
-            throw new ArgumentNullException(nameof(options));
-        }
+        ArgumentNullException.ThrowIfNull(options);
 
         if (string.IsNullOrEmpty(name))
         {
