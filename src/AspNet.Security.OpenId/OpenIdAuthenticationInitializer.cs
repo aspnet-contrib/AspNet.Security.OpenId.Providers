@@ -38,7 +38,7 @@ public class OpenIdAuthenticationInitializer<TOptions, THandler> : IPostConfigur
     /// </summary>
     /// <param name="name">The authentication scheme associated with the handler instance.</param>
     /// <param name="options">The options instance to initialize.</param>
-    public void PostConfigure([NotNull] string name, [NotNull] TOptions options)
+    public void PostConfigure([NotNull] string? name, [NotNull] TOptions options)
     {
         ArgumentNullException.ThrowIfNull(options);
 
