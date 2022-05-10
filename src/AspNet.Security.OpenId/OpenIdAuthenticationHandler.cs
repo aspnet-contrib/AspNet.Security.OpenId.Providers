@@ -276,6 +276,14 @@ public partial class OpenIdAuthenticationHandler<TOptions> : RemoteAuthenticatio
             Request.Scheme + "://" + Request.Host +
             OriginalPathBase + Options.CallbackPath;
 
+        var identity = "http://specs.openid.net/auth/2.0/identifier_select";
+        object? tmpValue;
+        properties.Parameters.TryGetValue(OpenIdAuthenticationConstants.Parameters.Identity, out tmpValue);
+        if (tmpValue != null)
+        {
+            identity = tmpValue.ToString();
+        }
+
         // Generate a new anti-forgery token.
         GenerateCorrelationId(properties);
 
@@ -283,8 +291,8 @@ public partial class OpenIdAuthenticationHandler<TOptions> : RemoteAuthenticatio
         // See http://openid.net/specs/openid-authentication-2_0.html#requesting_authentication
         var message = new OpenIdAuthenticationMessage
         {
-            ClaimedIdentifier = "http://specs.openid.net/auth/2.0/identifier_select",
-            Identity = "http://specs.openid.net/auth/2.0/identifier_select",
+            ClaimedIdentifier = identity,
+            Identity = identity,
             Mode = OpenIdAuthenticationConstants.Modes.CheckIdSetup,
             Namespace = OpenIdAuthenticationConstants.Namespaces.OpenId,
             Realm = realm,

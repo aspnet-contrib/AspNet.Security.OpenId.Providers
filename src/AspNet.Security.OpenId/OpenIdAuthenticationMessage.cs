@@ -209,10 +209,14 @@ public class OpenIdAuthenticationMessage
             }
 
             // Exclude attributes whose value is missing.
-            if (!Parameters.TryGetValue($"{OpenIdAuthenticationConstants.Prefixes.OpenId}.{alias}." +
-                                        $"{OpenIdAuthenticationConstants.Suffixes.Value}.{name}", out string? value))
+            var key = $"{OpenIdAuthenticationConstants.Prefixes.OpenId}.{alias}." +
+                                            $"{OpenIdAuthenticationConstants.Suffixes.Value}.{name}";
+            string? value;
+            if (!Parameters.TryGetValue(key, out value))
             {
-                continue;
+                key += ".1";
+                if (!Parameters.TryGetValue(key, out value))
+                    continue;
             }
 
             // Exclude attributes whose value is null or empty.
