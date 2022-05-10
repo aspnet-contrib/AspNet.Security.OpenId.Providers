@@ -6,6 +6,11 @@
     <UserSecretsId>AspNet.Security.OpenId.Providers.Mvc.Client</UserSecretsId>
   </PropertyGroup>
 
+  <!-- HACK Workaround for "CSC : error RSG002: TargetPath not specified for additional file: <file path>" -->
+  <PropertyGroup>
+    <UseRazorSourceGenerator>false</UseRazorSourceGenerator>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\src\AspNet.Security.OpenId.Steam\AspNet.Security.OpenId.Steam.csproj" />
   </ItemGroup>
