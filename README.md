@@ -39,6 +39,10 @@ See the [/samples](https://github.com/aspnet-contrib/AspNet.Security.OpenId.Prov
 
 We would love it if you could help contributing to this repository.
 
+## Security policy
+
+Please see [SECURITY.md](./.github/SECURITY.md) for information about reporting security issues and bugs.
+
 ## Support
 
 **Need help or wanna share your thoughts?** Don't hesitate to join us on Gitter or ask your question on StackOverflow:
