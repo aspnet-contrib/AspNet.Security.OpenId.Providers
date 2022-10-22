@@ -2,10 +2,10 @@ name: build
 
 on:
   push:
-    branches: [ dev, dev-7.0.0, rel/* ]
+    branches: [ dev, rel/* ]
     tags: [ '*' ]
   pull_request:
-    branches: [ dev, dev-7.0.0, rel/* ]
+    branches: [ dev, rel/* ]
 
 jobs:
   build:
