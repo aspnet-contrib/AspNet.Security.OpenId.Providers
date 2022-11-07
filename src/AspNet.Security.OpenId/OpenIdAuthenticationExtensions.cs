@@ -85,15 +85,8 @@ public static class OpenIdAuthenticationExtensions
         where TOptions : OpenIdAuthenticationOptions, new()
         where THandler : OpenIdAuthenticationHandler<TOptions>
     {
-        if (builder == null)
-        {
-            throw new ArgumentNullException(nameof(builder));
-        }
-
-        if (configuration == null)
-        {
-            throw new ArgumentNullException(nameof(configuration));
-        }
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentNullException.ThrowIfNull(configuration);
 
         if (string.IsNullOrEmpty(scheme))
         {

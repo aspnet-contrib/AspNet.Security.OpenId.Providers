@@ -1,11 +1,11 @@
 <Project>
 
   <PropertyGroup>
-    <MajorVersion>6</MajorVersion>
+    <MajorVersion>7</MajorVersion>
     <MinorVersion>0</MinorVersion>
-    <PatchVersion>1</PatchVersion>
+    <PatchVersion>0</PatchVersion>
     <VersionPrefix>$(MajorVersion).$(MinorVersion).$(PatchVersion)</VersionPrefix>
-    <PackageValidationBaselineVersion>6.0.0</PackageValidationBaselineVersion>
+    <PackageValidationBaselineVersion>7.0.0</PackageValidationBaselineVersion>
     <PreReleaseVersionLabel>preview</PreReleaseVersionLabel>
     <PreReleaseVersionIteration></PreReleaseVersionIteration>
     <PreReleaseBrandingLabel>Preview $(PreReleaseVersionIteration)</PreReleaseBrandingLabel>
@@ -13,6 +13,11 @@
     <DotNetFinalVersionKind Condition="'$(StabilizePackageVersion)' == 'true'">release</DotNetFinalVersionKind>
     <IncludePreReleaseLabelInPackageVersion>true</IncludePreReleaseLabelInPackageVersion>
     <IncludePreReleaseLabelInPackageVersion Condition=" '$(DotNetFinalVersionKind)' == 'release' ">false</IncludePreReleaseLabelInPackageVersion>
+  </PropertyGroup>
+
+  <!-- TODO Remove once 7.0.0 published to NuGet.org -->
+  <PropertyGroup>
+    <DisablePackageBaselineValidation>true</DisablePackageBaselineValidation>
   </PropertyGroup>
 
 </Project>
