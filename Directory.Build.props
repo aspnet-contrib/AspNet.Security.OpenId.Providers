@@ -43,6 +43,7 @@
     <PackageIconFullPath>$(MSBuildThisFileDirectory)package-icon.png</PackageIconFullPath>
     <PackageProjectUrl>https://github.com/aspnet-contrib/AspNet.Security.OpenId.Providers</PackageProjectUrl>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>git://github.com/aspnet-contrib/AspNet.Security.OpenId.Providers</RepositoryUrl>
   </PropertyGroup>
@@ -82,6 +83,10 @@
   <ItemGroup>
     <Using Include="JetBrains.Annotations" />
     <Using Include="Microsoft.AspNetCore.Authentication" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)$(PackageReadmeFile)" Pack="True" PackagePath="" />
   </ItemGroup>
 
 </Project>
