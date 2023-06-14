@@ -19,9 +19,8 @@ public class OpenIdAuthenticationHandler : OpenIdAuthenticationHandler<OpenIdAut
     public OpenIdAuthenticationHandler(
         [NotNull] IOptionsMonitor<OpenIdAuthenticationOptions> options,
         [NotNull] ILoggerFactory logger,
-        [NotNull] UrlEncoder encoder,
-        [NotNull] ISystemClock clock)
-        : base(options, logger, encoder, clock)
+        [NotNull] UrlEncoder encoder)
+        : base(options, logger, encoder)
     {
     }
 }
@@ -32,9 +31,8 @@ public partial class OpenIdAuthenticationHandler<TOptions> : RemoteAuthenticatio
     public OpenIdAuthenticationHandler(
         [NotNull] IOptionsMonitor<TOptions> options,
         [NotNull] ILoggerFactory logger,
-        [NotNull] UrlEncoder encoder,
-        [NotNull] ISystemClock clock)
-        : base(options, logger, encoder, clock)
+        [NotNull] UrlEncoder encoder)
+        : base(options, logger, encoder)
     {
     }
 
@@ -419,14 +417,14 @@ public partial class OpenIdAuthenticationHandler<TOptions> : RemoteAuthenticatio
 
             // Stop processing the assertion if the mandatory is_valid
             // parameter was missing from the response body.
-            if (!parameters.ContainsKey(OpenIdAuthenticationConstants.Parameters.IsValid))
+            if (!parameters.TryGetValue(OpenIdAuthenticationConstants.Parameters.IsValid, out var isValid))
             {
                 Log.InvalidCheckAuthenticationResponse(Logger);
                 return false;
             }
 
             // Stop processing the assertion if the authentication server declared it as invalid.
-            if (!string.Equals(parameters[OpenIdAuthenticationConstants.Parameters.IsValid], "true", StringComparison.Ordinal))
+            if (!string.Equals(isValid, "true", StringComparison.Ordinal))
             {
                 Log.InvalidSecurityAssertion(Logger);
                 return false;

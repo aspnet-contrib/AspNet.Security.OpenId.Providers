@@ -20,9 +20,8 @@ public partial class SteamAuthenticationHandler : OpenIdAuthenticationHandler<St
     public SteamAuthenticationHandler(
         [NotNull] IOptionsMonitor<SteamAuthenticationOptions> options,
         [NotNull] ILoggerFactory logger,
-        [NotNull] UrlEncoder encoder,
-        [NotNull] ISystemClock clock)
-        : base(options, logger, encoder, clock)
+        [NotNull] UrlEncoder encoder)
+        : base(options, logger, encoder)
     {
     }
 
