@@ -243,14 +243,14 @@ public partial class OpenIdAuthenticationHandler<TOptions> : RemoteAuthenticatio
         var configuration = await Options.ConfigurationManager!.GetConfigurationAsync(Context.RequestAborted);
         if (configuration == null)
         {
-            throw new InvalidOperationException("The OpenID 2.0 authentication middleware was unable to retrieve " +
-                                                "the provider configuration from the OpenID 2.0 authentication server.");
+            throw new AuthenticationFailureException("The OpenID 2.0 authentication middleware was unable to retrieve " +
+                                                     "the provider configuration from the OpenID 2.0 authentication server.");
         }
 
         if (string.IsNullOrEmpty(configuration.AuthenticationEndpoint))
         {
-            throw new InvalidOperationException("The OpenID 2.0 authentication middleware was unable to retrieve " +
-                                                "the authentication endpoint address from the discovery document.");
+            throw new AuthenticationFailureException("The OpenID 2.0 authentication middleware was unable to retrieve " +
+                                                     "the authentication endpoint address from the discovery document.");
         }
 
         // Determine the realm using the current address
@@ -340,14 +340,14 @@ public partial class OpenIdAuthenticationHandler<TOptions> : RemoteAuthenticatio
         var configuration = await Options.ConfigurationManager!.GetConfigurationAsync(Context.RequestAborted);
         if (configuration == null)
         {
-            throw new InvalidOperationException("The OpenID 2.0 authentication middleware was unable to retrieve " +
-                                                "the provider configuration from the OpenID 2.0 authentication server.");
+            throw new AuthenticationFailureException("The OpenID 2.0 authentication middleware was unable to retrieve " +
+                                                     "the provider configuration from the OpenID 2.0 authentication server.");
         }
 
         if (string.IsNullOrEmpty(configuration.AuthenticationEndpoint))
         {
-            throw new InvalidOperationException("The OpenID 2.0 authentication middleware was unable to retrieve " +
-                                                "the authentication endpoint address from the discovery document.");
+            throw new AuthenticationFailureException("The OpenID 2.0 authentication middleware was unable to retrieve " +
+                                                     "the authentication endpoint address from the discovery document.");
         }
 
         // Create a new message to store the parameters sent to the identity provider.
