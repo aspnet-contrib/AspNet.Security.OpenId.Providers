@@ -65,7 +65,7 @@ public partial class SteamAuthenticationHandler : OpenIdAuthenticationHandler<St
         {
             Log.InvalidIdentifier(Logger, identifier);
 
-            throw new InvalidOperationException($"The OpenID claimed identifier '{identifier}' is not valid.");
+            throw new AuthenticationFailureException($"The OpenID claimed identifier '{identifier}' is not valid.");
         }
 
         var address = QueryHelpers.AddQueryString(Options.UserInformationEndpoint, new Dictionary<string, string?>

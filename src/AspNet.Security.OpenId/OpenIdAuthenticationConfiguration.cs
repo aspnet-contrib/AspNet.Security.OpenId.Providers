@@ -74,11 +74,7 @@ public class OpenIdAuthenticationConfiguration
             [NotNull] string address, [NotNull] IDocumentRetriever retriever, CancellationToken cancellationToken)
         {
             ArgumentNullException.ThrowIfNull(retriever);
-
-            if (string.IsNullOrEmpty(address))
-            {
-                throw new ArgumentException("The address cannot be null or empty.", nameof(address));
-            }
+            ArgumentException.ThrowIfNullOrEmpty(address);
 
             if (!Uri.TryCreate(address, UriKind.Absolute, out Uri? uri))
             {
@@ -113,7 +109,7 @@ public class OpenIdAuthenticationConfiguration
                 var response = await HttpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                 if (!response.IsSuccessStatusCode)
                 {
-                    throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture,
+                    throw new AuthenticationFailureException(string.Format(CultureInfo.InvariantCulture,
                         "The Yadis discovery failed because an invalid response was received: the identity provider " +
                         "returned returned a {0} response with the following payload: {1} {2}.",
                         /* Status: */ response.StatusCode,
@@ -130,7 +126,7 @@ public class OpenIdAuthenticationConfiguration
                     var endpoint = await ProcessXrdsDocumentAsync(response, cancellationToken);
                     if (endpoint == null)
                     {
-                        throw new InvalidOperationException(
+                        throw new AuthenticationFailureException(
                             "The Yadis discovery failed because the XRDS document returned by the " +
                             "identity provider didn't contain the authentication endpoint address.");
                     }
@@ -173,7 +169,7 @@ public class OpenIdAuthenticationConfiguration
                 }
             }
 
-            throw new InvalidOperationException("The Yadis discovery failed because the XRDS document location was not found.");
+            throw new AuthenticationFailureException("The Yadis discovery failed because the XRDS document location was not found.");
         }
 
         private static async Task<Uri?> ProcessXrdsDocumentAsync(
@@ -203,7 +199,7 @@ public class OpenIdAuthenticationConfiguration
 
                 if (!Uri.TryCreate(endpoint, UriKind.Absolute, out Uri? uri))
                 {
-                    throw new InvalidOperationException(
+                    throw new AuthenticationFailureException(
                         "The Yadis discovery failed because the XRDS document " +
                         "returned by the identity provider was invalid.");
                 }
@@ -226,7 +222,7 @@ public class OpenIdAuthenticationConfiguration
 
             if (!Uri.TryCreate(endpoint, UriKind.Absolute, out Uri? uri))
             {
-                throw new InvalidOperationException(
+                throw new AuthenticationFailureException(
                     "The Yadis discovery failed because the X-XRDS-Location " +
                     "header returned by the identity provider was invalid.");
             }
@@ -257,7 +253,7 @@ public class OpenIdAuthenticationConfiguration
 
                 if (!Uri.TryCreate(endpoint, UriKind.Absolute, out Uri? uri))
                 {
-                    throw new InvalidOperationException(
+                    throw new AuthenticationFailureException(
                         "The Yadis discovery failed because the X-XRDS-Location " +
                         "metadata returned by the identity provider was invalid.");
                 }

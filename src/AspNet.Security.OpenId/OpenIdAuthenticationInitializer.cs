@@ -41,11 +41,7 @@ public class OpenIdAuthenticationInitializer<TOptions, THandler> : IPostConfigur
     public void PostConfigure([NotNull] string? name, [NotNull] TOptions options)
     {
         ArgumentNullException.ThrowIfNull(options);
-
-        if (string.IsNullOrEmpty(name))
-        {
-            throw new ArgumentException("The options instance name cannot be null or empty.", nameof(name));
-        }
+        ArgumentNullException.ThrowIfNullOrEmpty(name);
 
         if (options.MaximumRedirections < 1)
         {

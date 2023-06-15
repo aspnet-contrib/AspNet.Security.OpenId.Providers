@@ -144,15 +144,8 @@ public class OpenIdAuthenticationMessage
     /// <returns>The current instance, which allows chaining calls.</returns>
     public OpenIdAuthenticationMessage AddParameter([NotNull] string prefix, [NotNull] string name, [CanBeNull] string value)
     {
-        if (string.IsNullOrEmpty(prefix))
-        {
-            throw new ArgumentException("The prefix cannot be null or empty.", nameof(prefix));
-        }
-
-        if (string.IsNullOrEmpty(name))
-        {
-            throw new ArgumentException("The parameter name cannot be null or empty.", nameof(name));
-        }
+        ArgumentException.ThrowIfNullOrEmpty(prefix);
+        ArgumentException.ThrowIfNullOrEmpty(name);
 
         if (!Parameters.ContainsKey($"{prefix}.{name}"))
         {
@@ -260,15 +253,8 @@ public class OpenIdAuthenticationMessage
     /// <returns>The value extracted from the parameter.</returns>
     public string? GetParameter([NotNull] string prefix, [NotNull] string name)
     {
-        if (string.IsNullOrEmpty(prefix))
-        {
-            throw new ArgumentNullException(nameof(prefix));
-        }
-
-        if (string.IsNullOrEmpty(name))
-        {
-            throw new ArgumentNullException(nameof(name));
-        }
+        ArgumentException.ThrowIfNullOrEmpty(prefix);
+        ArgumentException.ThrowIfNullOrEmpty(name);
 
         if (Parameters.TryGetValue($"{prefix}.{name}", out string? value))
         {
@@ -305,15 +291,8 @@ public class OpenIdAuthenticationMessage
     /// <returns>The current instance, which allows chaining calls.</returns>
     public OpenIdAuthenticationMessage SetParameter([NotNull] string prefix, [NotNull] string name, [CanBeNull] string? value)
     {
-        if (string.IsNullOrEmpty(prefix))
-        {
-            throw new ArgumentException("The prefix cannot be null or empty.", nameof(prefix));
-        }
-
-        if (string.IsNullOrEmpty(name))
-        {
-            throw new ArgumentException("The parameter name cannot be null or empty.", nameof(name));
-        }
+        ArgumentException.ThrowIfNullOrEmpty(prefix);
+        ArgumentException.ThrowIfNullOrEmpty(name);
 
         // If the parameter value is null, remove
         // it from the parameters dictionary.

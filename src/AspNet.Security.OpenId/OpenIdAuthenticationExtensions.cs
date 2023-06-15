@@ -87,11 +87,7 @@ public static class OpenIdAuthenticationExtensions
     {
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentNullException.ThrowIfNull(configuration);
-
-        if (string.IsNullOrEmpty(scheme))
-        {
-            throw new ArgumentException("The scheme cannot be null or empty.", nameof(scheme));
-        }
+        ArgumentNullException.ThrowIfNullOrEmpty(scheme);
 
         // Note: TryAddEnumerable() is used here to ensure the initializer is only registered once.
         builder.Services.TryAddEnumerable(
