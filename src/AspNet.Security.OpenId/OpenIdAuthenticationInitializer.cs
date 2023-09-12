@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Licensed under the Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
  * See https://github.com/aspnet-contrib/AspNet.Security.OpenId.Providers
  * for more information concerning the license and the contributors participating to this project.
@@ -112,7 +112,7 @@ public class OpenIdAuthenticationInitializer<TOptions, THandler> : IPostConfigur
                         throw new ArgumentException("The authority cannot contain a fragment or a query string.", nameof(options));
                     }
 
-                    if (!options.Authority.OriginalString.EndsWith('/', StringComparison.Ordinal))
+                    if (!options.Authority.OriginalString.EndsWith('/'))
                     {
                         options.Authority = new Uri(options.Authority.OriginalString + "/", UriKind.Absolute);
                     }
