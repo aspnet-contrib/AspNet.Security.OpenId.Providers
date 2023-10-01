@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed under the Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
  * See https://github.com/aspnet-contrib/AspNet.Security.OpenId.Providers
  * for more information concerning the license and the contributors participating to this project.
@@ -17,21 +17,14 @@ namespace Microsoft.Extensions.DependencyInjection;
 /// Contains the methods required to ensure that the configuration used by
 /// the OpenID 2.0 generic handler is in a consistent and valid state.
 /// </summary>
+/// <remarks>
+/// Creates a new instance of the <see cref="OpenIdAuthenticationInitializer{TOptions, THandler}"/> class.
+/// </remarks>
 [EditorBrowsable(EditorBrowsableState.Never)]
-public class OpenIdAuthenticationInitializer<TOptions, THandler> : IPostConfigureOptions<TOptions>
+public class OpenIdAuthenticationInitializer<TOptions, THandler>([NotNull] IDataProtectionProvider dataProtectionProvider) : IPostConfigureOptions<TOptions>
     where TOptions : OpenIdAuthenticationOptions, new()
     where THandler : OpenIdAuthenticationHandler<TOptions>
 {
-    private readonly IDataProtectionProvider _dataProtectionProvider;
-
-    /// <summary>
-    /// Creates a new instance of the <see cref="OpenIdAuthenticationInitializer{TOptions, THandler}"/> class.
-    /// </summary>
-    public OpenIdAuthenticationInitializer([NotNull] IDataProtectionProvider dataProtectionProvider)
-    {
-        _dataProtectionProvider = dataProtectionProvider;
-    }
-
     /// <summary>
     /// Populates the default OpenID 2.0 handler options and ensure
     /// that the configuration is in a consistent and valid state.
@@ -41,17 +34,14 @@ public class OpenIdAuthenticationInitializer<TOptions, THandler> : IPostConfigur
     public void PostConfigure([NotNull] string? name, [NotNull] TOptions options)
     {
         ArgumentNullException.ThrowIfNull(options);
-        ArgumentNullException.ThrowIfNullOrEmpty(name);
+        ArgumentException.ThrowIfNullOrEmpty(name);
 
         if (options.MaximumRedirections < 1)
         {
             throw new ArgumentException("The maximal number of redirections must be a non-zero positive number.", nameof(options));
         }
 
-        if (options.DataProtectionProvider == null)
-        {
-            options.DataProtectionProvider = _dataProtectionProvider;
-        }
+        options.DataProtectionProvider ??= dataProtectionProvider;
 
         if (options.StateDataFormat == null)
         {
@@ -61,16 +51,13 @@ public class OpenIdAuthenticationInitializer<TOptions, THandler> : IPostConfigur
             options.StateDataFormat = new PropertiesDataFormat(protector);
         }
 
-        if (options.HtmlParser == null)
-        {
-            options.HtmlParser = new HtmlParser();
-        }
+        options.HtmlParser ??= new HtmlParser();
 
         if (options.Backchannel == null)
         {
 #pragma warning disable CA2000
             options.Backchannel = new HttpClient(options.BackchannelHttpHandler ?? new HttpClientHandler());
-#pragma warning disable CA2000
+#pragma warning restore CA2000
             options.Backchannel.DefaultRequestHeaders.UserAgent.ParseAdd("ASP.NET Core OpenID 2.0 middleware");
             options.Backchannel.Timeout = options.BackchannelTimeout;
             options.Backchannel.MaxResponseContentBufferSize = 1024 * 1024 * 10; // 10 MB

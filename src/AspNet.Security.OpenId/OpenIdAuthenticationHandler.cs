@@ -14,15 +14,11 @@ using Microsoft.Extensions.Options;
 
 namespace AspNet.Security.OpenId;
 
-public class OpenIdAuthenticationHandler : OpenIdAuthenticationHandler<OpenIdAuthenticationOptions>
+public class OpenIdAuthenticationHandler(
+    [NotNull] IOptionsMonitor<OpenIdAuthenticationOptions> options,
+    [NotNull] ILoggerFactory logger,
+    [NotNull] UrlEncoder encoder) : OpenIdAuthenticationHandler<OpenIdAuthenticationOptions>(options, logger, encoder)
 {
-    public OpenIdAuthenticationHandler(
-        [NotNull] IOptionsMonitor<OpenIdAuthenticationOptions> options,
-        [NotNull] ILoggerFactory logger,
-        [NotNull] UrlEncoder encoder)
-        : base(options, logger, encoder)
-    {
-    }
 }
 
 public partial class OpenIdAuthenticationHandler<TOptions> : RemoteAuthenticationHandler<TOptions>
@@ -396,39 +392,38 @@ public partial class OpenIdAuthenticationHandler<TOptions> : RemoteAuthenticatio
             return false;
         }
 
-        using (var stream = await response.Content.ReadAsStreamAsync(Context.RequestAborted))
-        using (var reader = new StreamReader(stream))
+        using var stream = await response.Content.ReadAsStreamAsync(Context.RequestAborted);
+        using var reader = new StreamReader(stream);
+
+        // Create a new dictionary containing the parameters extracted from the response body.
+        var parameters = new Dictionary<string, string>(StringComparer.Ordinal);
+
+        // Note: the response is encoded using the 'Key-Value Form Encoding'.
+        // See http://openid.net/specs/openid-authentication-2_0.html#anchor4
+        for (var line = await reader.ReadLineAsync(); line != null; line = await reader.ReadLineAsync())
         {
-            // Create a new dictionary containing the parameters extracted from the response body.
-            var parameters = new Dictionary<string, string>(StringComparer.Ordinal);
-
-            // Note: the response is encoded using the 'Key-Value Form Encoding'.
-            // See http://openid.net/specs/openid-authentication-2_0.html#anchor4
-            for (var line = await reader.ReadLineAsync(); line != null; line = await reader.ReadLineAsync())
+            var parameter = line.Split(':');
+            if (parameter.Length != 2)
             {
-                var parameter = line.Split(':');
-                if (parameter.Length != 2)
-                {
-                    continue;
-                }
-
-                parameters.Add(parameter[0], parameter[1]);
+                continue;
             }
 
-            // Stop processing the assertion if the mandatory is_valid
-            // parameter was missing from the response body.
-            if (!parameters.TryGetValue(OpenIdAuthenticationConstants.Parameters.IsValid, out var isValid))
-            {
-                Log.InvalidCheckAuthenticationResponse(Logger);
-                return false;
-            }
+            parameters.Add(parameter[0], parameter[1]);
+        }
 
-            // Stop processing the assertion if the authentication server declared it as invalid.
-            if (!string.Equals(isValid, "true", StringComparison.Ordinal))
-            {
-                Log.InvalidSecurityAssertion(Logger);
-                return false;
-            }
+        // Stop processing the assertion if the mandatory is_valid
+        // parameter was missing from the response body.
+        if (!parameters.TryGetValue(OpenIdAuthenticationConstants.Parameters.IsValid, out var isValid))
+        {
+            Log.InvalidCheckAuthenticationResponse(Logger);
+            return false;
+        }
+
+        // Stop processing the assertion if the authentication server declared it as invalid.
+        if (!string.Equals(isValid, "true", StringComparison.Ordinal))
+        {
+            Log.InvalidSecurityAssertion(Logger);
+            return false;
         }
 
         return true;

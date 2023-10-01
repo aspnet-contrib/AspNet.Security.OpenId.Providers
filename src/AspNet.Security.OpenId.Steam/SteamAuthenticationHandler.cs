@@ -52,12 +52,12 @@ public partial class SteamAuthenticationHandler : OpenIdAuthenticationHandler<St
         // Since then, the prefix is now an HTTPS address. The following logic supports both prefixes.
         if (identifier.StartsWith(SteamAuthenticationConstants.Namespaces.Identifier, StringComparison.Ordinal))
         {
-            identifier = identifier.Substring(SteamAuthenticationConstants.Namespaces.Identifier.Length);
+            identifier = identifier[SteamAuthenticationConstants.Namespaces.Identifier.Length..];
         }
 
         else if (identifier.StartsWith(SteamAuthenticationConstants.Namespaces.LegacyIdentifier, StringComparison.Ordinal))
         {
-            identifier = identifier.Substring(SteamAuthenticationConstants.Namespaces.LegacyIdentifier.Length);
+            identifier = identifier[SteamAuthenticationConstants.Namespaces.LegacyIdentifier.Length..];
         }
 
         // Prevent the sign-in operation from completing if the claimed identifier is malformed.

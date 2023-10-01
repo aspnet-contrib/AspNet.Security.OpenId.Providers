@@ -182,7 +182,7 @@ public class OpenIdAuthenticationMessage
             }
 
             // Exclude attributes whose alias is malformed.
-            var name = parameter.Key.Substring(prefix.Length);
+            var name = parameter.Key[prefix.Length..];
             if (string.IsNullOrEmpty(name))
             {
                 continue;
@@ -228,7 +228,7 @@ public class OpenIdAuthenticationMessage
 
             if (parameter.Key.StartsWith(prefix, StringComparison.Ordinal))
             {
-                extensions.Add(parameter.Value, parameter.Key.Substring(prefix.Length));
+                extensions.Add(parameter.Value, parameter.Key[prefix.Length..]);
             }
         }
 

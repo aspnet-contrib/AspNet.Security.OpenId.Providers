@@ -33,28 +33,22 @@ public class OpenIdAuthenticationConfiguration
     /// Represents a configuration retriever able to deserialize
     /// <see cref="OpenIdAuthenticationConfiguration"/> instances.
     /// </summary>
-    public class Retriever : IConfigurationRetriever<OpenIdAuthenticationConfiguration>
+    /// <remarks>
+    /// Creates a new instance of the <see cref="Retriever"/> class.
+    /// </remarks>
+    /// <param name="client">The HTTP client used to retrieve the discovery documents.</param>
+    /// <param name="parser">The HTML parser used to parse the discovery documents.</param>
+    public class Retriever([NotNull] HttpClient client, [NotNull] HtmlParser parser) : IConfigurationRetriever<OpenIdAuthenticationConfiguration>
     {
-        /// <summary>
-        /// Creates a new instance of the <see cref="Retriever"/> class.
-        /// </summary>
-        /// <param name="client">The HTTP client used to retrieve the discovery documents.</param>
-        /// <param name="parser">The HTML parser used to parse the discovery documents.</param>
-        public Retriever([NotNull] HttpClient client, [NotNull] HtmlParser parser)
-        {
-            HttpClient = client ?? throw new ArgumentNullException(nameof(client));
-            HtmlParser = parser ?? throw new ArgumentNullException(nameof(parser));
-        }
-
         /// <summary>
         /// Gets the HTML parser used to parse the discovery documents.
         /// </summary>
-        public HtmlParser HtmlParser { get; }
+        public HtmlParser HtmlParser { get; } = parser ?? throw new ArgumentNullException(nameof(parser));
 
         /// <summary>
         /// Gets the HTTP client used to retrieve the discovery documents.
         /// </summary>
-        public HttpClient HttpClient { get; }
+        public HttpClient HttpClient { get; } = client ?? throw new ArgumentNullException(nameof(client));
 
         /// <summary>
         /// Gets the maximal number of roundtrips that are allowed
@@ -71,7 +65,9 @@ public class OpenIdAuthenticationConfiguration
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that can be used to abort the operation.</param>
         /// <returns>An <see cref="OpenIdAuthenticationConfiguration"/> instance.</returns>
         public Task<OpenIdAuthenticationConfiguration> GetConfigurationAsync(
-            [NotNull] string address, [NotNull] IDocumentRetriever retriever, CancellationToken cancellationToken)
+            [NotNull] string address,
+            [NotNull] IDocumentRetriever retriever,
+            CancellationToken cancellationToken)
         {
             ArgumentNullException.ThrowIfNull(retriever);
             ArgumentException.ThrowIfNullOrEmpty(address);
@@ -90,7 +86,8 @@ public class OpenIdAuthenticationConfiguration
         }
 
         private async Task<OpenIdAuthenticationConfiguration> DiscoverConfigurationAsync(
-            [NotNull] Uri address, CancellationToken cancellationToken)
+            [NotNull] Uri address,
+            CancellationToken cancellationToken)
         {
             Debug.Assert(address != null, "The address shouldn't be null or empty.");
 
@@ -173,39 +170,39 @@ public class OpenIdAuthenticationConfiguration
         }
 
         private static async Task<Uri?> ProcessXrdsDocumentAsync(
-            [NotNull] HttpResponseMessage response, CancellationToken cancellationToken)
+            [NotNull] HttpResponseMessage response,
+            CancellationToken cancellationToken)
         {
             Debug.Assert(response != null, "The HTTP response shouldn't be null.");
 
             // Abort the operation if cancellation was requested.
             cancellationToken.ThrowIfCancellationRequested();
 
-            using (var stream = await response.Content.ReadAsStreamAsync(cancellationToken))
-            using (var reader = XmlReader.Create(stream))
+            using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
+            using var reader = XmlReader.Create(stream);
+
+            var document = XDocument.Load(reader);
+
+            var endpoint = (from service in document.Root!.Element(XName.Get("XRD", "xri://$xrd*($v*2.0)"))!
+                                                         .Descendants(XName.Get("Service", "xri://$xrd*($v*2.0)"))
+                            where service.Descendants(XName.Get("Type", "xri://$xrd*($v*2.0)"))
+                                         .Any(type => type.Value == "http://specs.openid.net/auth/2.0/server")
+                            orderby service.Attribute("priority"!)?.Value
+                            select service.Element(XName.Get("URI", "xri://$xrd*($v*2.0)"))?.Value).FirstOrDefault();
+
+            if (string.IsNullOrEmpty(endpoint))
             {
-                var document = XDocument.Load(reader);
-
-                var endpoint = (from service in document.Root!.Element(XName.Get("XRD", "xri://$xrd*($v*2.0)"))!
-                                                             .Descendants(XName.Get("Service", "xri://$xrd*($v*2.0)"))
-                                where service.Descendants(XName.Get("Type", "xri://$xrd*($v*2.0)"))
-                                             .Any(type => type.Value == "http://specs.openid.net/auth/2.0/server")
-                                orderby service.Attribute("priority"!)?.Value
-                                select service.Element(XName.Get("URI", "xri://$xrd*($v*2.0)"))?.Value).FirstOrDefault();
-
-                if (string.IsNullOrEmpty(endpoint))
-                {
-                    return null;
-                }
-
-                if (!Uri.TryCreate(endpoint, UriKind.Absolute, out Uri? uri))
-                {
-                    throw new AuthenticationFailureException(
-                        "The Yadis discovery failed because the XRDS document " +
-                        "returned by the identity provider was invalid.");
-                }
-
-                return uri;
+                return null;
             }
+
+            if (!Uri.TryCreate(endpoint, UriKind.Absolute, out Uri? uri))
+            {
+                throw new AuthenticationFailureException(
+                    "The Yadis discovery failed because the XRDS document " +
+                    "returned by the identity provider was invalid.");
+            }
+
+            return uri;
         }
 
         private static Uri? ProcessGenericDocument(HttpResponseMessage response)
@@ -231,35 +228,35 @@ public class OpenIdAuthenticationConfiguration
         }
 
         private async Task<Uri?> ProcessHtmlDocumentAsync(
-            [NotNull] HttpResponseMessage response, CancellationToken cancellationToken)
+            [NotNull] HttpResponseMessage response,
+            CancellationToken cancellationToken)
         {
             Debug.Assert(response != null, "The HTTP response shouldn't be null.");
 
             // Abort the operation if cancellation was requested.
             cancellationToken.ThrowIfCancellationRequested();
 
-            using (var stream = await response.Content.ReadAsStreamAsync(cancellationToken))
-            using (var document = await HtmlParser.ParseDocumentAsync(stream, cancellationToken))
+            using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
+            using var document = await HtmlParser.ParseDocumentAsync(stream, cancellationToken);
+
+            var endpoint = (from element in document.Head.GetElementsByTagName(OpenIdAuthenticationConstants.Metadata.Meta)
+                            let attribute = element.Attributes[OpenIdAuthenticationConstants.Metadata.HttpEquiv]
+                            where string.Equals(attribute?.Value, OpenIdAuthenticationConstants.Metadata.XrdsLocation, StringComparison.OrdinalIgnoreCase)
+                            select element.Attributes[OpenIdAuthenticationConstants.Metadata.Content]?.Value).FirstOrDefault();
+
+            if (string.IsNullOrEmpty(endpoint))
             {
-                var endpoint = (from element in document.Head.GetElementsByTagName(OpenIdAuthenticationConstants.Metadata.Meta)
-                                let attribute = element.Attributes[OpenIdAuthenticationConstants.Metadata.HttpEquiv]
-                                where string.Equals(attribute?.Value, OpenIdAuthenticationConstants.Metadata.XrdsLocation, StringComparison.OrdinalIgnoreCase)
-                                select element.Attributes[OpenIdAuthenticationConstants.Metadata.Content]?.Value).FirstOrDefault();
-
-                if (string.IsNullOrEmpty(endpoint))
-                {
-                    return null;
-                }
-
-                if (!Uri.TryCreate(endpoint, UriKind.Absolute, out Uri? uri))
-                {
-                    throw new AuthenticationFailureException(
-                        "The Yadis discovery failed because the X-XRDS-Location " +
-                        "metadata returned by the identity provider was invalid.");
-                }
-
-                return uri;
+                return null;
             }
+
+            if (!Uri.TryCreate(endpoint, UriKind.Absolute, out Uri? uri))
+            {
+                throw new AuthenticationFailureException(
+                    "The Yadis discovery failed because the X-XRDS-Location " +
+                    "metadata returned by the identity provider was invalid.");
+            }
+
+            return uri;
         }
     }
 }

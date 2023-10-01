@@ -13,22 +13,16 @@ namespace AspNet.Security.OpenId;
 /// <summary>
 /// Exposes various information about the current OpenID authentication flow.
 /// </summary>
-public class OpenIdAuthenticatedContext : BaseContext<OpenIdAuthenticationOptions>
+public class OpenIdAuthenticatedContext(
+    [NotNull] HttpContext context,
+    [NotNull] AuthenticationScheme scheme,
+    [NotNull] OpenIdAuthenticationOptions options,
+    [NotNull] AuthenticationTicket ticket) : BaseContext<OpenIdAuthenticationOptions>(context, scheme, options)
 {
-    public OpenIdAuthenticatedContext(
-        [NotNull] HttpContext context,
-        [NotNull] AuthenticationScheme scheme,
-        [NotNull] OpenIdAuthenticationOptions options,
-        [NotNull] AuthenticationTicket ticket)
-        : base(context, scheme, options)
-    {
-        Ticket = ticket;
-    }
-
     /// <summary>
     /// Gets or sets the authentication ticket.
     /// </summary>
-    public AuthenticationTicket Ticket { get; set; }
+    public AuthenticationTicket Ticket { get; set; } = ticket;
 
     /// <summary>
     /// Gets the identity containing the claims associated with the current user.
