@@ -15,7 +15,7 @@ public class SteamAuthenticationOptions : OpenIdAuthenticationOptions
     }
 
     /// <summary>
-    /// Gets or sets the application key used to retrive user details from Steam's API.
+    /// Gets or sets the application key used to retrieve user details from Steam's API.
     /// </summary>
     public string? ApplicationKey { get; set; }
 
