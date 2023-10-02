@@ -33,9 +33,6 @@ public class OpenIdAuthenticationConfiguration
     /// Represents a configuration retriever able to deserialize
     /// <see cref="OpenIdAuthenticationConfiguration"/> instances.
     /// </summary>
-    /// <remarks>
-    /// Creates a new instance of the <see cref="Retriever"/> class.
-    /// </remarks>
     /// <param name="client">The HTTP client used to retrieve the discovery documents.</param>
     /// <param name="parser">The HTML parser used to parse the discovery documents.</param>
     public class Retriever([NotNull] HttpClient client, [NotNull] HtmlParser parser) : IConfigurationRetriever<OpenIdAuthenticationConfiguration>

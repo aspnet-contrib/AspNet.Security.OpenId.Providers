@@ -17,9 +17,6 @@ namespace Microsoft.Extensions.DependencyInjection;
 /// Contains the methods required to ensure that the configuration used by
 /// the OpenID 2.0 generic handler is in a consistent and valid state.
 /// </summary>
-/// <remarks>
-/// Creates a new instance of the <see cref="OpenIdAuthenticationInitializer{TOptions, THandler}"/> class.
-/// </remarks>
 [EditorBrowsable(EditorBrowsableState.Never)]
 public class OpenIdAuthenticationInitializer<TOptions, THandler>([NotNull] IDataProtectionProvider dataProtectionProvider) : IPostConfigureOptions<TOptions>
     where TOptions : OpenIdAuthenticationOptions, new()
