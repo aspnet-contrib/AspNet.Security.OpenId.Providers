@@ -9,7 +9,6 @@
     <PackageVersion Include="Microsoft.AspNetCore.TestHost" Version="8.0.0-rc.2.23480.2" />
     <PackageVersion Include="Microsoft.IdentityModel.Protocols" Version="7.0.0" />
     <PackageVersion Include="Shouldly" Version="4.2.1" />
-    <PackageVersion Include="System.Text.Json" Version="8.0.0-rc.2.23479.6" />
   </ItemGroup>
 
 </Project>

@@ -18,7 +18,6 @@
     <PackageReference Include="AngleSharp" />
     <PackageReference Include="JetBrains.Annotations" PrivateAssets="All" />
     <PackageReference Include="Microsoft.IdentityModel.Protocols" />
-    <PackageReference Include="System.Text.Json" />
   </ItemGroup>
 
 </Project>
