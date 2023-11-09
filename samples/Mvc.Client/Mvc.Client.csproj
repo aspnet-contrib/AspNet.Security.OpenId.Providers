@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <IsShipping>false</IsShipping>
-    <TargetFrameworks>$(DefaultNetCoreTargetFramework)</TargetFrameworks>
+    <TargetFramework>$(DefaultNetCoreTargetFramework)</TargetFramework>
     <UserSecretsId>AspNet.Security.OpenId.Providers.Mvc.Client</UserSecretsId>
   </PropertyGroup>
 
