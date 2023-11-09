@@ -1,8 +1,8 @@
 <Project>
 
   <ItemGroup>
-    <PackageVersion Include="AngleSharp" Version="0.13.0" />
-    <PackageVersion Include="JetBrains.Annotations" Version="2023.2.0" />
+    <PackageVersion Include="AngleSharp" Version="1.0.5" />
+    <PackageVersion Include="JetBrains.Annotations" Version="2023.3.0" />
     <PackageVersion Include="JustEat.HttpClientInterception" Version="4.0.0" />
     <PackageVersion Include="MartinCostello.Logging.XUnit" Version="0.3.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.0-rc.2.23480.2" />

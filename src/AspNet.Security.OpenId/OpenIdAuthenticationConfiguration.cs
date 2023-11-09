@@ -236,7 +236,7 @@ public class OpenIdAuthenticationConfiguration
             using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
             using var document = await HtmlParser.ParseDocumentAsync(stream, cancellationToken);
 
-            var endpoint = (from element in document.Head.GetElementsByTagName(OpenIdAuthenticationConstants.Metadata.Meta)
+            var endpoint = (from element in document.Head?.GetElementsByTagName(OpenIdAuthenticationConstants.Metadata.Meta)
                             let attribute = element.Attributes[OpenIdAuthenticationConstants.Metadata.HttpEquiv]
                             where string.Equals(attribute?.Value, OpenIdAuthenticationConstants.Metadata.XrdsLocation, StringComparison.OrdinalIgnoreCase)
                             select element.Attributes[OpenIdAuthenticationConstants.Metadata.Content]?.Value).FirstOrDefault();
