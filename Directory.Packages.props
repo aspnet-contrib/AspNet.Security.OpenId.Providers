@@ -1,7 +1,7 @@
 <Project>
 
   <ItemGroup>
-    <PackageVersion Include="AngleSharp" Version="1.0.6-alpha-330" />
+    <PackageVersion Include="AngleSharp" Version="1.0.6" />
     <PackageVersion Include="JetBrains.Annotations" Version="2023.3.0" />
     <PackageVersion Include="JustEat.HttpClientInterception" Version="4.0.0" />
     <PackageVersion Include="MartinCostello.Logging.XUnit" Version="0.3.0" />
