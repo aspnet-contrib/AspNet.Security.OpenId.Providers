@@ -54,6 +54,14 @@
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(IsPackable)' == 'true' ">
+    <EnableAotAnalyzer>true</EnableAotAnalyzer>
+    <EnableSingleFileAnalyzer>true</EnableSingleFileAnalyzer>
+    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+    <IsAotCompatible>true</IsAotCompatible>
+    <IsTrimmable>true</IsTrimmable>
+  </PropertyGroup>
+
   <PropertyGroup>
     <EnablePackageValidation>$(IsPackable)</EnablePackageValidation>
   </PropertyGroup>
