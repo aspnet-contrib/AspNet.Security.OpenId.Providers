@@ -20,9 +20,8 @@ public partial class SteamAuthenticationHandler : OpenIdAuthenticationHandler<St
     public SteamAuthenticationHandler(
         [NotNull] IOptionsMonitor<SteamAuthenticationOptions> options,
         [NotNull] ILoggerFactory logger,
-        [NotNull] UrlEncoder encoder,
-        [NotNull] ISystemClock clock)
-        : base(options, logger, encoder, clock)
+        [NotNull] UrlEncoder encoder)
+        : base(options, logger, encoder)
     {
     }
 
@@ -53,12 +52,12 @@ public partial class SteamAuthenticationHandler : OpenIdAuthenticationHandler<St
         // Since then, the prefix is now an HTTPS address. The following logic supports both prefixes.
         if (identifier.StartsWith(SteamAuthenticationConstants.Namespaces.Identifier, StringComparison.Ordinal))
         {
-            identifier = identifier.Substring(SteamAuthenticationConstants.Namespaces.Identifier.Length);
+            identifier = identifier[SteamAuthenticationConstants.Namespaces.Identifier.Length..];
         }
 
         else if (identifier.StartsWith(SteamAuthenticationConstants.Namespaces.LegacyIdentifier, StringComparison.Ordinal))
         {
-            identifier = identifier.Substring(SteamAuthenticationConstants.Namespaces.LegacyIdentifier.Length);
+            identifier = identifier[SteamAuthenticationConstants.Namespaces.LegacyIdentifier.Length..];
         }
 
         // Prevent the sign-in operation from completing if the claimed identifier is malformed.
@@ -66,7 +65,7 @@ public partial class SteamAuthenticationHandler : OpenIdAuthenticationHandler<St
         {
             Log.InvalidIdentifier(Logger, identifier);
 
-            throw new InvalidOperationException($"The OpenID claimed identifier '{identifier}' is not valid.");
+            throw new AuthenticationFailureException($"The OpenID claimed identifier '{identifier}' is not valid.");
         }
 
         var address = QueryHelpers.AddQueryString(Options.UserInformationEndpoint, new Dictionary<string, string?>

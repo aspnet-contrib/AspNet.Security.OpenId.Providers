@@ -4,9 +4,11 @@
  * for more information concerning the license and the contributors participating to this project.
  */
 
+using System.Diagnostics.CodeAnalysis;
 using AspNet.Security.OpenId;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
+using NotNullAttribute = JetBrains.Annotations.NotNullAttribute;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -78,7 +80,7 @@ public static class OpenIdAuthenticationExtensions
     /// <param name="caption">The optional display name associated with this instance.</param>
     /// <param name="configuration">The delegate used to configure the OpenID 2.0 options.</param>
     /// <returns>The <see cref="AuthenticationBuilder"/>.</returns>
-    public static AuthenticationBuilder AddOpenId<TOptions, THandler>(
+    public static AuthenticationBuilder AddOpenId<TOptions, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] THandler>(
         [NotNull] this AuthenticationBuilder builder,
         [NotNull] string scheme, [CanBeNull] string caption,
         [NotNull] Action<TOptions> configuration)
@@ -87,11 +89,7 @@ public static class OpenIdAuthenticationExtensions
     {
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentNullException.ThrowIfNull(configuration);
-
-        if (string.IsNullOrEmpty(scheme))
-        {
-            throw new ArgumentException("The scheme cannot be null or empty.", nameof(scheme));
-        }
+        ArgumentException.ThrowIfNullOrEmpty(scheme);
 
         // Note: TryAddEnumerable() is used here to ensure the initializer is only registered once.
         builder.Services.TryAddEnumerable(
