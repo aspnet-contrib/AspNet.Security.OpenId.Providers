@@ -14,6 +14,7 @@ updates:
     timezone: Europe/London
   open-pull-requests-limit: 99
   ignore:
+    - dependency-name: "AngleSharp"
     - dependency-name: "Microsoft.AspNetCore.Mvc.Testing"
       update-types: ["version-update:semver-major"]
     - dependency-name: "Microsoft.AspNetCore.TestHost"
