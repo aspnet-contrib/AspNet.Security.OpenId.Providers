@@ -102,6 +102,8 @@ public partial class SteamAuthenticationHandler : OpenIdAuthenticationHandler<St
         if (profile.ValueKind == JsonValueKind.Object && profile.TryGetProperty(SteamAuthenticationConstants.Parameters.Name, out var name))
         {
             identity.AddClaim(new Claim(ClaimTypes.Name, name.GetString()!, ClaimValueTypes.String, Options.ClaimsIssuer));
+
+            AddSteamProfileClaims();
         }
 
         return await RunAuthenticatedEventAsync(payload);
@@ -124,6 +126,43 @@ public partial class SteamAuthenticationHandler : OpenIdAuthenticationHandler<St
             // Note: return the authentication ticket associated
             // with the notification to allow replacing the ticket.
             return context.Ticket;
+        }
+
+        void AddSteamProfileClaims()
+        {
+
+                AddSteamProfileClaim(SteamClaimTypes.SteamId);
+                AddSteamProfileClaim(SteamClaimTypes.DisplayName);
+                AddSteamProfileClaim(SteamClaimTypes.ProfileUrl);
+                AddSteamProfileClaim(SteamClaimTypes.Avatar);
+                AddSteamProfileClaim(SteamClaimTypes.AvatarMedium);
+                AddSteamProfileClaim(SteamClaimTypes.AvatarFull);
+                AddSteamProfileClaim(SteamClaimTypes.PersonaState);
+                AddSteamProfileClaim(SteamClaimTypes.CommunityVisibilityState);
+                AddSteamProfileClaim(SteamClaimTypes.ProfileState);
+                AddSteamProfileClaim(SteamClaimTypes.LastLogOff);
+                AddSteamProfileClaim(SteamClaimTypes.CommentPermission);
+                AddSteamProfileClaim(SteamClaimTypes.RealName);
+                AddSteamProfileClaim(SteamClaimTypes.PrimaryGroup);
+                AddSteamProfileClaim(SteamClaimTypes.TimeCreated);
+                AddSteamProfileClaim(SteamClaimTypes.CurrentGameId);
+                AddSteamProfileClaim(SteamClaimTypes.CurrentGameServerIp);
+                AddSteamProfileClaim(SteamClaimTypes.CurrentGameExtraInfo);
+                AddSteamProfileClaim(SteamClaimTypes.CountryCode);
+                AddSteamProfileClaim(SteamClaimTypes.StateCode);
+                AddSteamProfileClaim(SteamClaimTypes.CityId);
+
+
+
+            return;
+
+            void AddSteamProfileClaim(string claimType)
+            {
+                if (profile.TryGetProperty(claimType, out var claimValue))
+                {
+                    identity.AddClaim(new Claim(claimType, claimValue.GetRawText().Trim('"'), ClaimValueTypes.String, Options.ClaimsIssuer));
+                }
+            }
         }
     }
 
