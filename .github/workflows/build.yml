@@ -83,7 +83,7 @@ jobs:
       run: ./eng/common/cibuild.sh -configuration Release -prepareMachine
 
     - name: Attest artifacts
-      uses: actions/attest-build-provenance@951c0c5f8e375ad4efad33405ab77f7ded2358e4 # v1.1.1
+      uses: actions/attest-build-provenance@49df96e17e918a15956db358890b08e61c704919 # v1.2.0
       if: |
         runner.os == 'Windows' &&
         github.event.repository.fork == false &&
