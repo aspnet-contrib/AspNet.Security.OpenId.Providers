@@ -51,11 +51,6 @@ jobs:
       uses: actions/setup-dotnet@6bd8b7f7774af54e05809fcc5431931b3eb1ddee # v4.0.1
       id: setup-dotnet
 
-    - name: Setup NuGet
-      uses: nuget/setup-nuget@a21f25cd3998bf370fde17e3f1b4c12c175172f9 # v2.0.0
-      with:
-        nuget-version: '5.11.0'
-
     # Arcade only allows the revision to contain up to two characters, and GitHub Actions does not roll-over
     # build numbers every day like Azure DevOps does. To balance these two requirements, set the official
     # build ID to be the same format as the built-in default from Arcade, except with the revision number
