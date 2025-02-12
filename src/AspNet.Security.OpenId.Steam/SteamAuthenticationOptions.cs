@@ -12,6 +12,14 @@ public class SteamAuthenticationOptions : OpenIdAuthenticationOptions
     {
         Authority = new Uri(SteamAuthenticationDefaults.Authority);
         CallbackPath = SteamAuthenticationDefaults.CallbackPath;
+        Backchannel = new HttpClient
+        {
+            DefaultRequestHeaders =
+            {
+                { "referer", "https://steamcommunity.com" },
+                { "origin", "https://steamcommunity.com" }
+            }
+        };
     }
 
     /// <summary>
