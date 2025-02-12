@@ -77,6 +77,11 @@ public partial class SteamAuthenticationHandler : OpenIdAuthenticationHandler<St
         using var request = new HttpRequestMessage(HttpMethod.Get, address);
         request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(OpenIdAuthenticationConstants.Media.Json));
 
+        // Add referer and origin header so steam does not 403 the request
+        // Started to be a requirement on the 12th of February 2025
+        Options.Backchannel.DefaultRequestHeaders.Add("referer", "https://steamcommunity.com");
+        Options.Backchannel.DefaultRequestHeaders.Add("origin", "https://steamcommunity.com");
+
         // Return the authentication ticket as-is if the userinfo request failed.
         using var response = await Options.Backchannel.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, Context.RequestAborted);
         if (!response.IsSuccessStatusCode)
