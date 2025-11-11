@@ -13,6 +13,9 @@ indent_style = space
 insert_final_newline = true
 trim_trailing_whitespace = true
 
+[*.{sh}]
+end_of_line = lf
+
 [*.{csproj,json,props,ruleset,targets}]
 indent_size = 2
 
@@ -152,3 +155,5 @@ csharp_space_between_method_call_empty_parameter_list_parentheses = false
 # Wrapping preferences
 csharp_preserve_single_line_statements = true
 csharp_preserve_single_line_blocks = true
+
+dotnet_diagnostic.IDE0058.severity = none

@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Http;
 using Microsoft.Extensions.Logging;
 
@@ -60,16 +61,16 @@ public static class ApplicationFactory
         builder.Configure(ConfigureApplication)
                .ConfigureServices(services =>
                 {
-                        // Allow HTTP requests to external services to be intercepted
-                        services.AddHttpClient();
+                    // Allow HTTP requests to external services to be intercepted
+                    services.AddHttpClient();
                     services.AddSingleton<IHttpMessageHandlerBuilderFilter, HttpRequestInterceptionFilter>(
                         (_) => new HttpRequestInterceptionFilter(tests.Interceptor));
 
-                        // Set up the test endpoint
-                        services.AddRouting();
+                    // Set up the test endpoint
+                    services.AddRouting();
 
-                        // Configure authentication
-                        var authentication = services
+                    // Configure authentication
+                    var authentication = services
                         .AddAuthentication("External")
                         .AddCookie("External", o => o.ForwardChallenge = tests.DefaultScheme);
 
@@ -95,8 +96,8 @@ public static class ApplicationFactory
                    {
                        if (context.User.Identity?.IsAuthenticated == true)
                        {
-                           var xml = IdentityToXmlString(context.User);
-                           var buffer = Encoding.UTF8.GetBytes(xml.ToString());
+                           string xml = IdentityToXmlString(context.User);
+                           byte[] buffer = Encoding.UTF8.GetBytes(xml.ToString());
 
                            context.Response.StatusCode = 200;
                            context.Response.ContentType = "text/xml";
@@ -135,10 +136,15 @@ public static class ApplicationFactory
 
     private sealed class TestApplicationFactory : WebApplicationFactory<Program>
     {
-        protected override IWebHostBuilder CreateWebHostBuilder()
+        protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
-            return new WebHostBuilder()
-                .UseSetting("TEST_CONTENTROOT_ASPNET_SECURITY_OPENID_PROVIDERS_TESTS", "."); // Use a dummy content root
+            base.ConfigureWebHost(builder);
+            builder.UseContentRoot("."); // Use a dummy content root
+        }
+
+        protected override IHostBuilder? CreateHostBuilder()
+        {
+            return new HostBuilder();
         }
     }
 }
