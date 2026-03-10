@@ -96,7 +96,7 @@ public class OpenIdAuthenticationInitializer<TOptions, THandler>([NotNull] IData
                         throw new ArgumentException("The authority cannot contain a fragment or a query string.", nameof(options));
                     }
 
-                    if (!options.Authority.OriginalString.EndsWith('/'))
+                    if (!options.Authority.OriginalString.EndsWith('/', StringComparison.Ordinal))
                     {
                         options.Authority = new Uri(options.Authority.OriginalString + "/", UriKind.Absolute);
                     }
