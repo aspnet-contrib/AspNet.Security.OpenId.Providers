@@ -48,9 +48,6 @@ jobs:
   zizmor:
     runs-on: ubuntu-latest
 
-    env:
-      ZIZMOR_VERSION: '1.23.1'
-
     permissions:
       actions: read
       contents: read
@@ -65,6 +62,4 @@ jobs:
         show-progress: false
 
     - name: Scan workflows with zizmor
-      uses: zizmorcore/zizmor-action@71321a20a9ded102f6e9ce5718a2fcec2c4f70d8 # v0.5.2
-      with:
-        version: ${{ env.ZIZMOR_VERSION }}
+      uses: zizmorcore/zizmor-action@b1d7e1fb5de872772f31590499237e7cce841e8e # v0.5.3
