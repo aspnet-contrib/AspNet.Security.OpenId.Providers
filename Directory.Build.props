@@ -64,8 +64,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <!-- TODO Re-enable when the 11.0.0 packages are published to NuGet.org -->
-    <EnablePackageValidation>false</EnablePackageValidation>
+    <EnablePackageValidation>$(IsPackable)</EnablePackageValidation>
   </PropertyGroup>
 
   <PropertyGroup>
